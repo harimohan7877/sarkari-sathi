@@ -1,26 +1,300 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Colors - Bharat Official */
+  --navy: #0F2B5B;
+  --royal: #1847A6;
+  --saffron: #FF6B00;
+  --saffron-dark: #E55A00;
+  --saffron-lt: #FFF3E8;
+  --tri-green: #138808;
+  --tri-green-lt: #E8F5E9;
+
+  /* Backgrounds - Never pure white */
+  --bg-page: #EEF2F8;
+  --bg-card: #FFFFFF;
+  --bg-input: #F5F7FA;
+  --bg-chat: #E5EBF5;
+
+  /* Text - High contrast */
+  --text-primary: #0D1B2A;
+  --text-secondary: #4A5568;
+  --text-placeholder: #9CA3AF;
+  --text-on-dark: #FFFFFF;
+  --text-on-saffron: #FFFFFF;
+
+  /* Borders */
+  --border-default: #C5D0E0;
+  --border-focus: #1847A6;
+  --border-error: #DC2626;
+
+  /* Status */
+  --success-bg: #E8F5E9;
+  --success-text: #138808;
+
+  --background: var(--bg-page);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter), sans-serif;
+  --font-noto: var(--font-noto), sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-noto), 'Noto Sans Devanagari', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Input/Select - Always has background */
+input, select, textarea {
+  background-color: var(--bg-input) !important;
+}
+
+/* Fix dropdown options visibility */
+select option {
+  background: white !important;
+  color: var(--text-primary) !important;
+  padding: 12px !important;
+}
+
+/* Tiranga stripe */
+.tiranga-stripe {
+  height: 4px;
+  background: linear-gradient(90deg, #FF6B00 33%, #FFFFFF 33% 66%, #138808 66%);
+}
+
+/* Typing animation - bouncing dots */
+@keyframes typing-dot {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    background: #C5D0E0;
+  }
+  40% {
+    transform: translateY(-8px);
+    background: #1847A6;
+  }
+}
+
+.typing-dot {
+  animation: typing-dot 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Streaming cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.streaming-cursor::after {
+  content: '▋';
+  color: var(--royal);
+  animation: blink 1s infinite;
+}
+
+/* Card entrance animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 300ms ease-out forwards;
+}
+
+/* Mobile safe area */
+.pb-safe {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* Hide scrollbar but allow scroll */
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* WhatsApp-style chat bubbles */
+.chat-bubble-user {
+  background: linear-gradient(135deg, #0F2B5B, #1847A6);
+  color: white;
+  border-radius: 18px 18px 4px 18px;
+  padding: 12px 16px;
+  max-width: 85%;
+}
+
+.chat-bubble-ai {
+  background: white;
+  color: var(--text-primary);
+  border-radius: 4px 18px 18px 18px;
+  padding: 12px 16px;
+  max-width: 85%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Status badges */
+.status-open {
+  background: #E8F5E9;
+  color: #138808;
+}
+
+.status-upcoming {
+  background: #FFF3E8;
+  color: #FF6B00;
+}
+
+.status-closed {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+/* Quick replies chip */
+.quick-reply-chip {
+  background: white;
+  border: 1px solid var(--border-default);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-reply-chip:hover {
+  background: var(--saffron-lt);
+  border-color: var(--saffron);
+}
+
+/* Free trial counter */
+.free-counter {
+  position: fixed;
+  top: 70px;
+  right: 10px;
+  background: var(--tri-green-lt);
+  color: var(--tri-green);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 40;
+}
+
+/* Focus ring */
+.focus-ring:focus {
+  outline: none;
+  ring: 3px;
+  ring-color: var(--royal);
+  ring-offset: 2px;
+}
+
+/* Button hover effects */
+.btn-saffron {
+  background: var(--saffron);
+  color: white;
+  transition: all 0.2s;
+}
+
+.btn-saffron:hover {
+  background: var(--saffron-dark);
+}
+
+.btn-saffron:active {
+  transform: scale(0.98);
+}
+
+/* Disclaimer box */
+.disclaimer-box {
+  background: var(--saffron-lt);
+  border-left: 4px solid var(--saffron);
+  border-radius: 0 8px 8px 0;
+  padding: 12px;
+  font-size: 12px;
+}
+
+/* Exam card styles */
+.exam-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid var(--saffron);
+}
+
+/* Header gradient */
+.header-gradient {
+  background: linear-gradient(135deg, var(--navy), var(--royal));
+}
+
+/* Input focus states */
+.input-focused {
+  border-color: var(--royal);
+  box-shadow: 0 0 0 3px rgba(24, 71, 166, 0.1);
+}
+
+/* Message timestamp */
+.message-time {
+  font-size: 10px;
+  color: var(--text-placeholder);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Send button states */
+.send-btn-empty {
+  background: #E2E8F5;
+}
+
+.send-btn-active {
+  background: var(--saffron);
+}
+
+/* YouTube card */
+.youtube-card {
+  background: #FFF5F5;
+  border: 1px solid #FCA5A5;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Responsive container */
+.container-main {
+  max-width: 428px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+@media (min-width: 429px) {
+  .container-main {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
 }
