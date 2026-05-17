@@ -6,11 +6,11 @@ export interface UserProfile {
   education: 'eighth' | 'tenth' | 'twelfth' | 'graduation' | 'post_graduation' | string;
   category: 'general' | 'ews' | 'obc' | 'sbc' | 'sc' | 'st' | string;
   gender?: 'male' | 'female';
+  hasRSCIT?: boolean;
+  hasCET_graduate?: boolean;
+  hasCET_senior?: boolean;
   isWidowDivorced?: boolean;
   isPwD?: boolean;
-  hasCET_graduate?: boolean;
-  hasCET_senior_secondary?: boolean;
-  hasRSCIT?: boolean;
   hasPhysicalFitness?: boolean;
 }
 
@@ -168,7 +168,7 @@ export function checkEligibility(user: UserProfile, exams: any[]): EligibilityRe
     if (exam.eligibility.CET) {
       if (exam.eligibility.CET.includes('Graduate') && !user.hasCET_graduate) {
         warnings.push(`⚠️ CET Graduate Level MANDATORY hai — bina CET ke apply invalid hoga`);
-      } else if (exam.eligibility.CET.includes('Senior Secondary') && !user.hasCET_senior_secondary) {
+      } else if (exam.eligibility.CET.includes('Senior Secondary') && !user.hasCET_senior) {
         warnings.push(`⚠️ CET Senior Secondary Level MANDATORY hai`);
       }
     }

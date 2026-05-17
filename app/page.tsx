@@ -10,12 +10,16 @@ export default function Home() {
     age: "",
     education: "",
     category: "",
+    gender: "",
+    hasRSCIT: false,
+    hasCET_graduate: false,
+    hasCET_senior: false,
   });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.age || !formData.education || !formData.category) {
+    if (!formData.age || !formData.education || !formData.category || !formData.gender) {
       alert("कृपया सभी जानकारी भरें!");
       return;
     }
@@ -26,7 +30,7 @@ export default function Home() {
     }, 500);
   };
 
-  const updateField = (field: string, value: string) => {
+  const updateField = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -89,15 +93,54 @@ export default function Home() {
               </label>
               <input
                 type="number"
-                min="18"
+                min="14"
                 max="60"
                 value={formData.age}
                 onChange={(e) => updateField("age", e.target.value)}
-                placeholder="अपनी आयु लिखें"
+                placeholder="उदाहरण: 22"
                 className="w-full h-13 border-2 border-[#C5D0E0] rounded-xl px-4 text-base bg-[#F5F7FA] focus:bg-white focus:border-[#1847A6] focus:ring-3 focus:ring-blue-100 transition-all outline-none"
                 style={{ fontFamily: "var(--font-noto)" }}
                 required
               />
+              <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "var(--font-noto)" }}>
+                आपकी उम्र से हम आपकी योग्यता calculate करते हैं
+              </p>
+            </div>
+
+            {/* लिंग (Gender) - Pill buttons */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
+                लिंग (Gender) *
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => updateField("gender", "male")}
+                  className={`flex-1 h-13 rounded-xl font-semibold transition-all ${
+                    formData.gender === "male"
+                      ? "bg-[#0F2B5B] text-white"
+                      : "bg-[#F5F7FA] text-gray-700 border-2 border-[#C5D0E0]"
+                  }`}
+                  style={{ fontFamily: "var(--font-noto)" }}
+                >
+                  👨 पुरुष
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateField("gender", "female")}
+                  className={`flex-1 h-13 rounded-xl font-semibold transition-all ${
+                    formData.gender === "female"
+                      ? "bg-[#0F2B5B] text-white"
+                      : "bg-[#F5F7FA] text-gray-700 border-2 border-[#C5D0E0]"
+                  }`}
+                  style={{ fontFamily: "var(--font-noto)" }}
+                >
+                  👩 महिला
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "var(--font-noto)" }}>
+                Age relaxation के लिए जरूरी है
+              </p>
             </div>
 
             {/* शिक्षा (Education) */}
@@ -139,17 +182,63 @@ export default function Home() {
                 <option value="sc" style={{ backgroundColor: "white" }}>अनुसूचित जाति (SC)</option>
                 <option value="st" style={{ backgroundColor: "white" }}>अनुसूचित जनजाति (ST)</option>
               </select>
+              <div className="bg-[#FFF3E8] border border-[#FF6B00] rounded-lg p-2 mt-2">
+                <p className="text-xs text-[#FF6B00]" style={{ fontFamily: "var(--font-noto)" }}>
+                  💡 OBC/SC/ST candidates को age relaxation मिलती है — Rajasthan domicile होना जरूरी है
+                </p>
+              </div>
+            </div>
+
+            {/* Extra Qualifications - Checkboxes */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
+                आपके पास क्या है? (जो हो वो tick करें)
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasRSCIT}
+                    onChange={(e) => updateField("hasRSCIT", e.target.checked)}
+                    className="w-5 h-5 accent-[#0F2B5B]"
+                  />
+                  <span style={{ fontFamily: "var(--font-noto)" }}>💻 RS-CIT या Computer Certificate</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasCET_graduate}
+                    onChange={(e) => updateField("hasCET_graduate", e.target.checked)}
+                    className="w-5 h-5 accent-[#0F2B5B]"
+                  />
+                  <span style={{ fontFamily: "var(--font-noto)" }}>📋 CET Graduate Level (2024+)</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasCET_senior}
+                    onChange={(e) => updateField("hasCET_senior", e.target.checked)}
+                    className="w-5 h-5 accent-[#0F2B5B]"
+                  />
+                  <span style={{ fontFamily: "var(--font-noto)" }}>📋 CET Senior Secondary Level (2024+)</span>
+                </label>
+              </div>
             </div>
 
             {/* Submit Button - Saffron */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-14 bg-[#FF6B00] hover:bg-[#E56200] text-white text-lg font-bold rounded-xl mt-6 active:scale-95 transition-transform disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
+              className="w-full h-14 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] hover:from-[#E56200] hover:to-[#CC5500] text-white text-lg font-bold rounded-xl mt-6 active:scale-95 transition-transform disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
               style={{ fontFamily: "var(--font-noto)" }}
             >
               {loading ? "ढूंढ रहे हैं..." : "🔍 योग्य भर्तियाँ ढूंढें"}
             </button>
+
+            {/* Free trial notice */}
+            <p className="text-center text-[#FF6B00] font-medium" style={{ fontFamily: "var(--font-noto)" }}>
+              🆓 पहले 5 सवाल बिल्कुल मुफ्त | No signup needed
+            </p>
           </form>
         </div>
 
@@ -159,10 +248,10 @@ export default function Home() {
             🔒 सुरक्षित
           </span>
           <span className="bg-[#E8F5E9] text-[#138808] text-xs px-4 py-2 rounded-full font-medium">
-            ✅ Verified Data
+            ✅ हर सोमवार verified
           </span>
           <span className="bg-[#FFF3E8] text-[#FF6B00] text-xs px-4 py-2 rounded-full font-medium">
-            🆓 निःशुल्क
+            🆓 5 सवाल free
           </span>
         </div>
 
