@@ -1,6 +1,7 @@
 import examsData from "@/data/exams.json";
 
 export interface UserProfile {
+  name?: string;
   state: string;
   age: number | string;
   education: 'eighth' | 'tenth' | 'twelfth' | 'graduation' | 'post_graduation' | string;
