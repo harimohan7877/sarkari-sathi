@@ -93,8 +93,8 @@ export async function sendChatMessageSmart(
     lastMessage.length > 150;
 
   const model = needsSonnet
-    ? "anthropic/claude-3.5-sonnet-20241022"
-    : "anthropic/claude-3-haiku-20240307";
+    ? "openai/gpt-4o"
+    : "openai/gpt-4o-mini";
 
   const maxTokens = needsSonnet ? 1500 : 800;
 
@@ -131,9 +131,9 @@ ${examInfo}`;
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("API error:", error);
-      throw new Error(`API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error("API error:", response.status, errorText);
+      throw new Error(`API error: ${response.status} - ${errorText.substring(0, 200)}`);
     }
 
     const data = await response.json();
