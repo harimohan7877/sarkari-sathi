@@ -272,7 +272,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           )}
 
           {/* Message Counter */}
-          <MessageCounter used={msgUsed} limit={msgLimit} tier={userTier} onLoginClick={() => { setAuthReason('message_limit'); setShowAuthModal(true); }} onPayClick={() => router.push('/payment')} />
+          <MessageCounter used={msgUsed} limit={msgLimit} tier={userTier} />
 
           {/* Input */}
           <div className="px-3 py-2 bg-white border-t border-[#C5D0E0] flex gap-2">

@@ -361,10 +361,6 @@ export default function Home() {
             >
               {loading ? "ढूंढ रहे हैं..." : "🔍 योग्य भर्तियाँ ढूंढें"}
             </button>
-
-            <p className="text-center text-[#FF6B00] font-medium" style={{ fontFamily: "var(--font-noto)" }}>
-              🆓 पहले 5 सवाल बिल्कुल मुफ्त | No signup needed
-            </p>
           </form>
         </div>
 
@@ -375,9 +371,6 @@ export default function Home() {
           </span>
           <span className="bg-[#E8F5E9] text-[#138808] text-xs px-4 py-2 rounded-full font-medium">
             ✅ हर सोमवार verified
-          </span>
-          <span className="bg-[#FFF3E8] text-[#FF6B00] text-xs px-4 py-2 rounded-full font-medium">
-            🆓 5 सवाल free
           </span>
         </div>
 

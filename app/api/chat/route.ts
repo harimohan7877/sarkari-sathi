@@ -3,19 +3,8 @@ import { sendChatMessageSmart, type ChatMessage } from "@/lib/ai";
 import { getExamById } from "@/lib/eligibility";
 import { getUserTier, incrementMessageCount, saveChatMessages } from "@/lib/supabase";
 
-const AUTO_LOGIN_PROMPT = `
-Yeh user ka 4th question hai (guest tier).
-Jawab dene ke baad HAMESHA yeh add karo (natural tarike se):
-
----
-💡 **आपके लिए एक सुझाव:**
-आपके पास अभी 1 और FREE सवाल बचा है। Login करने पर 5 और FREE सवाल मिलेंगे — साथ ही पूरा Syllabus, Previous Year Papers और Study Material भी।
-
-Login बिल्कुल आसान है — सिर्फ email और एक OTP।
----
-`;
-
 export async function POST(req: NextRequest) {
+
   try {
     const body = await req.json();
     const { messages, examId, userProfile, userId, guestToken } = body;
@@ -42,15 +31,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "भर्ती नहीं मिली" }, { status: 404 });
     }
 
-    // Add auto-login prompt for guest's 4th message
-    let chatMessages = messages as ChatMessage[];
-    if (tier === 'guest' && messagesUsed === 3) {
-      chatMessages = [...chatMessages];
-      const lastMsg = chatMessages[chatMessages.length - 1];
-      if (lastMsg && lastMsg.role === 'user') {
-        lastMsg.content = lastMsg.content + '\n\n[SYSTEM NOTE: ' + AUTO_LOGIN_PROMPT + ']';
-      }
-    }
+    const chatMessages = messages as ChatMessage[];
 
     const { response, model } = await sendChatMessageSmart(chatMessages, userProfile, exam);
 

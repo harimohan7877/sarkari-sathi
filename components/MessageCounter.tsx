@@ -27,24 +27,6 @@ export default function MessageCounter({ used, limit, tier, onLoginClick, onPayC
         }
         {tier === 'guest' && ' (Guest)'}
       </span>
-      {remaining <= 2 && remaining > 0 && tier === 'guest' && (
-        <button
-          onClick={onLoginClick}
-          className="text-[#FF6B00] font-medium text-xs hover:underline"
-          style={{ fontFamily: 'var(--font-noto)' }}
-        >
-          Login → 5 और FREE
-        </button>
-      )}
-      {remaining <= 2 && remaining > 0 && tier === 'registered' && (
-        <button
-          onClick={onPayClick}
-          className="text-[#FF6B00] font-medium text-xs hover:underline"
-          style={{ fontFamily: 'var(--font-noto)' }}
-        >
-          ₹30 → Unlimited
-        </button>
-      )}
     </div>
   );
 }
