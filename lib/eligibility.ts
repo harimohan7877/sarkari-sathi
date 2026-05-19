@@ -18,12 +18,12 @@ export interface UserProfile {
 export interface Exam {
   id: string;
   name: string;
-  name_hindi: string;
+  name_hindi?: string;
   short_name?: string;
   board: string;
   board_full?: string;
-  status: 'open' | 'upcoming' | 'expected' | 'closed';
-  last_date: string | null;
+  status: 'open' | 'upcoming' | 'expected' | 'closed' | string;
+  last_date?: string | null;
   form_start?: string | null;
   total_posts?: string;
   expected_vacancies?: string;
@@ -52,8 +52,8 @@ export interface Exam {
     max_age: number;
     age_cutoff_date?: string;
     attempt_limit?: string;
-    states: string[];
-    [key: string]: any;
+    states?: string[];
+    [key: string]: string | number | string[] | undefined | any;
   };
   age_relaxation?: {
     [key: string]: string;
@@ -73,7 +73,7 @@ export interface Exam {
   disclaimer: string;
 }
 
-interface EligibilityResult extends Exam {
+export interface EligibilityResult extends Exam {
   eligible: boolean;
   reasons_eligible: string[];
   reasons_ineligible: string[];
@@ -81,7 +81,7 @@ interface EligibilityResult extends Exam {
   effective_max_age?: number;
 }
 
-export function checkEligibility(user: UserProfile, exams: any[]): EligibilityResult[] {
+export function checkEligibility(user: UserProfile, exams: Exam[]): EligibilityResult[] {
   const userAge = typeof user.age === 'string' ? parseInt(user.age) : user.age;
   const userGender = user.gender || 'male';
   const userCategory = (user.category || '').toLowerCase();
@@ -100,9 +100,9 @@ export function checkEligibility(user: UserProfile, exams: any[]): EligibilityRe
   };
 
   const userEduLevel = eduLevel[user.education] || 0;
-  const isRajasthan = user.state.toLowerCase() === 'rajasthan' || user.state === 'राजस्थान';
+  const isRajasthan = (user.state || '').toLowerCase() === 'rajasthan' || user.state === 'राजस्थान';
 
-  return exams.map((exam: Exam) => {
+  return (exams as Exam[]).map((exam: Exam) => {
     const reasons_eligible: string[] = [];
     const reasons_ineligible: string[] = [];
     const warnings: string[] = [];
@@ -202,32 +202,15 @@ export function checkEligibility(user: UserProfile, exams: any[]): EligibilityRe
 
 // Legacy function for backward compatibility
 export function getEligibleExams(profile: UserProfile): Exam[] {
-  const userAge = typeof profile.age === 'string' ? parseInt(profile.age) : profile.age;
-
-  const eduLevel: Record<string, number> = {
-    '8th': 1,
-    'eighth': 1,
-    '10th': 2,
-    'tenth': 2,
-    '12th': 3,
-    'twelfth': 3,
-    'graduation': 4,
-    'pg': 5,
-    'post_graduation': 5
-  };
-  const userEducationLevel = eduLevel[profile.education] || 0;
-
-  const userState = profile.state.toLowerCase();
-  const isRajasthan = userState === "rajasthan" || userState === "राजस्थान";
-
-  const results = checkEligibility(profile, examsData.exams);
+  const results = checkEligibility(profile, examsData.exams as unknown as Exam[]);
   return results.filter(r => r.eligible).map(r => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { eligible, reasons_eligible, reasons_ineligible, warnings, effective_max_age, ...exam } = r;
     return exam as Exam;
   });
 }
 
-export function getDaysRemaining(lastDate: string | null): number {
+export function getDaysRemaining(lastDate: string | null | undefined): number {
   if (!lastDate) return -1;
   const today = new Date();
   const lastDateObj = new Date(lastDate);
@@ -248,5 +231,5 @@ export function getAllExams(): Exam[] {
 }
 
 export function getExamById(id: string): Exam | undefined {
-  return examsData.exams.find((e: any) => e.id === id) as unknown as Exam | undefined;
+  return (examsData.exams as unknown as Exam[]).find((e: Exam) => e.id === id);
 }

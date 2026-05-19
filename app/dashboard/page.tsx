@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { User, Profile, SavedExam, ChatMessage } from "@/lib/types";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [savedExams, setSavedExams] = useState<any[]>([]);
-  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [savedExams, setSavedExams] = useState<SavedExam[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,13 +21,13 @@ export default function DashboardPage() {
       setUser(user);
 
       const { data: prof } = await supabase.from('user_profiles').select('*').eq('id', user.id).single();
-      setProfile(prof);
+      setProfile(prof as Profile);
 
       const { data: saved } = await supabase.from('saved_exams').select('*').eq('user_id', user.id).order('saved_at', { ascending: false });
-      setSavedExams(saved || []);
+      setSavedExams((saved || []) as SavedExam[]);
 
       const { data: chats } = await supabase.from('chat_messages').select('*').eq('user_id', user.id).eq('role', 'user').order('created_at', { ascending: false }).limit(5);
-      setChatHistory(chats || []);
+      setChatHistory((chats || []) as ChatMessage[]);
 
       setLoading(false);
     }

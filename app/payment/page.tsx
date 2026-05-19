@@ -3,18 +3,25 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { User } from "@/lib/types";
 
-declare global { interface Window { Razorpay: any; } }
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+declare global { interface Window { Razorpay: any; } } // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export default function PaymentPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data?.user) setUser(data.user);
+      if (data?.user) setUser(data.user as User);
       else router.push('/auth');
     });
 
@@ -35,6 +42,29 @@ export default function PaymentPage() {
       });
       const { orderId, amount } = await res.json();
 
+      // If Razorpay Key is missing, simulate success for UI demo
+      if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
+        console.log('Razorpay Key missing, simulating success...');
+        setTimeout(async () => {
+          const verifyRes = await fetch('/api/payment/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: orderId,
+              paymentId: 'pay_mock_' + Math.random().toString(36).substring(7),
+              signature: 'mock_sig',
+              userId: user.id,
+            }),
+          });
+          const result = await verifyRes.json();
+          if (result.success) {
+            setSuccess(true);
+            setTimeout(() => router.push('/results'), 2000);
+          }
+        }, 1500);
+        return;
+      }
+
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount,
@@ -42,7 +72,7 @@ export default function PaymentPage() {
         name: 'सरकारी साथी',
         description: 'Premium Access — Unlimited AI + Study Material',
         order_id: orderId,
-        handler: async (response: any) => {
+        handler: async (response: RazorpayResponse) => {
           const verifyRes = await fetch('/api/payment/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

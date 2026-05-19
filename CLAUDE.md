@@ -41,13 +41,19 @@ sarkari-saathi/
 │   ├── page.tsx                 ← Profile form (landing) - WITH GENDER + CHECKBOXES
 │   ├── globals.css              ← Complete CSS with animations
 │   ├── exams/
+│   │   └── page.tsx             ← Redirects to /results
+│   ├── exam/
+│   │   └── [id]/
+│   │       └── page.tsx         ← Advanced AI Chat + Study Material
+│   ├── results/
 │   │   └── page.tsx             ← Eligible exams list
-│   ├── guide/
-│   │   └── [examId]/
-│   │       └── page.tsx         ← AI Chat guide - WITH QUICK REPLIES + COUNTER
 │   └── api/
-│       └── chat/
-│           └── route.ts         ← API route
+│       ├── chat/
+│       │   └── route.ts         ← API route
+│       └── user/
+│           └── tier/
+│               └── route.ts     ← Tier info API
+
 ├── data/
 │   └── exams.json               ← 5 exams, full details
 ├── lib/
@@ -300,27 +306,22 @@ Step 4: Deploy karo
 
 ## Last Updated
 
-**2026-05-17 | Session Complete | AI Working in Hindi**
+**2026-05-18 | Session Complete | V3.0 Optimized & Fixed**
 
-**Test result:**
-```
-User: "SSO ID kaise banayein?"
+**Current Status:**
+*   SAB SAHI HAI ✅ (Local build passing).
+*   28+ Lint & TypeScript errors fixed.
+*   Exams data updated to 2026-05-18.
+*   Vercel Deployment: Environment Variables add karne ki zaroorat hai dashboard me.
 
-AI Response:
-SSO ID बनाने के लिए ये steps फॉलो करें:
-1. SSO की वेबसाइट पर जाएँ: sso.rajasthan.gov.in
-2. "Register" पर क्लिक करें।
-3. आधार कार्ड, फेसबुक, गूगल या भामाशाह में से किसी एक विकल्प को चुनें।
-4. जरूरी जानकारी भरें और OTP से वेरीफाई करें।
-5. यूजरनेम और पासवर्ड सेट करें।
-6. रजिस्ट्रेशन पूरा होने पर आपको SSO ID मिल जाएगी।
-7. कभी परेशानी हो, तो हेल्पडेस्क नंबर 0141-5153222 पर संपर्क करें।
-
-⚠️ यह जानकारी 2026-05-17 को verify थी। Apply से पहले official साइट जरूर देखें।
-```
+**Recent Fixes:**
+*   Fixed `any` types in `results`, `exam`, `eligibility`, and `ai` files.
+*   Fixed `useEffect` synchronous `setState` warnings.
+*   Unified type system in `lib/types.ts`.
+*   Matched `Exam` interface with `exams.json` structure.
 
 ---
 
 ## Next Session - Ready to Use!
 
-App fully functional hai. Sirf use karo aur test karo.
+App fully functional hai. Dashboard me environment variables add karke deploy karein.

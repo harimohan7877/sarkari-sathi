@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendChatMessageSmart, type ChatMessage } from "@/lib/ai";
 import { getExamById } from "@/lib/eligibility";
-import { getUserTier, incrementMessageCount, saveChatMessages, supabaseAdmin } from "@/lib/supabase";
+import { getUserTier, incrementMessageCount, saveChatMessages } from "@/lib/supabase";
 
 const AUTO_LOGIN_PROMPT = `
 Yeh user ka 4th question hai (guest tier).
@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
     const { response, model } = await sendChatMessageSmart(chatMessages, userProfile, exam);
 
     // Increment counter
+    const newUsedCount = messagesUsed + 1;
     await incrementMessageCount(effectiveUserId, effectiveGuestToken, messagesUsed);
 
     // Save chat history for logged-in users
@@ -63,15 +64,17 @@ export async function POST(req: NextRequest) {
       await saveChatMessages(effectiveUserId, examId, lastUserMsg, response);
     }
 
-    const remaining = limit - messagesUsed - 1;
+    const remaining = limit - newUsedCount;
     const warning = remaining <= 2 ? `REMAINING_${remaining}` : null;
 
     return NextResponse.json({
       response,
       model_used: model,
       remaining,
-      warning,
-      tier
+      messagesUsed: newUsedCount,
+      tier,
+      limit,
+      warning
     });
   } catch (error) {
     console.error("Chat route error:", error);

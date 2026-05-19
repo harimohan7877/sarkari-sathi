@@ -63,7 +63,7 @@ export const SARKARI_SAATHI_SYSTEM_PROMPT = `
 - जो नहीं जानता, वो बताओ "पता नहीं"
 
 CURRENT EXAM DATA:
-${JSON.stringify((examsData.exams as any[]).map(e => ({
+${JSON.stringify((examsData.exams as unknown as Exam[]).map((e: Exam) => ({
   id: e.id,
   name: e.short_name,
   board: e.board,
@@ -99,7 +99,7 @@ export async function sendChatMessageSmart(
   const maxTokens = needsSonnet ? 1500 : 800;
 
   // Build compact context
-  let examInfo = exam ? `
+  const examInfo = exam ? `
 EXAM: ${exam.short_name} | ${exam.board} | Last: ${exam.last_date || 'TBD'} | Fee: ₹${exam.fee.general_ews} | Age: ${exam.eligibility.min_age}-${exam.eligibility.max_age} | ${exam.official_url}
 ` : '';
 
@@ -139,7 +139,7 @@ ${examInfo}`;
     const data = await response.json();
     return {
       response: data.choices[0].message.content,
-      model: needsSonnet ? 'sonnet' : 'haiku'
+      model: needsSonnet ? 'gpt-4o' : 'gpt-4o-mini'
     };
   } catch (error) {
     console.error("Chat error:", error);

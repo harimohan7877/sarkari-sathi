@@ -3,10 +3,23 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { checkEligibility, getDaysRemaining, getFeeByCategory, type Exam, type UserProfile } from "@/lib/eligibility";
+import { checkEligibility, getDaysRemaining, getFeeByCategory, type UserProfile, type Exam, type EligibilityResult } from "@/lib/eligibility";
 import { supabase } from "@/lib/supabase";
 import examsData from "@/data/exams.json";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import { User } from "@/lib/types";
+
+interface Course {
+  type: 'youtube' | 'website';
+  name: string;
+  description: string;
+  url: string;
+  badge: string;
+  badgeColor: string;
+  subscribers?: string;
+  examId?: string;
+  examName?: string;
+}
 
 const TOP_WEBSITES = [
   { name: "RPSC", fullName: "राजस्थान लोक सेवा आयोग", url: "https://rpsc.rajasthan.gov.in", emoji: "🏛️", color: "#0F2B5B" },
@@ -18,7 +31,7 @@ const TOP_WEBSITES = [
   { name: "Jan Suchna", fullName: "जन सूचना पोर्टल", url: "https://jansoochna.rajasthan.gov.in", emoji: "ℹ️", color: "#0369A1" },
 ];
 
-const COURSES_BY_EXAM: Record<string, any[]> = {
+const COURSES_BY_EXAM: Record<string, Course[]> = {
   'rsmssb-patwari-2026': [
     { type: 'youtube', name: 'KGS Rajasthan Exams — पटवारी Complete', description: 'Daily live classes, mock tests', url: 'https://www.youtube.com/@KGSRajasthanExams', badge: '🆓 FREE', badgeColor: 'green', subscribers: '5 lakh+' },
     { type: 'youtube', name: 'Utkarsh Classes — Revenue Law & Raj GK', description: 'Subhash Charan Sir — Rajasthan ka best', url: 'https://www.youtube.com/@UtkarshClasses', badge: '🆓 FREE', badgeColor: 'green', subscribers: '50 lakh+' },
@@ -46,26 +59,28 @@ const COURSES_BY_EXAM: Record<string, any[]> = {
 export default function ResultsPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [results, setResults] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null);
+  const [results, setResults] = useState<EligibilityResult[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    // Check auth
-    supabase.auth.getUser().then(({ data }) => {
+    async function init() {
+      // Check auth
+      const { data } = await supabase.auth.getUser();
       if (data?.user) setUser(data.user);
-    });
 
-    // Load profile
-    const stored = localStorage.getItem("userProfile") || sessionStorage.getItem("userProfile");
-    if (!stored) {
-      router.push("/");
-      return;
+      // Load profile
+      const stored = localStorage.getItem("userProfile") || sessionStorage.getItem("userProfile");
+      if (!stored) {
+        router.push("/");
+        return;
+      }
+      const parsed = JSON.parse(stored) as UserProfile;
+      setProfile(parsed);
+      const eligibilityResults = checkEligibility(parsed, examsData.exams as unknown as Exam[]);
+      setResults(eligibilityResults);
     }
-    const parsed = JSON.parse(stored);
-    setProfile(parsed);
-    const eligibilityResults = checkEligibility(parsed, examsData.exams as any[]);
-    setResults(eligibilityResults);
+    init();
   }, [router]);
 
   if (!profile) {
@@ -81,7 +96,7 @@ export default function ResultsPage() {
   const ineligibleExams = results.filter(r => !r.eligible);
 
   // Collect all courses for eligible exams
-  const allCourses: any[] = [];
+  const allCourses: Course[] = [];
   eligibleExams.forEach(exam => {
     const courses = COURSES_BY_EXAM[exam.id] || [];
     courses.forEach(c => {
@@ -91,7 +106,7 @@ export default function ResultsPage() {
     });
   });
 
-  const formatDate = (dateStr: string | null) => {
+  const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return 'जल्द घोषित होगा';
     const date = new Date(dateStr);
     return date.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short', year: 'numeric' });

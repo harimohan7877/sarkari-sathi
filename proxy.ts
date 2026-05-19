@@ -1,7 +1,6 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const res = NextResponse.next();
 
   // Protected routes — redirect to auth if no session cookie
@@ -11,7 +10,6 @@ export async function middleware(req: NextRequest) {
   if (isProtected) {
     // Check for Supabase auth cookie
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     
     const authCookie = req.cookies.get('sb-access-token') || 
                        req.cookies.get(`sb-${supabaseUrl.split('//')[1]?.split('.')[0]}-auth-token`);

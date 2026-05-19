@@ -7,8 +7,27 @@ import { supabase } from "@/lib/supabase";
 import MessageCounter from "@/components/MessageCounter";
 import ScrollArrowCTA from "@/components/ScrollArrowCTA";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import { User } from "@/lib/types";
 
 interface ChatMsg { role: "user" | "assistant"; content: string; }
+
+interface SyllabusSubject {
+  name: string;
+  weightage: string;
+  topics: string[];
+}
+
+interface SyllabusData {
+  subjects: SyllabusSubject[];
+}
+
+interface PYQItem {
+  year: string;
+  name: string;
+  url: string;
+  source: string;
+  type: string;
+}
 
 const QUICK_REPLIES = [
   "इसका Syllabus क्या है?",
@@ -18,7 +37,7 @@ const QUICK_REPLIES = [
   "Age limit कितनी है?",
 ];
 
-const SYLLABUS_DATA: Record<string, any> = {
+const SYLLABUS_DATA: Record<string, SyllabusData> = {
   'rsmssb-patwari-2026': {
     subjects: [
       { name: "राजस्थान का इतिहास, कला, संस्कृति", weightage: "25%", topics: ["राजपूत काल", "मुगल काल", "स्वतंत्रता आंदोलन", "कला-संस्कृति", "लोक देवता"] },
@@ -32,7 +51,7 @@ const SYLLABUS_DATA: Record<string, any> = {
   },
 };
 
-const PYQ_DATA: Record<string, any[]> = {
+const PYQ_DATA: Record<string, PYQItem[]> = {
   'rsmssb-patwari-2026': [
     { year: "2021", name: "Patwari Exam Paper 2021", url: "https://www.adda247.com/exams/rajasthan/rajasthan-patwari-previous-year-paper/", source: "Adda247", type: "PDF" },
     { year: "Mock", name: "Online Mock Test (Free)", url: "https://toppersexam.com/state-level-exams/rajasthan-patwari-question-paper", source: "ToppersExam", type: "Online" },
@@ -48,37 +67,94 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
   const router = useRouter();
   const [exam, setExam] = useState<Exam | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [msgUsed, setMsgUsed] = useState(0);
+  const [msgLimit, setMsgLimit] = useState(5);
+  const [userTier, setUserTier] = useState<'guest' | 'registered' | 'paid'>('guest');
   const [activeTab, setActiveTab] = useState("overview");
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authReason, setAuthReason] = useState<'message_limit' | 'study_material' | 'save_exam'>('message_limit');
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
-  const tier: 'guest' | 'registered' | 'paid' = user ? 'registered' : 'guest';
-  const limit = tier === 'guest' ? 5 : tier === 'registered' ? 10 : 999;
-  const isGuest = !user;
-
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => { if (data?.user) setUser(data.user); });
-    const stored = localStorage.getItem("userProfile") || sessionStorage.getItem("userProfile");
-    if (stored) setProfile(JSON.parse(stored));
-    const e = getExamById(id);
-    if (e) {
-      setExam(e);
-      setMessages([{ role: "assistant", content: `नमस्ते! 🙏 मैं आपको **${e.short_name || e.name}** के बारे में पूरी जानकारी दे सकता हूँ।\n\nनीचे कोई भी सवाल पूछें या quick buttons use करें! ⬇️` }]);
-    }
+    const loadInitialData = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser as User);
+      
+      const stored = localStorage.getItem("userProfile") || sessionStorage.getItem("userProfile");
+      if (stored) setProfile(JSON.parse(stored));
+      
+      const guestToken = sessionStorage.getItem('guestToken');
+      
+      // Fetch real tier info
+      try {
+        const query = new URLSearchParams();
+        if (authUser?.id) query.set('userId', authUser.id);
+        if (guestToken) query.set('guestToken', guestToken);
+        
+        const tierRes = await fetch(`/api/user/tier?${query.toString()}`);
+        const tierData = await tierRes.json();
+        setUserTier(tierData.tier);
+        setMsgUsed(tierData.messagesUsed);
+        setMsgLimit(tierData.limit);
+      } catch (err) {
+        console.error("Failed to fetch tier:", err);
+      }
+
+      // Check if exam is saved
+      if (authUser?.id) {
+        const { data } = await supabase
+          .from('saved_exams')
+          .select('id')
+          .eq('user_id', authUser.id)
+          .eq('exam_id', id)
+          .single();
+        if (data) setIsSaved(true);
+      }
+      
+      const e = getExamById(id);
+      if (e) {
+        setExam(e);
+        setMessages([{ role: "assistant", content: `नमस्ते! 🙏 मैं आपको **${e.short_name || e.name}** के बारे में पूरी जानकारी दे सकता हूँ।\n\nनीचे कोई भी सवाल पूछें या quick buttons use करें! ⬇️` }]);
+      }
+    };
+    
+    loadInitialData();
   }, [id]);
 
   useEffect(() => { chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" }); }, [messages]);
 
+  async function toggleSave() {
+    if (!user) {
+      setAuthReason('save_exam');
+      setShowAuthModal(true);
+      return;
+    }
+
+    setSaveLoading(true);
+    try {
+      if (isSaved) {
+        await supabase.from('saved_exams').delete().eq('user_id', user.id).eq('exam_id', id);
+        setIsSaved(false);
+      } else {
+        await supabase.from('saved_exams').insert({ user_id: user.id, exam_id: id });
+        setIsSaved(true);
+      }
+    } catch (err) {
+      console.error("Save failed:", err);
+    }
+    setSaveLoading(false);
+  }
+
   async function sendMessage(text?: string) {
     const msg = text || input.trim();
     if (!msg || loading) return;
-    if (msgUsed >= limit) {
+    if (msgUsed >= msgLimit) {
       setAuthReason('message_limit');
       setShowAuthModal(true);
       return;
@@ -88,15 +164,31 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     setMessages(newMsgs);
     setLoading(true);
     try {
+      const guestToken = sessionStorage.getItem('guestToken');
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMsgs.filter(m => m.role !== 'assistant' || newMsgs.indexOf(m) > 0), examId: id, userProfile: profile }),
+        body: JSON.stringify({ 
+          messages: newMsgs.filter(m => m.role !== 'assistant' || newMsgs.indexOf(m) > 0), 
+          examId: id, 
+          userProfile: profile,
+          userId: user?.id,
+          guestToken
+        }),
       });
       const data = await res.json();
+      
+      if (data.error === 'LIMIT_REACHED') {
+        setAuthReason('message_limit');
+        setShowAuthModal(true);
+        setLoading(false);
+        return;
+      }
+      
       if (data.error) throw new Error(data.error);
       setMessages([...newMsgs, { role: "assistant", content: data.response }]);
-      setMsgUsed(prev => prev + 1);
+      setMsgUsed(data.messagesUsed || (msgUsed + 1));
+      if (data.tier) setUserTier(data.tier);
     } catch {
       setMessages([...newMsgs, { role: "assistant", content: "⚠️ कुछ problem हो गई। कृपया दोबारा कोशिश करें।" }]);
     }
@@ -107,7 +199,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
 
   const syllabus = SYLLABUS_DATA[id];
   const pyqs = PYQ_DATA[id] || [];
-  const docs = (exam as any).step_by_step_form_guide || [];
+  const isGuest = !user;
   const tabs = [
     { id: 'overview', label: 'Overview', emoji: '📋' },
     { id: 'syllabus', label: 'Syllabus', emoji: '📚', locked: isGuest },
@@ -126,7 +218,16 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
         <div className="flex-1 text-center">
           <h1 className="text-white text-base font-bold truncate px-4" style={{ fontFamily: "var(--font-noto)" }}>{exam.short_name || exam.name}</h1>
         </div>
-        <a href={exam.official_url} target="_blank" rel="noopener noreferrer" className="text-white/80 text-sm">🌐</a>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={toggleSave}
+            disabled={saveLoading}
+            className={`text-xl transition-all ${isSaved ? 'text-red-500 scale-110' : 'text-white/50 hover:text-white'}`}
+          >
+            {isSaved ? '❤️' : '🤍'}
+          </button>
+          <a href={exam.official_url} target="_blank" rel="noopener noreferrer" className="text-white/80 text-sm">🌐</a>
+        </div>
       </div>
 
       <div className="pt-16 flex flex-col flex-1 max-w-2xl mx-auto w-full">
@@ -171,7 +272,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           )}
 
           {/* Message Counter */}
-          <MessageCounter used={msgUsed} limit={limit} tier={tier} onLoginClick={() => { setAuthReason('message_limit'); setShowAuthModal(true); }} onPayClick={() => router.push('/payment')} />
+          <MessageCounter used={msgUsed} limit={msgLimit} tier={userTier} onLoginClick={() => { setAuthReason('message_limit'); setShowAuthModal(true); }} onPayClick={() => router.push('/payment')} />
 
           {/* Input */}
           <div className="px-3 py-2 bg-white border-t border-[#C5D0E0] flex gap-2">
@@ -180,13 +281,13 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
               placeholder="अपना सवाल पूछें..."
-              disabled={msgUsed >= limit}
+              disabled={msgUsed >= msgLimit}
               className="flex-1 h-11 border-2 border-[#C5D0E0] rounded-xl px-4 text-sm bg-[#F5F7FA] focus:border-[#1847A6] focus:bg-white outline-none disabled:opacity-50"
               style={{ fontFamily: "var(--font-noto)" }}
             />
             <button
               onClick={() => sendMessage()}
-              disabled={!input.trim() || loading || msgUsed >= limit}
+              disabled={!input.trim() || loading || msgUsed >= msgLimit}
               className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${input.trim() ? 'bg-[#FF6B00] text-white' : 'bg-[#E2E8F5] text-gray-400'}`}
             >
               ➤
@@ -247,7 +348,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
             {activeTab === 'syllabus' && syllabus && (
               <div className="space-y-3">
                 <h3 className="font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>📚 विस्तृत पाठ्यक्रम</h3>
-                {syllabus.subjects.map((s: any, i: number) => (
+                {syllabus.subjects.map((s: SyllabusSubject, i: number) => (
                   <div key={i} className="bg-[#EEF2F8] rounded-xl p-3">
                     <div className="flex justify-between items-center mb-1">
                       <p className="font-bold text-sm text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{s.name}</p>
@@ -269,7 +370,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
             {activeTab === 'pyq' && (
               <div className="space-y-3">
                 <h3 className="font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>📝 Previous Year Papers</h3>
-                {pyqs.length > 0 ? pyqs.map((p: any, i: number) => (
+                {pyqs.length > 0 ? pyqs.map((p: PYQItem, i: number) => (
                   <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="block bg-[#EEF2F8] rounded-xl p-3 hover:shadow-md transition-all">
                     <div className="flex justify-between items-center">
                       <div>
@@ -300,7 +401,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
                 <h3 className="font-bold text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>🔗 महत्वपूर्ण लिंक</h3>
                 {[
                   { label: "Official Website", url: exam.official_url, icon: "🏛️" },
-                  { label: "Apply Online (SSO)", url: (exam as any).apply_url || "https://sso.rajasthan.gov.in", icon: "📝" },
+                  { label: "Apply Online (SSO)", url: exam.apply_url || "https://sso.rajasthan.gov.in", icon: "📝" },
                   { label: "SSO Helpdesk: 0141-5153222", url: "tel:01415153222", icon: "📞" },
                 ].map((l, i) => (
                   <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-[#EEF2F8] rounded-lg p-3 hover:shadow-md transition-all">
