@@ -60,13 +60,6 @@ export default function AuthPage() {
             </p>
           </div>
 
-          {/* Benefits bar */}
-          <div className="bg-green-50 border-b border-green-100 px-6 py-3">
-            <p className="text-green-700 text-sm text-center font-medium" style={{ fontFamily: 'var(--font-noto)' }}>
-              ✅ Login के बाद: 10 AI सवाल FREE + पूरा Study Material
-            </p>
-          </div>
-
           <div className="p-6">
             {step === 'email' ? (
               <>
