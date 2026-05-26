@@ -56,7 +56,6 @@ export default function Home() {
         });
         sessionStorage.setItem('guestToken', sessionToken);
       } catch (err) {
-        // Fallback — continue without DB
         console.error('Guest session creation failed:', err);
       }
     } else {
@@ -91,19 +90,23 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#EEF2F8]">
+    <main className="min-h-screen bg-[#EEF2F8] relative overflow-hidden">
+      {/* Decorative background glows for premium feel */}
+      <div className="absolute w-96 h-96 rounded-full bg-orange-500/5 blur-3xl -top-20 -left-20 pointer-events-none" />
+      <div className="absolute w-96 h-96 rounded-full bg-blue-500/5 blur-3xl top-1/2 right-0 pointer-events-none" />
+
       {/* Tiranga stripe */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#138808] z-[60]" />
 
       {/* Header */}
-      <div className="bg-[#0F2B5B] h-24 px-4 flex items-end pb-3 fixed top-1 w-full z-50 shadow-lg">
-        <div className="flex items-center gap-3 flex-1">
-          <div className="w-1 h-10 bg-[#FF6B00] rounded-full" />
+      <div className="bg-gradient-to-r from-[#0F2B5B] to-[#1847A6] h-20 px-6 flex items-center justify-between fixed top-1 w-full z-50 shadow-md border-b border-white/10 rounded-b-xl">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-8 bg-[#FF6B00] rounded-full" />
           <div>
-            <h1 className="text-white text-2xl font-bold" style={{ fontFamily: "var(--font-noto)" }}>
+            <h1 className="text-white text-xl font-extrabold tracking-tight" style={{ fontFamily: "var(--font-noto)" }}>
               🏛️ सरकारी साथी
             </h1>
-            <p className="text-white/70 text-xs" style={{ fontFamily: "var(--font-noto)" }}>
+            <p className="text-white/60 text-[10px]" style={{ fontFamily: "var(--font-noto)" }}>
               राजस्थान सरकारी भर्ती पोर्टल
             </p>
           </div>
@@ -111,14 +114,14 @@ export default function Home() {
         {/* Login button */}
         {user ? (
           <Link href="/dashboard">
-            <div className="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center text-white text-sm font-bold hover:bg-white/30 transition-colors">
+            <div className="w-9 h-9 bg-white/15 hover:bg-white/25 rounded-full flex items-center justify-center text-white text-sm font-bold border border-white/20 transition-all cursor-pointer">
               {user.email?.[0]?.toUpperCase() || '?'}
             </div>
           </Link>
         ) : (
           <Link
             href="/auth"
-            className="text-white/90 text-sm border border-white/40 px-3 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+            className="text-white/95 text-xs font-semibold border border-white/20 bg-white/5 px-4 py-2 rounded-full hover:bg-white/15 transition-all shadow-sm"
             style={{ fontFamily: "var(--font-noto)" }}
           >
             Login
@@ -127,46 +130,46 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="pt-28 pb-8 px-4">
+      <div className="pt-24 pb-12 px-4 max-w-md mx-auto relative z-10">
         {/* Welcome Card */}
-        <div className="bg-gradient-to-r from-[#0F2B5B] to-[#1847A6] rounded-2xl p-6 mx-auto max-w-md mb-6 text-white">
-          <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--font-noto)" }}>
+        <div className="bg-gradient-to-br from-[#0f2b5b] via-[#143770] to-[#1847a6] rounded-2xl p-6 mb-6 text-white shadow-xl shadow-blue-900/10 border border-white/5 animate-slide-up">
+          <h2 className="text-lg font-bold flex items-center gap-2" style={{ fontFamily: "var(--font-noto)" }}>
             {formData.name ? `नमस्ते ${formData.name}! 🙏` : 'नमस्ते! 🙏'}
           </h2>
-          <p className="text-white/80 text-sm" style={{ fontFamily: "var(--font-noto)" }}>
-            अपनी जानकारी भरें और पाएं सरकारी नौकरी के सही अवसर
+          <p className="text-white/70 text-xs mt-1.5 leading-relaxed" style={{ fontFamily: "var(--font-noto)" }}>
+            अपनी शैक्षणिक योग्यता और आयु भरें, हमारा AI सिस्टम आपके लिए राजस्थान की सही सरकारी नौकरियों के अवसर खोजेगा।
           </p>
         </div>
 
         {/* Profile Form Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-[#C5D0E0] mx-auto max-w-md overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-xl border border-[#C5D0E0]/60 overflow-hidden animate-slide-up" style={{ animationDelay: '100ms' }}>
           {/* Form Header */}
-          <div className="p-6 pb-0">
-            <h2 className="text-xl font-bold text-[#0F2B5B] mb-1" style={{ fontFamily: "var(--font-noto)" }}>
-              अपनी जानकारी भरें
+          <div className="p-6 pb-4 border-b border-gray-100">
+            <h2 className="text-lg font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>
+              अपनी जानकारी दर्ज करें
             </h2>
-            <p className="text-gray-500 text-sm mb-4" style={{ fontFamily: "var(--font-noto)" }}>
-              हम आपके लिए सही भर्तियाँ ढूंढेंगे
+            <p className="text-gray-400 text-xs mt-0.5" style={{ fontFamily: "var(--font-noto)" }}>
+              सभी जानकारियाँ पूर्ण और सही भरें
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 pt-0 space-y-4">
-            {/* Section A — Optional Personal Info (collapsed by default) */}
-            <div className="border border-dashed border-[#C5D0E0] rounded-xl overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+            {/* Section A — Optional Personal Info */}
+            <div className="border border-dashed border-[#C5D0E0] rounded-xl overflow-hidden bg-gray-50/50">
               <button
                 type="button"
                 onClick={() => setShowPersonal(!showPersonal)}
-                className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-[#1847A6] hover:bg-blue-50/50 transition-colors"
+                className="w-full px-4 py-3 flex items-center justify-between text-xs font-semibold text-[#1847A6] hover:bg-blue-50/50 transition-colors outline-none"
                 style={{ fontFamily: "var(--font-noto)" }}
               >
-                <span>{showPersonal ? '−' : '+'} अपना नाम और शहर जोड़ें (optional)</span>
-                <span className="text-xs text-gray-400">{showPersonal ? '▲' : '▼'}</span>
+                <span>{showPersonal ? '−' : '+'} अपना नाम और शहर जोड़ें (वैकल्पिक)</span>
+                <span className="text-[10px] text-gray-400">{showPersonal ? '▲' : '▼'}</span>
               </button>
 
               {showPersonal && (
-                <div className="px-4 pb-4 space-y-3 border-t border-dashed border-[#C5D0E0]">
+                <div className="px-4 pb-4 space-y-3 border-t border-dashed border-[#C5D0E0] bg-white">
                   <div className="pt-3">
-                    <label className="block text-sm font-semibold text-gray-700 mb-1" style={{ fontFamily: "var(--font-noto)" }}>
+                    <label className="block text-xs font-bold text-gray-500 mb-1" style={{ fontFamily: "var(--font-noto)" }}>
                       नाम (Name)
                     </label>
                     <input
@@ -174,84 +177,77 @@ export default function Home() {
                       value={formData.name}
                       onChange={(e) => updateField("name", e.target.value)}
                       placeholder="उदाहरण: Ramesh Kumar"
-                      className="w-full h-12 border-2 border-[#C5D0E0] rounded-xl px-4 text-base bg-[#F5F7FA] focus:bg-white focus:border-[#1847A6] focus:ring-3 focus:ring-blue-100 transition-all outline-none"
+                      className="w-full h-11 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50/50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] focus:ring-4 focus:ring-blue-100 transition-all outline-none"
                       style={{ fontFamily: "var(--font-noto)" }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1" style={{ fontFamily: "var(--font-noto)" }}>
-                      शहर / जिला
+                    <label className="block text-xs font-bold text-gray-500 mb-1" style={{ fontFamily: "var(--font-noto)" }}>
+                      शहर / जिला (City / District)
                     </label>
                     <input
                       type="text"
                       value={formData.city}
                       onChange={(e) => updateField("city", e.target.value)}
                       placeholder="उदाहरण: सरदारशहर, चुरू"
-                      className="w-full h-12 border-2 border-[#C5D0E0] rounded-xl px-4 text-base bg-[#F5F7FA] focus:bg-white focus:border-[#1847A6] focus:ring-3 focus:ring-blue-100 transition-all outline-none"
+                      className="w-full h-11 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50/50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] focus:ring-4 focus:ring-blue-100 transition-all outline-none"
                       style={{ fontFamily: "var(--font-noto)" }}
                     />
-                  </div>
-                  <div className="bg-blue-50 rounded-lg p-2.5">
-                    <p className="text-xs text-[#1847A6]" style={{ fontFamily: "var(--font-noto)" }}>
-                      💡 यह जानकारी सिर्फ आपको personalized अनुभव देने के लिए है — किसी के साथ share नहीं होती।
-                    </p>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Section B — Required Info */}
-            {/* राज्य (State) - Locked */}
+            {/* State - Locked */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5" style={{ fontFamily: "var(--font-noto)" }}>
                 राज्य (State) *
               </label>
-              <div className="w-full h-13 border-2 border-[#C5D0E0] bg-[#F5F7FA] rounded-xl px-4 flex items-center">
-                <span className="text-[#0F2B5B] font-semibold" style={{ fontFamily: "var(--font-noto)" }}>
-                  🇮🇳 राजस्थान ✓
+              <div className="w-full h-12 border border-[#C5D0E0] bg-gray-50 rounded-xl px-4 flex items-center justify-between">
+                <span className="text-[#0F2B5B] text-sm font-semibold" style={{ fontFamily: "var(--font-noto)" }}>
+                  🇮🇳 राजस्थान Domicile
                 </span>
+                <span className="text-[#138808] text-xs font-bold bg-[#E8F5E9] px-2 py-0.5 rounded-full">✓ Locked</span>
               </div>
             </div>
 
-            {/* लिंग (Gender) - Pill buttons */}
+            {/* Gender - Pill buttons */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5" style={{ fontFamily: "var(--font-noto)" }}>
                 लिंग (Gender) *
               </label>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => updateField("gender", "male")}
-                  className={`flex-1 h-13 rounded-xl font-semibold transition-all ${
+                  className={`flex-1 h-12 rounded-xl text-sm font-bold transition-all ${
                     formData.gender === "male"
-                      ? "bg-[#0F2B5B] text-white shadow-md"
-                      : "bg-[#F5F7FA] text-gray-700 border-2 border-[#C5D0E0]"
+                      ? "bg-[#0F2B5B] text-white shadow-md shadow-blue-900/25 border border-transparent"
+                      : "bg-[#F5F7FA] text-[#0D1B2A] border border-[#C5D0E0] hover:bg-gray-100"
                   }`}
                   style={{ fontFamily: "var(--font-noto)" }}
                 >
-                  👨 पुरुष
+                  👨 पुरुष (Male)
                 </button>
                 <button
                   type="button"
                   onClick={() => updateField("gender", "female")}
-                  className={`flex-1 h-13 rounded-xl font-semibold transition-all ${
+                  className={`flex-1 h-12 rounded-xl text-sm font-bold transition-all ${
                     formData.gender === "female"
-                      ? "bg-[#0F2B5B] text-white shadow-md"
-                      : "bg-[#F5F7FA] text-gray-700 border-2 border-[#C5D0E0]"
+                      ? "bg-[#0F2B5B] text-white shadow-md shadow-blue-900/25 border border-transparent"
+                      : "bg-[#F5F7FA] text-[#0D1B2A] border border-[#C5D0E0] hover:bg-gray-100"
                   }`}
                   style={{ fontFamily: "var(--font-noto)" }}
                 >
-                  👩 महिला
+                  👩 महिला (Female)
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "var(--font-noto)" }}>
-                Age relaxation के लिए जरूरी है
-              </p>
             </div>
 
-            {/* उम्र (Age) */}
+            {/* Age */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5" style={{ fontFamily: "var(--font-noto)" }}>
                 आयु (Age) *
               </label>
               <input
@@ -261,93 +257,91 @@ export default function Home() {
                 value={formData.age}
                 onChange={(e) => updateField("age", e.target.value)}
                 placeholder="उदाहरण: 22"
-                className="w-full h-13 border-2 border-[#C5D0E0] rounded-xl px-4 text-base bg-[#F5F7FA] focus:bg-white focus:border-[#1847A6] focus:ring-3 focus:ring-blue-100 transition-all outline-none"
+                className="w-full h-12 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50/50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] focus:ring-4 focus:ring-blue-100 transition-all outline-none"
                 style={{ fontFamily: "var(--font-noto)" }}
                 required
               />
-              <p className="text-xs text-gray-500 mt-1" style={{ fontFamily: "var(--font-noto)" }}>
-                आपकी उम्र से हम आपकी योग्यता calculate करते हैं
-              </p>
             </div>
 
-            {/* शिक्षा (Education) */}
+            {/* Education */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
-                शिक्षा (Education) *
+              <label className="block text-xs font-bold text-gray-500 mb-1.5" style={{ fontFamily: "var(--font-noto)" }}>
+                उच्चतम शिक्षा (Highest Education) *
               </label>
               <select
                 value={formData.education}
                 onChange={(e) => updateField("education", e.target.value)}
-                className="w-full h-13 border-2 border-[#C5D0E0] rounded-xl px-4 text-base bg-[#F5F7FA] focus:bg-white focus:border-[#1847A6] focus:ring-3 focus:ring-blue-100 transition-all outline-none"
+                className="w-full h-12 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50/50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] focus:ring-4 focus:ring-blue-100 transition-all outline-none cursor-pointer"
                 style={{ fontFamily: "var(--font-noto)" }}
                 required
               >
-                <option value="" style={{ backgroundColor: "white" }}>-- चुनें --</option>
-                <option value="8th" style={{ backgroundColor: "white" }}>8वीं पास (8th Pass)</option>
-                <option value="10th" style={{ backgroundColor: "white" }}>10वीं पास (10th Pass)</option>
-                <option value="12th" style={{ backgroundColor: "white" }}>12वीं पास (12th Pass)</option>
-                <option value="graduation" style={{ backgroundColor: "white" }}>स्नातक (Graduation)</option>
-                <option value="pg" style={{ backgroundColor: "white" }}>परास्नातक (Post Graduation)</option>
+                <option value="" className="text-gray-500">-- चुनें --</option>
+                <option value="8th" className="text-[#0D1B2A]">8वीं पास (8th Pass)</option>
+                <option value="10th" className="text-[#0D1B2A]">10वीं पास (10th Pass)</option>
+                <option value="12th" className="text-[#0D1B2A]">12वीं पास (12th Pass)</option>
+                <option value="graduation" className="text-[#0D1B2A]">स्नातक (Graduation)</option>
+                <option value="pg" className="text-[#0D1B2A]">परास्नातक (Post Graduation)</option>
               </select>
             </div>
 
-            {/* श्रेणी (Category) */}
+            {/* Category */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
-                श्रेणी (Category) *
+              <label className="block text-xs font-bold text-gray-500 mb-1.5" style={{ fontFamily: "var(--font-noto)" }}>
+                आरक्षण श्रेणी (Category) *
               </label>
               <select
                 value={formData.category}
                 onChange={(e) => updateField("category", e.target.value)}
-                className="w-full h-13 border-2 border-[#C5D0E0] rounded-xl px-4 text-base bg-[#F5F7FA] focus:bg-white focus:border-[#1847A6] focus:ring-3 focus:ring-blue-100 transition-all outline-none"
+                className="w-full h-12 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50/50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] focus:ring-4 focus:ring-blue-100 transition-all outline-none cursor-pointer"
                 style={{ fontFamily: "var(--font-noto)" }}
                 required
               >
-                <option value="" style={{ backgroundColor: "white" }}>-- चुनें --</option>
-                <option value="general_ews" style={{ backgroundColor: "white" }}>सामान्य / EWS</option>
-                <option value="obc_sbc" style={{ backgroundColor: "white" }}>OBC / SBC</option>
-                <option value="sc" style={{ backgroundColor: "white" }}>अनुसूचित जाति (SC)</option>
-                <option value="st" style={{ backgroundColor: "white" }}>अनुसूचित जनजाति (ST)</option>
+                <option value="" className="text-gray-500">-- चुनें --</option>
+                <option value="general_ews" className="text-[#0D1B2A]">सामान्य / EWS</option>
+                <option value="obc_sbc" className="text-[#0D1B2A]">OBC / SBC</option>
+                <option value="sc" className="text-[#0D1B2A]">अनुसूचित जाति (SC)</option>
+                <option value="st" className="text-[#0D1B2A]">अनुसूचित जनजाति (ST)</option>
               </select>
-              <div className="bg-[#FFF3E8] border border-[#FF6B00] rounded-lg p-2 mt-2">
-                <p className="text-xs text-[#FF6B00]" style={{ fontFamily: "var(--font-noto)" }}>
-                  💡 OBC/SC/ST candidates को age relaxation मिलती है — Rajasthan domicile होना जरूरी है
-                </p>
-              </div>
             </div>
 
             {/* Section C — Optional Qualifications */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" style={{ fontFamily: "var(--font-noto)" }}>
-                आपके पास क्या है? (जो हो वो tick करें)
+            <div className="space-y-2.5 border-t border-gray-100 pt-4">
+              <label className="block text-xs font-bold text-gray-500 mb-1" style={{ fontFamily: "var(--font-noto)" }}>
+                विशेष योग्यता / सर्टिफिकेट्स (यदि उपलब्ध हो)
               </label>
               <div className="space-y-2">
-                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
                     checked={formData.hasRSCIT}
                     onChange={(e) => updateField("hasRSCIT", e.target.checked)}
-                    className="w-5 h-5 accent-[#0F2B5B]"
+                    className="w-5 h-5 accent-[#0F2B5B] rounded"
                   />
-                  <span style={{ fontFamily: "var(--font-noto)" }}>💻 RS-CIT या Computer Certificate</span>
+                  <span className="text-xs font-medium text-gray-700" style={{ fontFamily: "var(--font-noto)" }}>
+                    💻 RS-CIT कंप्यूटर सर्टिफिकेट
+                  </span>
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
                     checked={formData.hasCET_graduate}
                     onChange={(e) => updateField("hasCET_graduate", e.target.checked)}
-                    className="w-5 h-5 accent-[#0F2B5B]"
+                    className="w-5 h-5 accent-[#0F2B5B] rounded"
                   />
-                  <span style={{ fontFamily: "var(--font-noto)" }}>📋 CET Graduate Level (2024+)</span>
+                  <span className="text-xs font-medium text-gray-700" style={{ fontFamily: "var(--font-noto)" }}>
+                    📋 CET Graduate Level उत्तीर्ण (2024+)
+                  </span>
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <label className="flex items-center gap-3 cursor-pointer p-2 rounded-xl hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
                     checked={formData.hasCET_senior}
                     onChange={(e) => updateField("hasCET_senior", e.target.checked)}
-                    className="w-5 h-5 accent-[#0F2B5B]"
+                    className="w-5 h-5 accent-[#0F2B5B] rounded"
                   />
-                  <span style={{ fontFamily: "var(--font-noto)" }}>📋 CET Senior Secondary Level (2024+)</span>
+                  <span className="text-xs font-medium text-gray-700" style={{ fontFamily: "var(--font-noto)" }}>
+                    📋 CET Senior Secondary उत्तीर्ण (2024+)
+                  </span>
                 </label>
               </div>
             </div>
@@ -356,27 +350,27 @@ export default function Home() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-14 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] hover:from-[#E56200] hover:to-[#CC5500] text-white text-lg font-bold rounded-xl mt-6 active:scale-95 transition-transform disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
+              className="w-full h-13 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] hover:from-[#E55A00] hover:to-[#cc5000] text-white text-base font-bold rounded-xl mt-6 active:scale-95 transition-transform disabled:opacity-60 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer"
               style={{ fontFamily: "var(--font-noto)" }}
             >
-              {loading ? "ढूंढ रहे हैं..." : "🔍 योग्य भर्तियाँ ढूंढें"}
+              {loading ? "खोज रहे हैं..." : "🔍 योग्य भर्तियाँ ढूंढें"}
             </button>
           </form>
         </div>
 
         {/* Trust Signals */}
-        <div className="flex gap-3 justify-center py-6 mt-4 flex-wrap">
-          <span className="bg-[#E8F5E9] text-[#138808] text-xs px-4 py-2 rounded-full font-medium">
+        <div className="flex gap-3 justify-center py-6 mt-2 flex-wrap">
+          <span className="bg-[#E8F5E9] text-[#138808] text-xs px-4 py-2 rounded-full font-bold shadow-sm">
             🔒 सुरक्षित
           </span>
-          <span className="bg-[#E8F5E9] text-[#138808] text-xs px-4 py-2 rounded-full font-medium">
+          <span className="bg-[#E8F5E9] text-[#138808] text-xs px-4 py-2 rounded-full font-bold shadow-sm">
             ✅ हर सोमवार verified
           </span>
         </div>
 
         {/* Disclaimer */}
-        <p className="text-center text-gray-400 text-xs px-4 mt-4" style={{ fontFamily: "var(--font-noto)" }}>
-          यह पोर्टल अनौपचारिक है। आधिकारिक जानकारी के लिए संबंधित विभाग की वेबसाइट देखें।
+        <p className="text-center text-gray-400 text-[10px] px-6 mt-2 leading-relaxed" style={{ fontFamily: "var(--font-noto)" }}>
+          यह पोर्टल अनौपचारिक है। अधिकारिक व सटीक जानकारी के लिए हमेशा संबंधित सरकारी विभाग की आधिकारिक वेबसाइट देखें।
         </p>
       </div>
     </main>

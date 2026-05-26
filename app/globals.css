@@ -51,9 +51,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Input/Select - Always has background */
+/* Input/Select - Always has background and high-contrast text */
 input, select, textarea {
-  background-color: var(--bg-input) !important;
+  background-color: var(--bg-input);
+  color: var(--foreground);
 }
 
 /* Fix dropdown options visibility */
@@ -298,3 +299,26 @@ select option {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   }
 }
+
+/* Admin Panel Specific Custom Overrides */
+.admin-input-field {
+  background-color: #0f1117 !important;
+  color: #ffffff !important;
+  border-color: #2a2d3a !important;
+}
+
+.admin-input-field:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+.admin-select-field {
+  background-color: #0f1117 !important;
+  color: #ffffff !important;
+  border-color: #2a2d3a !important;
+}
+
+.admin-select-field option {
+  background-color: #1a1d27 !important;
+  color: #ffffff !important;
+}

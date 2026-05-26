@@ -425,12 +425,12 @@ export default function AdminDashboard() {
                 <select
                   value={config.active_provider}
                   onChange={(e) => setConfig({ ...config, active_provider: e.target.value })}
-                  className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl p-3 text-white focus:border-[#10b981] outline-none cursor-pointer"
+                  className="w-full admin-select-field border border-[#2a2d3a] rounded-xl p-3 text-white focus:border-[#10b981] outline-none cursor-pointer"
                 >
-                  <option value="gemini">🟢 Google Gemini 2.0 Flash (Recommended & Free Tier)</option>
-                  <option value="openai">🔵 OpenAI GPT-4o-mini</option>
-                  <option value="claude">🟣 Anthropic Claude 3.5 (Haiku / Sonnet)</option>
-                  <option value="openrouter">🟠 OpenRouter (Global Proxy)</option>
+                  <option value="gemini">Gemini 2.0 Flash (Recommended & Free Tier)</option>
+                  <option value="openai">OpenAI GPT-4o-mini</option>
+                  <option value="claude">Anthropic Claude 3.5 (Haiku / Sonnet)</option>
+                  <option value="openrouter">OpenRouter (Global Proxy)</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-2">
                   चैटबॉट रियल-टाइम में इसी सक्रिय प्रदाता (Active Provider) का उपयोग करके छात्रों के प्रश्नों का जवाब देगा।
@@ -450,7 +450,7 @@ export default function AdminDashboard() {
                       value={config.gemini_key}
                       onChange={(e) => setConfig({ ...config, gemini_key: e.target.value })}
                       placeholder="AIzaSy..."
-                      className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
                     />
                   </div>
                   <button
@@ -471,7 +471,7 @@ export default function AdminDashboard() {
                       value={config.openai_key}
                       onChange={(e) => setConfig({ ...config, openai_key: e.target.value })}
                       placeholder="sk-proj-..."
-                      className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
                     />
                   </div>
                   <button
@@ -492,7 +492,7 @@ export default function AdminDashboard() {
                       value={config.claude_key}
                       onChange={(e) => setConfig({ ...config, claude_key: e.target.value })}
                       placeholder="sk-ant-..."
-                      className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
                     />
                   </div>
                   <button
@@ -513,7 +513,7 @@ export default function AdminDashboard() {
                       value={config.openrouter_key}
                       onChange={(e) => setConfig({ ...config, openrouter_key: e.target.value })}
                       placeholder="sk-or-v1-..."
-                      className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
                     />
                   </div>
                   <button
@@ -577,7 +577,7 @@ export default function AdminDashboard() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="नाम / शहर / श्रेणी सर्च करें..."
-                  className="bg-[#1a1d27] border border-[#2a2d3a] rounded-xl px-4 py-2 text-sm text-white focus:border-[#10b981] outline-none"
+                  className="admin-input-field border border-[#2a2d3a] rounded-xl px-4 py-2 text-sm text-white focus:border-[#10b981] outline-none"
                   onKeyDown={(e) => e.key === "Enter" && fetchUsers(searchQuery)}
                 />
                 <button
