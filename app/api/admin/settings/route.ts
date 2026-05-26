@@ -16,12 +16,27 @@ export async function GET(req: NextRequest) {
     return key.substring(0, 4) + '••••••••' + key.substring(key.length - 4);
   };
 
+  // Check if groq_key column is present in the database table
+  let hasGroqColumn = false;
+  try {
+    const { data } = await supabaseAdmin
+      .from('admin_settings')
+      .select('*')
+      .limit(1)
+      .maybeSingle();
+    hasGroqColumn = data ? ('groq_key' in data) : false;
+  } catch (e) {
+    console.error("Column check error in GET:", e);
+  }
+
   return NextResponse.json({
     active_provider: settings.active_provider,
     gemini_key: maskKey(settings.gemini_key),
     openai_key: maskKey(settings.openai_key),
     claude_key: maskKey(settings.claude_key),
     openrouter_key: maskKey(settings.openrouter_key),
+    groq_key: maskKey(settings.groq_key),
+    db_missing_groq: !hasGroqColumn
   });
 }
 
@@ -32,7 +47,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { active_provider, gemini_key, openai_key, claude_key, openrouter_key } = body;
+    const { active_provider, gemini_key, openai_key, claude_key, openrouter_key, groq_key } = body;
 
     const existing = await getAdminSettings();
 
@@ -49,6 +64,23 @@ export async function POST(req: NextRequest) {
     updateObj.openai_key = processKey(openai_key, existing.openai_key);
     updateObj.claude_key = processKey(claude_key, existing.claude_key);
     updateObj.openrouter_key = processKey(openrouter_key, existing.openrouter_key);
+
+    // Dynamic database column check for groq_key
+    let hasGroqColumn = false;
+    try {
+      const { data } = await supabaseAdmin
+        .from('admin_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+      hasGroqColumn = data ? ('groq_key' in data) : false;
+    } catch (e) {
+      console.error("Column check error in POST:", e);
+    }
+
+    if (hasGroqColumn) {
+      updateObj.groq_key = processKey(groq_key, existing.groq_key);
+    }
 
     const { data: existingRows } = await supabaseAdmin
       .from('admin_settings')
@@ -70,7 +102,7 @@ export async function POST(req: NextRequest) {
       if (error) throw error;
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, db_missing_groq: !hasGroqColumn });
   } catch (error: any) {
     console.error('Save admin settings error:', error);
     return NextResponse.json({ error: 'Database update failed: ' + error.message }, { status: 500 });

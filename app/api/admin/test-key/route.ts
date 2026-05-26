@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
           'X-Title': 'Sarkari Saathi'
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.0-flash-001',
+          model: 'google/gemini-2.0-flash',
           messages: [{ role: 'user', content: testPrompt }],
           max_tokens: 20
         })
@@ -103,6 +103,30 @@ export async function POST(req: NextRequest) {
       if (!res.ok) {
         const err = await res.text();
         return NextResponse.json({ success: false, error: `OpenRouter Error: ${res.status} - ${err.substring(0, 100)}` });
+      }
+
+      const data = await res.json();
+      const text = data.choices?.[0]?.message?.content || '';
+      return NextResponse.json({ success: true, response: text.trim() });
+    }
+
+    if (provider === 'groq') {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: testPrompt }],
+          max_tokens: 20
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.text();
+        return NextResponse.json({ success: false, error: `Groq Error: ${res.status} - ${err.substring(0, 100)}` });
       }
 
       const data = await res.json();

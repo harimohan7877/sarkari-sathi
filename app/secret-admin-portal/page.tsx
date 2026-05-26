@@ -41,6 +41,8 @@ interface ConfigSettings {
   openai_key: string;
   claude_key: string;
   openrouter_key: string;
+  groq_key: string;
+  db_missing_groq?: boolean;
 }
 
 export default function AdminDashboard() {
@@ -52,7 +54,15 @@ export default function AdminDashboard() {
   const [chats, setChats] = useState<ChatMessage[]>([]);
   
   // AI Config States
-  const [config, setConfig] = useState<ConfigSettings>({ active_provider: "openrouter", gemini_key: "", openai_key: "", claude_key: "", openrouter_key: "" });
+  const [config, setConfig] = useState<ConfigSettings>({ 
+    active_provider: "openrouter", 
+    gemini_key: "", 
+    openai_key: "", 
+    claude_key: "", 
+    openrouter_key: "",
+    groq_key: "",
+    db_missing_groq: false
+  });
   const [testResult, setTestResult] = useState<{ success?: boolean; text?: string; loading?: boolean }>({});
   const [saveStatus, setSaveStatus] = useState<{ success?: boolean; text?: string; loading?: boolean }>({});
   
@@ -216,6 +226,7 @@ export default function AdminDashboard() {
     if (provider === "openai") key = config.openai_key;
     if (provider === "claude") key = config.claude_key;
     if (provider === "openrouter") key = config.openrouter_key;
+    if (provider === "groq") key = config.groq_key;
 
     if (!key) {
       setTestResult({ success: false, text: "कृपया पहले कुंजी (API Key) दर्ज करें।" });
@@ -431,6 +442,7 @@ export default function AdminDashboard() {
                   <option value="openai">OpenAI GPT-4o-mini</option>
                   <option value="claude">Anthropic Claude 3.5 (Haiku / Sonnet)</option>
                   <option value="openrouter">OpenRouter (Global Proxy)</option>
+                  <option value="groq">Groq (Llama-3.3-70b-versatile)</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-2">
                   चैटबॉट रियल-टाइम में इसी सक्रिय प्रदाता (Active Provider) का उपयोग करके छात्रों के प्रश्नों का जवाब देगा।
@@ -442,88 +454,126 @@ export default function AdminDashboard() {
                 <h3 className="text-sm font-semibold text-white">API Keys Management</h3>
 
                 {/* Gemini */}
-                <div className="grid grid-cols-4 gap-4 items-center">
-                  <span className="text-xs text-gray-400 col-span-1 font-semibold">Gemini API Key:</span>
-                  <div className="col-span-2">
-                    <input
-                      type="password"
-                      value={config.gemini_key}
-                      onChange={(e) => setConfig({ ...config, gemini_key: e.target.value })}
-                      placeholder="AIzaSy..."
-                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
-                    />
+                {config.active_provider === "gemini" && (
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-xs text-gray-400 col-span-1 font-semibold">Gemini API Key:</span>
+                    <div className="col-span-2">
+                      <input
+                        type="password"
+                        value={config.gemini_key}
+                        onChange={(e) => setConfig({ ...config, gemini_key: e.target.value })}
+                        placeholder="AIzaSy..."
+                        className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTestKey("gemini")}
+                      className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
+                    >
+                      Test Connection
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleTestKey("gemini")}
-                    className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
-                  >
-                    Test Connection
-                  </button>
-                </div>
+                )}
 
                 {/* OpenAI */}
-                <div className="grid grid-cols-4 gap-4 items-center">
-                  <span className="text-xs text-gray-400 col-span-1 font-semibold">OpenAI API Key:</span>
-                  <div className="col-span-2">
-                    <input
-                      type="password"
-                      value={config.openai_key}
-                      onChange={(e) => setConfig({ ...config, openai_key: e.target.value })}
-                      placeholder="sk-proj-..."
-                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
-                    />
+                {config.active_provider === "openai" && (
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-xs text-gray-400 col-span-1 font-semibold">OpenAI API Key:</span>
+                    <div className="col-span-2">
+                      <input
+                        type="password"
+                        value={config.openai_key}
+                        onChange={(e) => setConfig({ ...config, openai_key: e.target.value })}
+                        placeholder="sk-proj-..."
+                        className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTestKey("openai")}
+                      className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
+                    >
+                      Test Connection
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleTestKey("openai")}
-                    className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
-                  >
-                    Test Connection
-                  </button>
-                </div>
+                )}
 
                 {/* Claude */}
-                <div className="grid grid-cols-4 gap-4 items-center">
-                  <span className="text-xs text-gray-400 col-span-1 font-semibold">Claude API Key:</span>
-                  <div className="col-span-2">
-                    <input
-                      type="password"
-                      value={config.claude_key}
-                      onChange={(e) => setConfig({ ...config, claude_key: e.target.value })}
-                      placeholder="sk-ant-..."
-                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
-                    />
+                {config.active_provider === "claude" && (
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-xs text-gray-400 col-span-1 font-semibold">Claude API Key:</span>
+                    <div className="col-span-2">
+                      <input
+                        type="password"
+                        value={config.claude_key}
+                        onChange={(e) => setConfig({ ...config, claude_key: e.target.value })}
+                        placeholder="sk-ant-..."
+                        className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTestKey("claude")}
+                      className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
+                    >
+                      Test Connection
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleTestKey("claude")}
-                    className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
-                  >
-                    Test Connection
-                  </button>
-                </div>
+                )}
 
                 {/* OpenRouter */}
-                <div className="grid grid-cols-4 gap-4 items-center">
-                  <span className="text-xs text-gray-400 col-span-1 font-semibold">OpenRouter Key:</span>
-                  <div className="col-span-2">
-                    <input
-                      type="password"
-                      value={config.openrouter_key}
-                      onChange={(e) => setConfig({ ...config, openrouter_key: e.target.value })}
-                      placeholder="sk-or-v1-..."
-                      className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
-                    />
+                {config.active_provider === "openrouter" && (
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-xs text-gray-400 col-span-1 font-semibold">OpenRouter Key:</span>
+                    <div className="col-span-2">
+                      <input
+                        type="password"
+                        value={config.openrouter_key}
+                        onChange={(e) => setConfig({ ...config, openrouter_key: e.target.value })}
+                        placeholder="sk-or-v1-..."
+                        className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleTestKey("openrouter")}
+                      className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
+                    >
+                      Test Connection
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleTestKey("openrouter")}
-                    className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
-                  >
-                    Test Connection
-                  </button>
-                </div>
+                )}
+
+                {/* Groq */}
+                {config.active_provider === "groq" && (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-4 gap-4 items-center">
+                      <span className="text-xs text-gray-400 col-span-1 font-semibold">Groq API Key:</span>
+                      <div className="col-span-2">
+                        <input
+                          type="password"
+                          value={config.groq_key}
+                          onChange={(e) => setConfig({ ...config, groq_key: e.target.value })}
+                          placeholder="gsk_..."
+                          className="w-full admin-input-field border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-[#10b981] outline-none"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleTestKey("groq")}
+                        className="h-10 bg-[#2a2d3a] hover:bg-[#3a3d4d] text-xs font-bold rounded-xl transition-all"
+                      >
+                        Test Connection
+                      </button>
+                    </div>
+                    {config.db_missing_groq && (
+                      <div className="bg-amber-950/40 border border-amber-500/30 text-amber-300 p-4 rounded-xl text-xs leading-relaxed">
+                        ⚠️ <strong>डेटाबेस सूचना:</strong> आपके Supabase में <code>groq_key</code> कॉलम मौजूद नहीं है। आपकी यह कुंजी केवल तभी सेव होगी जब आप डेटाबेस में नया कॉलम जोड़ेंगे। कृपया "Supabase Schema Guide" टैब में दिए गए नए ALTER TABLE निर्देश को अपने Supabase SQL Editor में चलाएं। (तब तक आप <code>GROQ_API_KEY</code> को <code>.env.local</code> में भी सेट कर सकते हैं।)
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Status and Test Alerts */}
@@ -719,13 +769,17 @@ CREATE TABLE IF NOT EXISTS admin_settings (
   openai_key TEXT DEFAULT '',
   claude_key TEXT DEFAULT '',
   openrouter_key TEXT DEFAULT '',
+  groq_key TEXT DEFAULT '',
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- 3. Enable Row Level Security (RLS)
+-- 3. Run this migration if table already exists but lacks groq_key column
+ALTER TABLE admin_settings ADD COLUMN IF NOT EXISTS groq_key TEXT DEFAULT '';
+
+-- 4. Enable Row Level Security (RLS)
 ALTER TABLE admin_settings ENABLE ROW LEVEL SECURITY;
 
--- 4. Insert default row if settings table is empty
+-- 5. Insert default row if settings table is empty
 INSERT INTO admin_settings (active_provider)
 SELECT 'openrouter'
 WHERE NOT EXISTS (SELECT 1 FROM admin_settings);`}

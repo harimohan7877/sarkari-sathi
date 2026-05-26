@@ -225,6 +225,39 @@ ${examInfo}`;
     };
   }
 
+  if (provider === 'groq') {
+    const key = settings.groq_key || process.env.GROQ_API_KEY;
+    if (!key) throw new Error("Groq API Key is not configured in Admin Settings or env.");
+
+    const modelName = "llama-3.3-70b-versatile";
+
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: apiMessages,
+        max_tokens: maxTokens,
+        temperature: 0.7
+      })
+    });
+
+    if (!res.ok) {
+      const errTxt = await res.text();
+      console.error("Groq API error:", res.status, errTxt);
+      throw new Error(`Groq API error: ${res.status} - ${errTxt.substring(0, 200)}`);
+    }
+
+    const data = await res.json();
+    return {
+      response: data.choices[0].message.content,
+      model: modelName
+    };
+  }
+
   // Default: OpenRouter
   const key = settings.openrouter_key || settings.openai_key || process.env.OPENROUTER_API_KEY;
   if (!key) throw new Error("OpenRouter API Key is not configured in Admin Settings or env.");
