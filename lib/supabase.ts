@@ -67,3 +67,81 @@ export async function saveChatMessages(userId: string, examId: string, userMessa
     { user_id: userId, exam_id: examId, role: 'assistant', content: aiResponse }
   ]);
 }
+
+import { NextRequest } from 'next/server';
+
+export async function verifyUserSession(req: NextRequest, userId: string): Promise<boolean> {
+  if (!userId) return false;
+  
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const ref = supabaseUrl.split('//')[1]?.split('.')[0] || '';
+  
+  // Try to find the auth cookie
+  const token = req.cookies.get('sb-access-token')?.value || 
+                req.cookies.get(`sb-${ref}-auth-token`)?.value ||
+                req.cookies.get(`sb-${ref}-auth-token.0`)?.value ||
+                req.cookies.get(`sb-${ref}-auth-token.1`)?.value;
+                
+  if (!token) return false;
+  
+  let actualToken = token;
+  try {
+    const parsed = JSON.parse(token);
+    actualToken = parsed.access_token || token;
+  } catch {}
+  
+  try {
+    const { data: { user } } = await supabaseAdmin.auth.getUser(actualToken);
+    return user?.id === userId;
+  } catch (err) {
+    console.error("Session verification error:", err);
+    return false;
+  }
+}
+
+export interface AdminSettings {
+  active_provider: string;
+  gemini_key: string;
+  openai_key: string;
+  claude_key: string;
+  openrouter_key: string;
+}
+
+export async function getAdminSettings(): Promise<AdminSettings> {
+  const fallbackSettings: AdminSettings = {
+    active_provider: process.env.ACTIVE_AI_PROVIDER || 'openrouter',
+    gemini_key: process.env.GEMINI_API_KEY || '',
+    openai_key: process.env.OPENAI_API_KEY || '',
+    claude_key: process.env.CLAUDE_API_KEY || '',
+    openrouter_key: process.env.OPENROUTER_API_KEY || ''
+  };
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('admin_settings')
+      .select('*')
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.warn("Could not fetch admin settings from DB (table might be missing), falling back to env:", error.message);
+      return fallbackSettings;
+    }
+
+    if (!data) {
+      return fallbackSettings;
+    }
+
+    return {
+      active_provider: data.active_provider || fallbackSettings.active_provider,
+      gemini_key: data.gemini_key || fallbackSettings.gemini_key,
+      openai_key: data.openai_key || fallbackSettings.openai_key,
+      claude_key: data.claude_key || fallbackSettings.claude_key,
+      openrouter_key: data.openrouter_key || fallbackSettings.openrouter_key,
+    };
+  } catch (err) {
+    console.error("Error reading admin settings from DB:", err);
+    return fallbackSettings;
+  }
+}
+

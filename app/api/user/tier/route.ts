@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserTier } from "@/lib/supabase";
+import { getUserTier, verifyUserSession } from "@/lib/supabase";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -8,6 +8,14 @@ export async function GET(req: NextRequest) {
 
   if (!userId && !guestToken) {
     return NextResponse.json({ tier: 'guest', messagesUsed: 0, limit: 5 });
+  }
+
+  // Secure backend: Verify user session if userId is provided
+  if (userId) {
+    const isValid = await verifyUserSession(req, userId);
+    if (!isValid) {
+      return NextResponse.json({ error: "अनाधिकृत प्रवेश (Unauthorized Access)" }, { status: 401 });
+    }
   }
 
   try {

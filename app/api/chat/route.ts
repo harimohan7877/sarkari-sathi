@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendChatMessageSmart, type ChatMessage } from "@/lib/ai";
 import { getExamById } from "@/lib/eligibility";
-import { getUserTier, incrementMessageCount, saveChatMessages } from "@/lib/supabase";
+import { getUserTier, incrementMessageCount, saveChatMessages, verifyUserSession } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
 
@@ -11,6 +11,14 @@ export async function POST(req: NextRequest) {
 
     if (!messages || !examId || !userProfile) {
       return NextResponse.json({ error: "कृपया सभी जानकारी भरें" }, { status: 400 });
+    }
+
+    // Secure backend: Verify user session if userId is provided
+    if (userId) {
+      const isValid = await verifyUserSession(req, userId);
+      if (!isValid) {
+        return NextResponse.json({ error: "अनाधिकृत प्रवेश (Unauthorized Access)" }, { status: 401 });
+      }
     }
 
     // Get user tier and check limits

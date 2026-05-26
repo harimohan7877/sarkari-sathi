@@ -1,7 +1,6 @@
 import { Exam, type UserProfile } from "./eligibility";
 import examsData from "@/data/exams.json";
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+import { getAdminSettings } from "./supabase";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -48,9 +47,9 @@ export const SARKARI_SAATHI_SYSTEM_PROMPT = `
 - "SSO ID कैसे बनाएं?" → 7 steps + helpdesk 0141-5153222
 - "Documents क्या चाहिए?" → Exam-specific list
 - "Fee कैसे दें?" → Debit/Net Banking/UPI, 2-3 दिन पहले
-- "कब मिलेगी?" → "Exact नहीं बता सकता, site check करो"
+- "कब मिलेगी?" → "Exact नहीं बता सकता, site check karo"
 
-📺 Free YouTube (Rajasthan exam के लिए):
+Free YouTube (Rajasthan exam के लिए):
 - KGS Rajasthan Exams (best)
 - Utkarsh Classes (Revenue/Raj GK)
 - Exampur (Reasoning/Maths)
@@ -85,16 +84,16 @@ export async function sendChatMessageSmart(
 ): Promise<{ response: string; model: string }> {
   const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
 
-  // Simple queries = fast model, Complex = detailed
+  // 1. Load active AI provider and key from admin settings (DB with env fallback)
+  const settings = await getAdminSettings();
+  const provider = settings.active_provider;
+
+  // Decide if we need a smarter model based on query complexity
   const needsSonnet =
     lastMessage.includes('step') ||
     lastMessage.includes('kaise') ||
     lastMessage.includes('guide') ||
     lastMessage.length > 150;
-
-  const model = needsSonnet
-    ? "openai/gpt-4o"
-    : "openai/gpt-4o-mini";
 
   const maxTokens = needsSonnet ? 1500 : 800;
 
@@ -113,38 +112,152 @@ ${examInfo}`;
     ...messages.map((m) => ({ role: m.role, content: m.content })),
   ];
 
-  try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        "HTTP-Referer": "https://sarkari-saathi.vercel.app",
-        "X-Title": "Sarkari Saathi",
-      },
+  // 2. Dispatch to the correct AI Provider
+  if (provider === 'gemini') {
+    const key = settings.gemini_key || process.env.GEMINI_API_KEY;
+    if (!key) throw new Error("Gemini API Key is not configured in Admin Settings or env.");
+
+    const modelName = "gemini-2.0-flash";
+    
+    // Format messages for Gemini API
+    const contents = apiMessages.filter(m => m.role !== 'system').map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: m.content }]
+    }));
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model,
-        messages: apiMessages,
-        max_tokens: maxTokens,
-        temperature: 0.7,
-      }),
+        contents,
+        systemInstruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: maxTokens
+        }
+      })
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API error:", response.status, errorText);
-      throw new Error(`API error: ${response.status} - ${errorText.substring(0, 200)}`);
+    if (!res.ok) {
+      const errTxt = await res.text();
+      console.error("Gemini API error:", res.status, errTxt);
+      throw new Error(`Gemini API error: ${res.status} - ${errTxt.substring(0, 200)}`);
     }
 
-    const data = await response.json();
+    const data = await res.json();
+    const text = (data.candidates?.[0]?.content?.parts||[]).map((p: any) => p.text||'').join('');
+    return {
+      response: text,
+      model: modelName
+    };
+  }
+
+  if (provider === 'openai') {
+    const key = settings.openai_key || process.env.OPENAI_API_KEY;
+    if (!key) throw new Error("OpenAI API Key is not configured in Admin Settings or env.");
+
+    const modelName = needsSonnet ? "gpt-4o" : "gpt-4o-mini";
+
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: apiMessages,
+        max_tokens: maxTokens,
+        temperature: 0.7
+      })
+    });
+
+    if (!res.ok) {
+      const errTxt = await res.text();
+      console.error("OpenAI API error:", res.status, errTxt);
+      throw new Error(`OpenAI API error: ${res.status} - ${errTxt.substring(0, 200)}`);
+    }
+
+    const data = await res.json();
     return {
       response: data.choices[0].message.content,
-      model: needsSonnet ? 'gpt-4o' : 'gpt-4o-mini'
+      model: modelName
     };
-  } catch (error) {
-    console.error("Chat error:", error);
-    throw error;
   }
+
+  if (provider === 'claude') {
+    const key = settings.claude_key || process.env.CLAUDE_API_KEY;
+    if (!key) throw new Error("Claude API Key is not configured in Admin Settings or env.");
+
+    const modelName = needsSonnet ? "claude-3-5-sonnet-20241022" : "claude-3-5-haiku-20241022";
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: modelName,
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages: apiMessages.filter(m => m.role !== 'system').map(m => ({
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: m.content
+        }))
+      })
+    });
+
+    if (!res.ok) {
+      const errTxt = await res.text();
+      console.error("Claude API error:", res.status, errTxt);
+      throw new Error(`Claude API error: ${res.status} - ${errTxt.substring(0, 200)}`);
+    }
+
+    const data = await res.json();
+    const text = (data.content||[]).map((b: any) => b.text||'').join('');
+    return {
+      response: text,
+      model: modelName
+    };
+  }
+
+  // Default: OpenRouter
+  const key = settings.openrouter_key || settings.openai_key || process.env.OPENROUTER_API_KEY;
+  if (!key) throw new Error("OpenRouter API Key is not configured in Admin Settings or env.");
+
+  const modelName = needsSonnet ? "openai/gpt-4o" : "openai/gpt-4o-mini";
+
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`,
+      "HTTP-Referer": "https://sarkari-saathi.vercel.app",
+      "X-Title": "Sarkari Saathi",
+    },
+    body: JSON.stringify({
+      model: modelName,
+      messages: apiMessages,
+      max_tokens: maxTokens,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error("OpenRouter API error:", response.status, errorText);
+    throw new Error(`OpenRouter API error: ${response.status} - ${errorText.substring(0, 200)}`);
+  }
+
+  const data = await response.json();
+  return {
+    response: data.choices[0].message.content,
+    model: modelName
+  };
 }
 
 // Legacy export for backward compatibility
