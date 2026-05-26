@@ -72,11 +72,11 @@ sarkari-saathi/
 
 1. Vercel Dashboard → Project Settings → Environment Variables
 2. Add these variables:
-   - `OPENROUTER_API_KEY` = `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`
+   - `OPENROUTER_API_KEY` = `your_openrouter_key_here`
 
 **Local .env.local:**
 ```
-OPENROUTER_API_KEY=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
+OPENROUTER_API_KEY=your_openrouter_key_here
 NEXT_PUBLIC_APP_NAME=Sarkari Saathi
 NEXT_PUBLIC_FREE_MESSAGES_LIMIT=5
 ```

@@ -101,13 +101,9 @@ CREATE POLICY "Anyone can create guest session"
   ON guest_sessions FOR INSERT
   WITH CHECK (TRUE);
 
-CREATE POLICY "Anyone can read own guest session by token"
-  ON guest_sessions FOR SELECT
-  USING (TRUE);
+-- NOTE: SELECT and UPDATE are disabled for public/anon roles for security.
+-- Next.js backend uses supabaseAdmin client (service role) to query and update guest sessions safely.
 
-CREATE POLICY "Anyone can update own guest session"
-  ON guest_sessions FOR UPDATE
-  USING (TRUE);
 
 -- Chat messages policies
 CREATE POLICY "Users can read own chat messages"
@@ -153,3 +149,30 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- ═══════════════════════════════════════════
+-- SARKARI SAATHI V3 — ADMIN PANEL UPDATES
+-- ═══════════════════════════════════════════
+
+-- 1. Add is_admin field to user_profiles
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
+
+-- 2. Create Admin Settings Table for AI Provider & API Keys
+CREATE TABLE IF NOT EXISTS admin_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  active_provider TEXT NOT NULL DEFAULT 'openrouter',
+  gemini_key TEXT DEFAULT '',
+  openai_key TEXT DEFAULT '',
+  claude_key TEXT DEFAULT '',
+  openrouter_key TEXT DEFAULT '',
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- RLS enable on admin_settings (By default, only service role has access since no policy is created)
+ALTER TABLE admin_settings ENABLE ROW LEVEL SECURITY;
+
+-- Insert default row if none exists
+INSERT INTO admin_settings (active_provider)
+SELECT 'openrouter'
+WHERE NOT EXISTS (SELECT 1 FROM admin_settings);
+
