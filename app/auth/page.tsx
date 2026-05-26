@@ -16,7 +16,7 @@ export default function AuthPage() {
     setError('');
     const { error } = await supabase.auth.signInWithOtp({ email });
     if (error) {
-      setError('Email galat hai ya kuch problem aa gayi। Dobara try karo।');
+      setError('ईमेल गलत है या कोई तकनीकी समस्या आ गई है। कृपया पुनः प्रयास करें।');
     } else {
       setStep('otp');
     }
@@ -31,7 +31,7 @@ export default function AuthPage() {
       type: 'email'
     });
     if (error) {
-      setError('Code galat hai। Email mein aaya 6-digit code daalo।');
+      setError('प्रवेश कोड गलत है। ईमेल में प्राप्त हुआ 6-अंकीय कोड दर्ज करें।');
     } else {
       const returnTo = typeof window !== 'undefined' 
         ? sessionStorage.getItem('returnTo') || '/' 
@@ -42,75 +42,88 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EEF2F8] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#EEF2F8] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Decorative background glows */}
+      <div className="absolute w-96 h-96 rounded-full bg-orange-500/5 blur-3xl -top-20 -left-20 pointer-events-none" />
+      <div className="absolute w-96 h-96 rounded-full bg-blue-500/5 blur-3xl top-1/2 right-0 pointer-events-none" />
+
       {/* Tiranga stripe at very top */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#138808] z-50" />
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md relative z-10 animate-slide-up">
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-xl shadow-blue-900/10 overflow-hidden border border-[#C5D0E0]/60">
           {/* Card header */}
-          <div className="bg-gradient-to-r from-[#0F2B5B] to-[#1847A6] p-6 text-center">
-            <div className="text-4xl mb-2">🏛️</div>
-            <h1 className="text-white text-xl font-bold" style={{ fontFamily: 'var(--font-noto)' }}>
+          <div className="bg-gradient-to-br from-[#0F2B5B] via-[#143770] to-[#1847A6] p-8 text-center border-b border-white/10 relative">
+            {/* Simple Home Link */}
+            <button 
+              onClick={() => router.push('/')}
+              className="absolute left-4 top-4 text-white/70 hover:text-white text-xs bg-white/10 hover:bg-white/20 p-2 rounded-full border border-white/10 transition-all active:scale-95"
+            >
+              ← होम
+            </button>
+            <div className="text-4xl mb-2.5">🏛️</div>
+            <h1 className="text-white text-xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-noto)' }}>
               सरकारी साथी
             </h1>
-            <p className="text-white/75 text-sm mt-1" style={{ fontFamily: 'var(--font-noto)' }}>
-              Login करें और पूरी जानकारी पाएं
+            <p className="text-white/70 text-xs mt-1" style={{ fontFamily: 'var(--font-noto)' }}>
+              राजस्थान सरकारी भर्ती मार्गदर्शन पोर्टल
             </p>
           </div>
 
-          <div className="p-6">
+          <div className="p-8">
             {step === 'email' ? (
               <>
-                <h2 className="text-[#0F2B5B] font-bold text-lg mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
+                <h2 className="text-[#0F2B5B] font-extrabold text-base mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
                   Email से Login करें
                 </h2>
-                <p className="text-gray-500 text-sm mb-6" style={{ fontFamily: 'var(--font-noto)' }}>
-                  No password! Email पर 6-digit code आएगा।
+                <p className="text-gray-400 text-xs mb-6" style={{ fontFamily: 'var(--font-noto)' }}>
+                  कोई पासवर्ड नहीं! ईमेल पर 6 अंकों का सुरक्षित कोड भेजा जाएगा।
                 </p>
 
-                <label className="block text-sm font-semibold text-[#0F2B5B] mb-2" style={{ fontFamily: 'var(--font-noto)' }}>
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="aapka@email.com"
-                  className="w-full h-12 border-2 border-[#C5D0E0] rounded-xl px-4 text-base text-gray-900 bg-gray-50 focus:border-[#1847A6] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1847A6]/10 mb-4"
-                  onKeyDown={e => e.key === 'Enter' && email && sendOTP()}
-                />
+                <div className="mb-4">
+                  <label className="block text-xs font-bold text-gray-500 mb-1.5" style={{ fontFamily: 'var(--font-noto)' }}>
+                    ईमेल एड्रेस (Email Address)
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="example@domain.com"
+                    className="w-full h-12 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50/50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] focus:ring-4 focus:ring-blue-100 transition-all outline-none"
+                    onKeyDown={e => e.key === 'Enter' && email && sendOTP()}
+                  />
+                </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded-lg mb-4" style={{ fontFamily: 'var(--font-noto)' }}>
-                    {error}
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-xl mb-4" style={{ fontFamily: 'var(--font-noto)' }}>
+                    ⚠️ {error}
                   </div>
                 )}
 
                 <button
                   onClick={sendOTP}
                   disabled={!email || loading}
-                  className="w-full h-12 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-[#E56200] hover:to-[#CC5500] active:scale-[0.98] transition-all"
+                  className="w-full h-12 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:from-[#E55A00] hover:to-[#cc5000] active:scale-[0.98] transition-all shadow-md hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer text-sm"
                   style={{ fontFamily: 'var(--font-noto)' }}
                 >
-                  {loading ? '⏳ भेज रहे हैं...' : 'Code भेजो 📧'}
+                  {loading ? '⏳ भेज रहे हैं...' : 'OTP कोड भेजें 📧'}
                 </button>
 
-                <p className="text-center text-xs text-gray-400 mt-4" style={{ fontFamily: 'var(--font-noto)' }}>
-                  कोई password नहीं। कोई personal data नहीं। सिर्फ email।
+                <p className="text-center text-[10px] text-gray-400 mt-4 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
+                  कोई पासवर्ड याद रखने की जरूरत नहीं। आपका डेटा पूर्णतः सुरक्षित है।
                 </p>
               </>
             ) : (
               <>
-                <h2 className="text-[#0F2B5B] font-bold text-lg mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
-                  Code Enter करें
+                <h2 className="text-[#0F2B5B] font-extrabold text-base mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
+                  सुरक्षा कोड (OTP) दर्ज करें
                 </h2>
-                <p className="text-gray-500 text-sm mb-6" style={{ fontFamily: 'var(--font-noto)' }}>
-                  {email} पर 6-digit code भेजा गया है
+                <p className="text-gray-400 text-xs mb-6" style={{ fontFamily: 'var(--font-noto)' }}>
+                  हमने <span className="font-bold text-[#1847A6]">{email}</span> पर 6-अंकीय कोड भेजा है।
                 </p>
 
-                <div className="flex gap-2 mb-4">
+                <div className="flex gap-2.5 mb-5">
                   {[0,1,2,3,4,5].map(i => (
                     <input
                       key={i}
@@ -118,7 +131,7 @@ export default function AuthPage() {
                       type="text"
                       maxLength={1}
                       inputMode="numeric"
-                      className="w-full h-14 border-2 border-[#C5D0E0] rounded-xl text-center text-xl font-bold text-[#0F2B5B] focus:border-[#FF6B00] focus:outline-none"
+                      className="w-full h-14 border border-[#C5D0E0] rounded-xl text-center text-xl font-extrabold text-[#0D1B2A] bg-gray-50 focus:border-[#FF6B00] focus:bg-white focus:ring-4 focus:ring-orange-100 transition-all outline-none"
                       value={otp[i] || ''}
                       onChange={e => {
                         const val = e.target.value.replace(/\D/g, '');
@@ -140,26 +153,26 @@ export default function AuthPage() {
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded-lg mb-4" style={{ fontFamily: 'var(--font-noto)' }}>
-                    {error}
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-xl mb-4" style={{ fontFamily: 'var(--font-noto)' }}>
+                    ⚠️ {error}
                   </div>
                 )}
 
                 <button
                   onClick={verifyOTP}
                   disabled={otp.length < 6 || loading}
-                  className="w-full h-12 bg-gradient-to-r from-[#0F2B5B] to-[#1847A6] text-white font-bold rounded-xl disabled:opacity-50 hover:from-[#0D2550] hover:to-[#1540A0] active:scale-[0.98] transition-all"
+                  className="w-full h-12 bg-gradient-to-r from-[#0F2B5B] to-[#1847A6] text-white font-bold rounded-xl disabled:opacity-50 hover:from-[#0D2550] hover:to-[#1540A0] active:scale-[0.98] transition-all shadow-md text-sm cursor-pointer"
                   style={{ fontFamily: 'var(--font-noto)' }}
                 >
-                  {loading ? '⏳ Verify हो रहा है...' : 'Login करें ✅'}
+                  {loading ? '⏳ पुष्टि की जा रही है...' : 'Login पुष्टि करें ✅'}
                 </button>
 
                 <button
                   onClick={() => { setStep('email'); setOtp(''); setError(''); }}
-                  className="w-full mt-3 text-sm text-gray-500 hover:text-gray-700"
+                  className="w-full mt-4 text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors text-center"
                   style={{ fontFamily: 'var(--font-noto)' }}
                 >
-                  ← वापस जाएं
+                  ← वापस जाएं (Change Email)
                 </button>
               </>
             )}
@@ -167,10 +180,10 @@ export default function AuthPage() {
         </div>
 
         {/* Guest continue option */}
-        <p className="text-center text-sm text-gray-500 mt-4" style={{ fontFamily: 'var(--font-noto)' }}>
-          अभी नहीं?{' '}
-          <button onClick={() => router.back()} className="text-[#1847A6] font-medium hover:underline">
-            5 सवाल Guest के रूप में पूछें →
+        <p className="text-center text-xs text-gray-500 mt-5" style={{ fontFamily: 'var(--font-noto)' }}>
+          अभी लॉगिन नहीं करना?{' '}
+          <button onClick={() => router.back()} className="text-[#1847A6] font-bold hover:underline active:scale-95 transition-transform">
+            Guest के रूप में जारी रखें →
           </button>
         </p>
       </div>

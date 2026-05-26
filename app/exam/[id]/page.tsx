@@ -209,51 +209,71 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
   ];
 
   return (
-    <main className="min-h-screen bg-[#EEF2F8] flex flex-col">
+    <main className="min-h-screen bg-[#EEF2F8] pb-12 relative overflow-hidden flex flex-col">
+      {/* Decorative glows */}
+      <div className="absolute w-96 h-96 rounded-full bg-orange-500/5 blur-3xl -top-20 -left-20 pointer-events-none" />
+      <div className="absolute w-96 h-96 rounded-full bg-blue-500/5 blur-3xl top-1/2 right-0 pointer-events-none" />
+
       <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#138808] z-[60]" />
 
       {/* Header */}
-      <div className="bg-[#0F2B5B] h-14 px-4 flex items-center fixed top-1 w-full z-50 shadow-lg">
-        <button onClick={() => router.push("/results")} className="text-white font-semibold" style={{ fontFamily: "var(--font-noto)" }}>← वापस</button>
-        <div className="flex-1 text-center">
-          <h1 className="text-white text-base font-bold truncate px-4" style={{ fontFamily: "var(--font-noto)" }}>{exam.short_name || exam.name}</h1>
+      <div className="bg-gradient-to-r from-[#0F2B5B] to-[#1847A6] h-16 px-4 flex items-center justify-between fixed top-1 w-full z-50 shadow-md border-b border-white/10 rounded-b-xl">
+        <button 
+          onClick={() => router.push("/results")} 
+          className="text-white/90 hover:text-white flex items-center gap-1 text-sm font-semibold bg-white/10 px-3 py-1.5 rounded-full border border-white/10 transition-all hover:bg-white/20 active:scale-95" 
+          style={{ fontFamily: "var(--font-noto)" }}
+        >
+          ← वापस
+        </button>
+        <div className="text-center flex-1 max-w-[50%] mx-auto">
+          <h1 className="text-white text-sm md:text-base font-bold truncate" style={{ fontFamily: "var(--font-noto)" }}>{exam.short_name || exam.name}</h1>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={toggleSave}
             disabled={saveLoading}
-            className={`text-xl transition-all ${isSaved ? 'text-red-500 scale-110' : 'text-white/50 hover:text-white'}`}
+            className={`text-lg p-1.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all ${isSaved ? 'text-red-500' : 'text-white/50 hover:text-white'}`}
           >
             {isSaved ? '❤️' : '🤍'}
           </button>
-          <a href={exam.official_url} target="_blank" rel="noopener noreferrer" className="text-white/80 text-sm">🌐</a>
+          <a 
+            href={exam.official_url} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-white/85 hover:text-white text-xs bg-white/10 hover:bg-white/20 p-2 rounded-full border border-white/10 transition-all active:scale-95 flex items-center justify-center font-bold"
+          >
+            🌐
+          </a>
         </div>
       </div>
 
-      <div className="pt-16 flex flex-col flex-1 max-w-2xl mx-auto w-full">
+      <div className="pt-20 pb-4 flex flex-col flex-1 max-w-xl mx-auto w-full px-4 relative z-10 space-y-5">
         {/* Chat Section */}
-        <div className="bg-white border-b border-[#C5D0E0] flex flex-col" style={{ height: '55vh' }}>
+        <div className="bg-white rounded-2xl border border-[#C5D0E0]/60 shadow-lg flex flex-col overflow-hidden w-full" style={{ height: '55vh' }}>
           {/* Bot header */}
-          <div className="bg-[#EEF2F8] px-4 py-2 flex items-center gap-2 border-b border-[#C5D0E0]">
-            <div className="w-8 h-8 bg-[#0F2B5B] rounded-full flex items-center justify-center text-white text-sm">🏛️</div>
+          <div className="bg-gradient-to-r from-gray-50 to-[#EEF2F8] px-4 py-3 flex items-center gap-3 border-b border-[#C5D0E0]/60">
+            <div className="w-8 h-8 bg-[#0F2B5B] rounded-full flex items-center justify-center text-white text-sm shadow-sm">🏛️</div>
             <div>
-              <p className="text-sm font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>सरकारी साथी</p>
-              <p className="text-[10px] text-green-600">● Online</p>
+              <p className="text-sm font-bold text-[#0F2B5B] leading-none" style={{ fontFamily: "var(--font-noto)" }}>सरकारी साथी</p>
+              <p className="text-[10px] text-green-600 mt-1 font-semibold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block animate-pulse"></span>
+                Online
+              </p>
             </div>
           </div>
 
           {/* Messages */}
-          <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#E5EBF5]">
+          <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#E5EBF5]/60">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}>
-                  <p className="text-sm whitespace-pre-wrap" style={{ fontFamily: "var(--font-noto)" }}>{m.content}</p>
+                <div className={m.role === 'user' ? 'chat-bubble-user shadow-md' : 'chat-bubble-ai shadow-sm'}>
+                  <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed" style={{ fontFamily: "var(--font-noto)" }}>{m.content}</p>
                 </div>
               </div>
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="chat-bubble-ai flex gap-1.5 py-3">
+                <div className="chat-bubble-ai flex gap-1.5 py-3.5 shadow-sm">
                   <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot" />
                   <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot" />
                   <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot" />
@@ -264,9 +284,16 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
 
           {/* Quick replies */}
           {messages.length <= 2 && (
-            <div className="px-3 py-2 flex gap-2 overflow-x-auto scroll-hidden bg-white border-t border-[#C5D0E0]">
+            <div className="px-3 py-2 flex gap-2 overflow-x-auto scroll-hidden bg-white border-t border-[#C5D0E0]/50">
               {QUICK_REPLIES.map((q, i) => (
-                <button key={i} onClick={() => sendMessage(q)} className="quick-reply-chip flex-shrink-0" style={{ fontFamily: "var(--font-noto)" }}>{q}</button>
+                <button 
+                  key={i} 
+                  onClick={() => sendMessage(q)} 
+                  className="quick-reply-chip flex-shrink-0 text-xs py-2 hover:shadow-sm active:scale-95" 
+                  style={{ fontFamily: "var(--font-noto)" }}
+                >
+                  {q}
+                </button>
               ))}
             </div>
           )}
@@ -274,21 +301,21 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           {/* Message Counter */}
           <MessageCounter used={msgUsed} limit={msgLimit} tier={userTier} />
 
-          {/* Input */}
-          <div className="px-3 py-2 bg-white border-t border-[#C5D0E0] flex gap-2">
+          {/* Input Area */}
+          <div className="p-3 bg-white border-t border-[#C5D0E0]/50 flex gap-2 items-center">
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
               placeholder="अपना सवाल पूछें..."
               disabled={msgUsed >= msgLimit}
-              className="flex-1 h-11 border-2 border-[#C5D0E0] rounded-xl px-4 text-sm bg-[#F5F7FA] focus:border-[#1847A6] focus:bg-white outline-none disabled:opacity-50"
+              className="flex-1 h-12 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50 focus:border-[#1847A6] focus:bg-white transition-all outline-none disabled:opacity-50 text-[#0D1B2A] placeholder-gray-400"
               style={{ fontFamily: "var(--font-noto)" }}
             />
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading || msgUsed >= msgLimit}
-              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${input.trim() ? 'bg-[#FF6B00] text-white' : 'bg-[#E2E8F5] text-gray-400'}`}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-md ${input.trim() ? 'bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white shadow-orange-500/10' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}
             >
               ➤
             </button>
@@ -299,9 +326,9 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
         {messages.length >= 2 && <ScrollArrowCTA />}
 
         {/* Exam Info Section */}
-        <div id="exam-info" className="bg-white">
+        <div id="exam-info" className="bg-white rounded-2xl border border-[#C5D0E0]/60 shadow-lg overflow-hidden w-full">
           {/* Tabs */}
-          <div className="flex overflow-x-auto scroll-hidden border-b border-[#C5D0E0]">
+          <div className="flex overflow-x-auto scroll-hidden bg-gray-50 border-b border-[#C5D0E0]/60">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -309,35 +336,43 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
                   if (tab.locked) { setAuthReason('study_material'); setShowAuthModal(true); return; }
                   setActiveTab(tab.id);
                 }}
-                className={`flex-shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === tab.id ? 'border-[#FF6B00] text-[#0F2B5B]' : 'border-transparent text-gray-400 hover:text-gray-600'
-                } ${tab.locked ? 'opacity-60' : ''}`}
+                className={`flex-1 min-w-[76px] text-center py-3 text-[10px] md:text-xs font-bold border-b-2 transition-all flex flex-col items-center gap-1 ${
+                  activeTab === tab.id 
+                    ? 'border-[#FF6B00] text-[#0F2B5B] bg-white' 
+                    : 'border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-100/50'
+                } ${tab.locked ? 'opacity-70' : ''}`}
                 style={{ fontFamily: "var(--font-noto)" }}
               >
-                {tab.emoji} {tab.label} {tab.locked && '🔒'}
+                <span className="text-sm md:text-base">{tab.emoji}</span>
+                <span className="flex items-center gap-0.5">
+                  {tab.label} {tab.locked && <span className="text-[10px]">🔒</span>}
+                </span>
               </button>
             ))}
           </div>
 
           {/* Tab Content */}
-          <div className="p-5 min-h-[300px]">
+          <div className="p-5 min-h-[260px] bg-white">
             {activeTab === 'overview' && (
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>{exam.name}</h3>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="bg-[#EEF2F8] rounded-lg p-3"><p className="text-gray-500 text-xs">बोर्ड</p><p className="font-bold text-[#0F2B5B]">{exam.board}</p></div>
-                    <div className="bg-[#EEF2F8] rounded-lg p-3"><p className="text-gray-500 text-xs">Status</p><p className="font-bold text-[#0F2B5B]">{exam.status}</p></div>
-                    <div className="bg-[#EEF2F8] rounded-lg p-3"><p className="text-gray-500 text-xs">शिक्षा</p><p className="font-bold text-[#0F2B5B] text-xs">{exam.eligibility.education}</p></div>
-                    <div className="bg-[#EEF2F8] rounded-lg p-3"><p className="text-gray-500 text-xs">आयु</p><p className="font-bold text-[#0F2B5B]">{exam.eligibility.min_age}-{exam.eligibility.max_age}</p></div>
+                  <h3 className="font-extrabold text-[#0F2B5B] mb-3 text-base" style={{ fontFamily: "var(--font-noto)" }}>{exam.name}</h3>
+                  <div className="grid grid-cols-2 gap-3 text-xs md:text-sm">
+                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">बोर्ड</p><p className="font-extrabold text-[#0F2B5B]">{exam.board}</p></div>
+                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Status</p><p className="font-extrabold text-[#0F2B5B]">{exam.status}</p></div>
+                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">शिक्षा</p><p className="font-extrabold text-[#0F2B5B]">{exam.eligibility.education}</p></div>
+                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">आयु</p><p className="font-extrabold text-[#0F2B5B]">{exam.eligibility.min_age}-{exam.eligibility.max_age} वर्ष</p></div>
                   </div>
                 </div>
                 {exam.selection_process && (
-                  <div>
-                    <h4 className="font-bold text-sm text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>चयन प्रक्रिया</h4>
-                    <div className="space-y-1">
+                  <div className="pt-2">
+                    <h4 className="font-bold text-xs md:text-sm text-[#0F2B5B] mb-3" style={{ fontFamily: "var(--font-noto)" }}>चयन प्रक्रिया (Selection Process)</h4>
+                    <div className="space-y-2">
                       {exam.selection_process.map((s, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm"><span className="w-6 h-6 bg-[#FF6B00] text-white rounded-full flex items-center justify-center text-xs font-bold">{i+1}</span><span style={{ fontFamily: "var(--font-noto)" }}>{s}</span></div>
+                        <div key={i} className="flex items-center gap-3 text-xs md:text-sm bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                          <span className="w-6 h-6 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white rounded-full flex items-center justify-center text-xs font-bold shadow-sm">{i+1}</span>
+                          <span className="text-gray-700 font-semibold" style={{ fontFamily: "var(--font-noto)" }}>{s}</span>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -347,16 +382,16 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
 
             {activeTab === 'syllabus' && syllabus && (
               <div className="space-y-3">
-                <h3 className="font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>📚 विस्तृत पाठ्यक्रम</h3>
+                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>📚 विस्तृत पाठ्यक्रम</h3>
                 {syllabus.subjects.map((s: SyllabusSubject, i: number) => (
-                  <div key={i} className="bg-[#EEF2F8] rounded-xl p-3">
-                    <div className="flex justify-between items-center mb-1">
-                      <p className="font-bold text-sm text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{s.name}</p>
-                      <span className="bg-[#FF6B00] text-white text-xs px-2 py-0.5 rounded-full">{s.weightage}</span>
+                  <div key={i} className="bg-[#EEF2F8]/70 border border-[#C5D0E0]/30 rounded-xl p-3.5">
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="font-extrabold text-xs md:text-sm text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{s.name}</p>
+                      <span className="bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">{s.weightage}</span>
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1.5 mt-2">
                       {s.topics.map((t: string, ti: number) => (
-                        <span key={ti} className="bg-white text-xs text-gray-600 px-2 py-1 rounded-lg" style={{ fontFamily: "var(--font-noto)" }}>{t}</span>
+                        <span key={ti} className="bg-white text-[10px] md:text-xs text-gray-600 px-2.5 py-1 rounded-lg border border-gray-100 font-medium" style={{ fontFamily: "var(--font-noto)" }}>{t}</span>
                       ))}
                     </div>
                   </div>
@@ -364,50 +399,50 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
               </div>
             )}
             {activeTab === 'syllabus' && !syllabus && (
-              <p className="text-gray-400 text-center py-8" style={{ fontFamily: "var(--font-noto)" }}>Syllabus जल्द उपलब्ध होगा</p>
+              <p className="text-gray-400 text-center py-8 text-xs font-semibold" style={{ fontFamily: "var(--font-noto)" }}>Syllabus जल्द उपलब्ध होगा</p>
             )}
 
             {activeTab === 'pyq' && (
               <div className="space-y-3">
-                <h3 className="font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>📝 Previous Year Papers</h3>
+                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>📝 Previous Year Papers</h3>
                 {pyqs.length > 0 ? pyqs.map((p: PYQItem, i: number) => (
-                  <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="block bg-[#EEF2F8] rounded-xl p-3 hover:shadow-md transition-all">
+                  <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="block bg-[#EEF2F8]/70 border border-[#C5D0E0]/30 rounded-xl p-3.5 hover:shadow-md transition-all active:scale-99">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-bold text-sm text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{p.name}</p>
-                        <p className="text-xs text-gray-500">{p.source} • {p.year}</p>
+                        <p className="font-bold text-xs md:text-sm text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{p.name}</p>
+                        <p className="text-[10px] text-gray-500 mt-0.5 font-medium">{p.source} • {p.year}</p>
                       </div>
-                      <span className="text-[#FF6B00] text-sm">→</span>
+                      <span className="text-[#FF6B00] text-sm font-extrabold">→</span>
                     </div>
                   </a>
-                )) : <p className="text-gray-400 text-center py-8" style={{ fontFamily: "var(--font-noto)" }}>PYQ जल्द उपलब्ध होंगे</p>}
+                )) : <p className="text-gray-400 text-center py-8 text-xs font-semibold" style={{ fontFamily: "var(--font-noto)" }}>PYQ जल्द उपलब्ध होंगे</p>}
               </div>
             )}
 
             {activeTab === 'documents' && (
               <div className="space-y-2">
-                <h3 className="font-bold text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>📄 जरूरी दस्तावेज़</h3>
-                {["SSO ID (mandatory)", "Jan Aadhaar / Aadhaar Card", "10th Certificate (age proof)", "Category Certificate (SC/ST/OBC/EWS)", "Domicile Certificate (Rajasthan)", "Passport Photo (white BG)", "Scanned Signature", "Bank Details"].map((d, i) => (
-                  <div key={i} className="flex items-center gap-2 bg-[#EEF2F8] rounded-lg p-3 text-sm">
-                    <span className="text-[#138808]">✅</span>
-                    <span style={{ fontFamily: "var(--font-noto)" }}>{d}</span>
+                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-3" style={{ fontFamily: "var(--font-noto)" }}>📄 जरूरी दस्तावेज़</h3>
+                {["SSO ID (अनिवार्य)", "जन आधार / आधार कार्ड", "10वीं सर्टिफिकेट (आयु प्रमाण)", "श्रेणी प्रमाणपत्र (SC/ST/OBC/EWS)", "मूल निवास प्रमाणपत्र (राजस्थान)", "पासपोर्ट फोटो (सफेद बैकग्राउंड)", "हस्ताक्षर स्कैन", "बैंक खाता विवरण"].map((d, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-[#EEF2F8]/50 border border-blue-50/50 rounded-xl p-3 text-xs md:text-sm font-semibold">
+                    <span className="text-[#138808] text-sm">✓</span>
+                    <span className="text-gray-700" style={{ fontFamily: "var(--font-noto)" }}>{d}</span>
                   </div>
                 ))}
               </div>
             )}
 
             {activeTab === 'links' && (
-              <div className="space-y-2">
-                <h3 className="font-bold text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>🔗 महत्वपूर्ण लिंक</h3>
+              <div className="space-y-2.5">
+                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-3" style={{ fontFamily: "var(--font-noto)" }}>🔗 महत्वपूर्ण लिंक</h3>
                 {[
-                  { label: "Official Website", url: exam.official_url, icon: "🏛️" },
-                  { label: "Apply Online (SSO)", url: exam.apply_url || "https://sso.rajasthan.gov.in", icon: "📝" },
-                  { label: "SSO Helpdesk: 0141-5153222", url: "tel:01415153222", icon: "📞" },
+                  { label: "आधिकारिक वेबसाइट", url: exam.official_url, icon: "🏛️" },
+                  { label: "ऑनलाइन आवेदन (SSO Portal)", url: exam.apply_url || "https://sso.rajasthan.gov.in", icon: "📝" },
+                  { label: "SSO हेल्पडेस्क: 0141-5153222", url: "tel:01415153222", icon: "📞" },
                 ].map((l, i) => (
-                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-[#EEF2F8] rounded-lg p-3 hover:shadow-md transition-all">
-                    <span className="text-lg">{l.icon}</span>
-                    <span className="text-sm font-medium text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{l.label}</span>
-                    <span className="ml-auto text-[#FF6B00]">→</span>
+                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-[#EEF2F8]/70 border border-[#C5D0E0]/30 rounded-xl p-3.5 hover:shadow-md transition-all active:scale-99">
+                    <span className="text-base">{l.icon}</span>
+                    <span className="text-xs md:text-sm font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{l.label}</span>
+                    <span className="ml-auto text-[#FF6B00] text-sm">→</span>
                   </a>
                 ))}
               </div>
@@ -416,8 +451,8 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
         </div>
 
         {/* Disclaimer */}
-        <div className="bg-[#FFF3E8] border-l-4 border-[#FF6B00] p-3 m-4 rounded-r-lg">
-          <p className="text-orange-800 text-xs" style={{ fontFamily: "var(--font-noto)" }}>
+        <div className="bg-[#FFF3E8] border-l-2 border-[#FF6B00] p-3.5 rounded-r-xl">
+          <p className="text-orange-800 text-[10px] md:text-xs leading-relaxed italic" style={{ fontFamily: "var(--font-noto)" }}>
             ⚠️ {exam.disclaimer}
           </p>
         </div>
