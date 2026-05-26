@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-18",
+  "last_updated": "2026-05-26",
   "updated_by": "Harimohan Sharma",
   "disclaimer": "Yeh data manually verified hai. Apply karne se pehle official site zaroor check karein.",
 
@@ -215,9 +215,9 @@
       "board_full": "Rajasthan Subordinate and Ministerial Services Selection Board",
       "official_url": "https://rsmssb.rajasthan.gov.in",
       "apply_url": "https://sso.rajasthan.gov.in",
-      "status": "open",
-      "last_date": "2026-06-15",
-      "form_start": "2026-05-01",
+      "status": "expected",
+      "last_date": null,
+      "form_start": null,
       "total_posts": "3896",
       "prestige": "★★★★☆ (Village level post — good salary + stability)",
 
@@ -307,9 +307,9 @@
         }
       ],
 
-      "last_verified": "2026-05-18",
+      "last_verified": "2026-05-26",
       "guide_available": true,
-      "disclaimer": "CET Graduate Level qualify karna MANDATORY hai. Bina CET ke apply invalid hai."
+      "disclaimer": "Official notification 2026 ke liye abhi tak release nahi hua hai. Standard updates ke liye official site check karte rahein."
     },
 
     {
@@ -319,9 +319,9 @@
       "board": "RSMSSB",
       "official_url": "https://rsmssb.rajasthan.gov.in",
       "apply_url": "https://sso.rajasthan.gov.in",
-      "status": "upcoming",
-      "last_date": null,
-      "expected_notification": "2026 Q3",
+      "status": "closed",
+      "last_date": "2026-02-13",
+      "form_start": "2026-01-15",
       "prestige": "★★★☆☆ (Clerk post — stable govt job, good for 12th pass)",
 
       "eligibility": {
@@ -372,9 +372,9 @@
         }
       ],
 
-      "last_verified": "2026-05-18",
+      "last_verified": "2026-05-26",
       "guide_available": false,
-      "disclaimer": "Notification aane ka wait karo. CET Senior Secondary Level qualify karna mandatory hai."
+      "disclaimer": "Written exam date July 5 & 6, 2026 ko scheduled hai. Application window closed ho chuki hai."
     },
 
     {
@@ -456,7 +456,9 @@
       "board": "Rajasthan Education Department (DEE)",
       "official_url": "https://bstcrajasthan.in",
       "apply_url": "https://bstcrajasthan.in",
-      "status": "upcoming",
+      "status": "closed",
+      "form_start": "2025-12-02",
+      "last_date": "2026-04-02",
       "note": "BSTC SSO se nahi hota — separate portal hai",
       "prestige": "★★★☆☆ (Teacher banne ka pehla kadam — 2 saal D.El.Ed course)",
 
@@ -508,9 +510,86 @@
         }
       ],
 
-      "last_verified": "2026-05-18",
+      "last_verified": "2026-05-26",
       "guide_available": false,
-      "disclaimer": "BSTC alag portal se hota hai — SSO ID yahaan kaam nahi aata. Official site check karo."
+      "disclaimer": "BSTC Pre D.El.Ed application form block closed hai, exam May 20, 2026 ko ho chuka hai."
+    },
+    {
+      "id": "rsmssb-computer-instructor-2026",
+      "name": "RSMSSB Senior & Basic Computer Instructor 2026",
+      "short_name": "Computer Instructor",
+      "board": "RSMSSB",
+      "board_full": "Rajasthan Subordinate and Ministerial Services Selection Board",
+      "official_url": "https://rsmssb.rajasthan.gov.in",
+      "apply_url": "https://sso.rajasthan.gov.in",
+      "status": "open",
+      "form_start": "2026-05-25",
+      "last_date": "2026-06-23",
+      "total_posts": "3951 (3629 Basic, 322 Senior)",
+      "prestige": "★★★★☆ (Excellent technical job in school education department)",
+      "eligibility": {
+        "nationality": "Indian citizen",
+        "domicile": "Rajasthan preferred",
+        "education": "Graduation + A-Level/PGDCA OR BCA OR B.Sc CS/IT OR B.E./B.Tech (CS/IT/ECE/EE/EEE/EIC/TIE) for Basic; MCA OR M.Sc CS/IT OR M.E./M.Tech (CS/IT/ECE/EE/EEE/ETE/EIE) OR B-Level/C-Level for Senior",
+        "min_age": 18,
+        "max_age": 40,
+        "age_cutoff_date": "2027-01-01",
+        "rajasthan_hindi": "Mandatory",
+        "rajasthan_culture": "Basic knowledge required"
+      },
+      "age_relaxation": {
+        "General_male": "18-40 saal",
+        "General_female_rajasthan": "18-45 saal (+5)",
+        "SC_ST_OBC_EWS_male_rajasthan": "18-45 saal (+5)",
+        "SC_ST_OBC_EWS_female_rajasthan": "18-50 saal (+10)",
+        "widow_divorced_female": "No upper limit",
+        "PwD_general": "18-50 saal (+10)"
+      },
+      "fee": {
+        "general_OBC_creamy": 600,
+        "SC_ST_OBC_non_creamy_EWS_PwD": 400
+      },
+      "selection_process": [
+        "Written Exam (2 Papers)",
+        "Document Verification",
+        "Medical Examination"
+      ],
+      "subjects": [
+        "Paper 1: Art, Culture, History, Geography, General Science, Current Affairs, Quantitative Aptitude, Logical Reasoning",
+        "Paper 2: Pedagogy, Mental Ability, Fundamentals of Computer, Programming Languages, Data Structures, Algorithms, Computer Organization, OS, DBMS, Web Development, Network Security, System Analysis & Design"
+      ],
+      "step_by_step_form_guide": [
+        "Step 1: SSO ID pe login karo (sso.rajasthan.gov.in)",
+        "Step 2: Dashboard mein 'Recruitment Portal' select karo",
+        "Step 3: 'Apply Online' pe click karo",
+        "Step 4: OTR (One Time Registration) fill karo ya confirm karo",
+        "Step 5: Form fill up karo: Basic vs Senior select karo",
+        "Step 6: Photo and Signature upload karo (Standard sizes: Photo 50-100KB, Sign 20-50KB)",
+        "Step 7: Category rules ke hisaab se fees clear karo via SSO Gateway",
+        "Step 8: Final application form ka Print Out ya PDF save karo"
+      ],
+      "common_mistakes": [
+        "Basic vs Senior selection mein galti karna",
+        "Age cutoff 2027-01-01 ko clear na check karna",
+        "Non-eligible branches se apply karna (check eligibility criteria closely)"
+      ],
+      "free_youtube": [
+        {
+          "channel": "KGS Rajasthan Exams",
+          "url": "https://www.youtube.com/@KGSRajasthanExams",
+          "best_for": "Computer Instructor Guidance + Classes",
+          "language": "Hindi"
+        },
+        {
+          "channel": "Utkarsh Classes",
+          "url": "https://www.youtube.com/@UtkarshClasses",
+          "best_for": "Rajasthan GK & Computer pedagogy",
+          "language": "Hindi"
+        }
+      ],
+      "last_verified": "2026-05-26",
+      "guide_available": true,
+      "disclaimer": "Senior Computer Instructor ke liye Master's degree & Basic ke liye Bachelor's degree category-wise mandatory hai. Fee OTR system se pay hogi."
     }
   ]
 }
