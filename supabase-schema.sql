@@ -165,8 +165,12 @@ CREATE TABLE IF NOT EXISTS admin_settings (
   openai_key TEXT DEFAULT '',
   claude_key TEXT DEFAULT '',
   openrouter_key TEXT DEFAULT '',
+  groq_key TEXT DEFAULT '',
   updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- 3. Run migration if table exists but lacks groq_key
+ALTER TABLE admin_settings ADD COLUMN IF NOT EXISTS groq_key TEXT DEFAULT '';
 
 -- RLS enable on admin_settings (By default, only service role has access since no policy is created)
 ALTER TABLE admin_settings ENABLE ROW LEVEL SECURITY;

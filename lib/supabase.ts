@@ -105,6 +105,7 @@ export interface AdminSettings {
   openai_key: string;
   claude_key: string;
   openrouter_key: string;
+  groq_key: string;
 }
 
 export async function getAdminSettings(): Promise<AdminSettings> {
@@ -113,7 +114,8 @@ export async function getAdminSettings(): Promise<AdminSettings> {
     gemini_key: process.env.GEMINI_API_KEY || '',
     openai_key: process.env.OPENAI_API_KEY || '',
     claude_key: process.env.CLAUDE_API_KEY || '',
-    openrouter_key: process.env.OPENROUTER_API_KEY || ''
+    openrouter_key: process.env.OPENROUTER_API_KEY || '',
+    groq_key: process.env.GROQ_API_KEY || ''
   };
 
   try {
@@ -138,6 +140,7 @@ export async function getAdminSettings(): Promise<AdminSettings> {
       openai_key: data.openai_key || fallbackSettings.openai_key,
       claude_key: data.claude_key || fallbackSettings.claude_key,
       openrouter_key: data.openrouter_key || fallbackSettings.openrouter_key,
+      groq_key: data.groq_key || fallbackSettings.groq_key,
     };
   } catch (err) {
     console.error("Error reading admin settings from DB:", err);
