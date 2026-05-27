@@ -14,30 +14,40 @@ export default function AuthPage() {
   async function sendOTP() {
     setLoading(true);
     setError('');
-    const { error } = await supabase.auth.signInWithOtp({ email });
-    if (error) {
-      setError('ईमेल गलत है या कोई तकनीकी समस्या आ गई है। कृपया पुनः प्रयास करें।');
-    } else {
-      setStep('otp');
-    }
+    // Original authentication disabled for testing bypass
+    // const { error } = await supabase.auth.signInWithOtp({ email });
+    // if (error) {
+    //   setError('ईमेल गलत है या कोई तकनीकी समस्या आ गई है। कृपया पुनः प्रयास करें।');
+    // } else {
+    //   setStep('otp');
+    // }
+    setStep('otp');
     setLoading(false);
   }
 
   async function verifyOTP() {
     setLoading(true);
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: 'email'
-    });
-    if (error) {
-      setError('प्रवेश कोड गलत है। ईमेल में प्राप्त हुआ 6-अंकीय कोड दर्ज करें।');
-    } else {
-      const returnTo = typeof window !== 'undefined' 
-        ? sessionStorage.getItem('returnTo') || '/' 
-        : '/';
-      router.push(returnTo);
-    }
+    // Original verification disabled for testing bypass. Mock session is stored.
+    // const { error } = await supabase.auth.verifyOtp({
+    //   email,
+    //   token: otp,
+    //   type: 'email'
+    // });
+    // if (error) {
+    //   setError('प्रवेश कोड गलत है। ईमेल में प्राप्त हुआ 6-अंकीय कोड दर्ज करें।');
+    // } else { ... }
+
+    const mockUser = {
+      id: '00000000-0000-0000-0000-000000000000',
+      email: email || 'test@sarkari.com',
+      created_at: new Date().toISOString()
+    };
+    localStorage.setItem('mock_user_session', JSON.stringify(mockUser));
+
+    const returnTo = typeof window !== 'undefined' 
+      ? sessionStorage.getItem('returnTo') || '/' 
+      : '/';
+    router.push(returnTo);
     setLoading(false);
   }
 
