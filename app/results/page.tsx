@@ -54,6 +54,11 @@ const COURSES_BY_EXAM: Record<string, Course[]> = {
   'bstc-2026': [
     { type: 'youtube', name: 'Raithan Classes — BSTC Special', description: 'BSTC complete, Teaching Aptitude', url: 'https://www.youtube.com/channel/UCIkHMs9yy7mmPsMSBCUoG8A', badge: '🆓 FREE', badgeColor: 'green' },
   ],
+  'rsmssb-computer-instructor-2026': [
+    { type: 'youtube', name: 'KGS Rajasthan Exams — Computer Instructor', description: 'Daily live technical classes & GK', url: 'https://www.youtube.com/@KGSRajasthanExams', badge: '🆓 FREE', badgeColor: 'green' },
+    { type: 'youtube', name: 'Gate Smashers — CS Subjects', description: 'Varun Singla Sir — Best for Core CS subjects (OS, DBMS, DSA)', url: 'https://www.youtube.com/@GateSmashers', badge: '🆓 FREE', badgeColor: 'green', subscribers: '15 lakh+' },
+    { type: 'website', name: 'RSMSSB Official — PDF Syllabus', description: 'Download official syllabus PDF', url: 'https://rsmssb.rajasthan.gov.in', badge: '🏛️ Official', badgeColor: 'navy' },
+  ],
 };
 
 export default function ResultsPage() {

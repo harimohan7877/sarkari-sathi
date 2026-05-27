@@ -49,16 +49,78 @@ const SYLLABUS_DATA: Record<string, SyllabusData> = {
       { name: "राजस्व कानून", weightage: "5%", topics: ["Tenancy Act", "Land Records", "Revenue Manual"] },
     ],
   },
+  'rpsc-ras-2026': {
+    subjects: [
+      { name: "राजस्थान का इतिहास, कला, संस्कृति", weightage: "20%", topics: ["प्रागैतिहासिक स्थल", "प्रमुख राजवंश", "स्वतंत्रता संग्राम", "मेले और त्योहार", "लोक संगीत व नृत्य"] },
+      { name: "भारत और विश्व का भूगोल", weightage: "15%", topics: ["भौतिक विशेषताएं", "कृषि व उद्योग", "वन्यजीव", "प्रमुख खनिज"] },
+      { name: "भारतीय संविधान व राजव्यवस्था", weightage: "15%", topics: ["संविधान सभा", "मौलिक अधिकार", "राष्ट्रपति व राज्यपाल", "पंचायती राज"] },
+      { name: "भारतीय व राजस्थान अर्थव्यवस्था", weightage: "15%", topics: ["बजट संकल्पना", "राष्ट्रीय आय", "सरकारी योजनाएं", "कृषि एवं औद्योगिक क्षेत्र"] },
+      { name: "सामान्य विज्ञान व प्रौद्योगिकी", weightage: "15%", topics: ["दैनिक जीवन में विज्ञान", "कंप्यूटर व आईटी", "रक्षा व अंतरिक्ष", "पर्यावरण जैव विविधता"] },
+      { name: "तार्किक क्षमता व रीजनिंग", weightage: "10%", topics: ["कथन और निष्कर्ष", "कोडिंग-डिकोडिंग", "प्रतिशत", "औसत व ब्याज"] },
+      { name: "सामयिक मामले (Current Affairs)", weightage: "10%", topics: ["राजस्थान समसामयिकी", "राष्ट्रीय घटनाएं", "खेलकूद", "पुरस्कार"] },
+    ],
+  },
+  'rsmssb-ldc-2026': {
+    subjects: [
+      { name: "सामान्य ज्ञान (Paper 1)", weightage: "25%", topics: ["राजस्थान की भूगोल व इतिहास", "भारत का भूगोल", "प्रमुख औद्योगिक क्षेत्र", "संसदीय व्यवस्था"] },
+      { name: "दैनिक विज्ञान (Paper 1)", weightage: "25%", topics: ["भौतिक एवं रासायनिक परिवर्तन", "धातु व अधातु", "प्रकाश का परावर्तन", "आनुवंशिकी", "पारिस्थितिकी"] },
+      { name: "गणित (Paper 1)", weightage: "20%", topics: ["वैदिक गणित", "अनुपात-समानुपात", "गुणनखंड", "त्रिकोणमिति", "क्षेत्रमिति"] },
+      { name: "सामान्य हिंदी (Paper 2)", weightage: "15%", topics: ["संधि और समास", "उपसर्ग-प्रत्यय", "विलोम-पर्यायवाची", "वाक्य शुद्धि", "कार्यालयी पत्र"] },
+      { name: "General English (Paper 2)", weightage: "15%", topics: ["Tenses", "Voice & Narration", "Use of Prepositions", "Translation (Eng-Hindi)", "Synonyms & Antonyms"] },
+      { name: "Typewriting/Efficiency Test (Phase 2)", weightage: "Qualifying", topics: ["Hindi Typing (10 mins, 25 Marks)", "English Typing (10 mins, 25 Marks)", "Formatting Efficiency Test"] },
+    ],
+  },
+  'rajasthan-police-constable-2026': {
+    subjects: [
+      { name: "रीजनिंग, तर्क व कंप्यूटर ज्ञान", weightage: "40%", topics: ["कोडिंग-डिकोडिंग", "रक्त संबंध", "कैलेंडर/घड़ी", "कंप्यूटर बेसिक", "MS Office 365", "इंटरनेट"] },
+      { name: "सामान्य ज्ञान, विज्ञान व सामयिक मामले", weightage: "25%", topics: ["सामान्य विज्ञान सिद्धांत", "भारतीय इतिहास व भूगोल", "भारतीय संविधान", "करंट अफेयर्स"] },
+      { name: "महिला व बच्चों के विरुद्ध अपराध", weightage: "10%", topics: ["कानूनी प्रावधान", "POCSO एक्ट", "घरेलू हिंसा अधिनियम", "महिला हेल्पलाइन 1090"] },
+      { name: "राजस्थान का सामान्य ज्ञान (GK)", weightage: "25%", topics: ["राजस्थान इतिहास", "कला-संस्कृति", "राजस्थान भूगोल", "राजव्यवस्था व योजनाएं"] },
+    ],
+  },
+  'bstc-2026': {
+    subjects: [
+      { name: "मानसिक योग्यता (Mental Ability)", weightage: "25%", topics: ["सादृश्यता (Analogy)", "तार्किक चिंतन", "अंकगणित योग्यता", "रिश्ते व संबंध"] },
+      { name: "राजस्थान की सामान्य जानकारी", weightage: "25%", topics: ["ऐतिहासिक पक्ष", "भौगोलिक स्थिति", "लोक जीवन व संस्कृति", "साहित्यिक पक्ष"] },
+      { name: "शिक्षण अभिक्षमता (Teaching Aptitude)", weightage: "25%", topics: ["नेतृत्व गुण", "सृजनात्मकता", "संचार कौशल", "व्यावसायिक दृष्टिकोण"] },
+      { name: "भाषा योग्यता (English)", weightage: "10%", topics: ["Comprehension", "Spotting Errors", "Narration", "Synonyms/Antonyms"] },
+      { name: "भाषा योग्यता (Hindi / Sanskrit)", weightage: "15%", topics: ["वर्ण विचार", "स्वर-व्यंजन", "संधि व समास", "पर्यायवाची शब्द", "शुद्ध वर्तनी"] },
+    ],
+  },
+  'rsmssb-computer-instructor-2026': {
+    subjects: [
+      { name: "सामान्य योग्यता व जीके (Paper 1)", weightage: "50%", topics: ["राजस्थान का इतिहास व संस्कृति", "राजस्थान का भूगोल", "लॉजिकल रीजनिंग", "डीआई व गणित", "करंट अफेयर्स"] },
+      { name: "शिक्षाशास्त्र (Pedagogy - Paper 2)", weightage: "10%", topics: ["बाल शिक्षाशास्त्र", "अधिगम सिद्धांत", "शैक्षणिक तकनीकी"] },
+      { name: "कंप्यूटर फंडामेंटल्स व प्रोग्रामिंग (Paper 2)", weightage: "30%", topics: ["C, C++, Java, Python", "OOPs Concepts", "Data Structures", "Algorithms", "Operating Systems", "DBMS & SQL"] },
+      { name: "वेब डेवलपमेंट व नेटवर्क सिक्योरिटी (Paper 2)", weightage: "10%", topics: ["HTML, CSS, JS", "System Analysis & Design", "Cyber Security", "Network Layers"] },
+    ],
+  },
 };
 
 const PYQ_DATA: Record<string, PYQItem[]> = {
   'rsmssb-patwari-2026': [
-    { year: "2021", name: "Patwari Exam Paper 2021", url: "https://www.adda247.com/exams/rajasthan/rajasthan-patwari-previous-year-paper/", source: "Adda247", type: "PDF" },
+    { year: "2021", name: "Patwari Exam Paper 2021", url: "https://rsmssb.rajasthan.gov.in", source: "RSMSSB Official", type: "PDF" },
     { year: "Mock", name: "Online Mock Test (Free)", url: "https://toppersexam.com/state-level-exams/rajasthan-patwari-question-paper", source: "ToppersExam", type: "Online" },
-    { year: "Official", name: "RSMSSB Official Papers", url: "https://rsmssb.rajasthan.gov.in", source: "RSMSSB", type: "Official" },
   ],
   'rpsc-ras-2026': [
-    { year: "2016-2023", name: "RAS Previous Year Papers", url: "https://rpsc.rajasthan.gov.in/previousquestionpapers.aspx", source: "RPSC Official", type: "Official" },
+    { year: "2023", name: "RAS Pre Exam Paper 2023", url: "https://rpsc.rajasthan.gov.in/previousquestionpapers.aspx", source: "RPSC Official", type: "Official" },
+    { year: "2021", name: "RAS Pre Exam Paper 2021", url: "https://rpsc.rajasthan.gov.in/previousquestionpapers.aspx", source: "RPSC Official", type: "Official" },
+  ],
+  'rsmssb-ldc-2026': [
+    { year: "2018", name: "LDC Exam Paper 2018 (Paper 1)", url: "https://rsmssb.rajasthan.gov.in", source: "RSMSSB Official", type: "Official" },
+    { year: "2018", name: "LDC Exam Paper 2018 (Paper 2)", url: "https://rsmssb.rajasthan.gov.in", source: "RSMSSB Official", type: "Official" },
+  ],
+  'rajasthan-police-constable-2026': [
+    { year: "2022", name: "Constable Exam Paper 2022 (Shift 1)", url: "https://police.rajasthan.gov.in", source: "Police Portal Official", type: "Official" },
+    { year: "2020", name: "Constable Exam Paper 2020", url: "https://police.rajasthan.gov.in", source: "Police Portal Official", type: "Official" },
+  ],
+  'bstc-2026': [
+    { year: "2023", name: "BSTC Entrance Paper 2023", url: "https://bstcrajasthan.in", source: "DEE BSTC Portal", type: "Official" },
+    { year: "2022", name: "BSTC Entrance Paper 2022", url: "https://bstcrajasthan.in", source: "DEE BSTC Portal", type: "Official" },
+  ],
+  'rsmssb-computer-instructor-2026': [
+    { year: "2022", name: "Basic Computer Instructor Paper 2022", url: "https://rsmssb.rajasthan.gov.in", source: "RSMSSB Official", type: "Official" },
+    { year: "2022", name: "Senior Computer Instructor Paper 2022", url: "https://rsmssb.rajasthan.gov.in", source: "RSMSSB Official", type: "Official" },
   ],
 };
 
