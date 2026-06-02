@@ -6,10 +6,19 @@ interface MessageCounterProps {
   tier: 'guest' | 'registered' | 'paid';
   onLoginClick?: () => void;
   onPayClick?: () => void;
+  isCustomKeyActive?: boolean;
 }
 
-export default function MessageCounter({ used, limit, tier, onLoginClick, onPayClick }: MessageCounterProps) {
+export default function MessageCounter({ used, limit, tier, onLoginClick, onPayClick, isCustomKeyActive }: MessageCounterProps) {
   if (tier === 'paid') return null;
+
+  if (isCustomKeyActive) {
+    return (
+      <div className="px-4 py-2 flex items-center justify-between text-xs bg-green-50 text-green-700 font-bold border-t border-[#C5D0E0]/30" style={{ fontFamily: 'var(--font-noto)' }}>
+        <span>🔑 आपकी Custom API Key सक्रिय है (असीमित AI चैट)</span>
+      </div>
+    );
+  }
 
   const remaining = limit - used;
 

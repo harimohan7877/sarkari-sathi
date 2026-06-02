@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { messages, examId, userProfile, userId, guestToken } = body;
+    const { messages, examId, userProfile, userId, guestToken, customApiProvider, customApiKey } = body;
 
     if (!messages || !examId || !userProfile) {
       return NextResponse.json({ error: "कृपया सभी जानकारी भरें" }, { status: 400 });
@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
     const effectiveGuestToken = guestToken || null;
     const { tier, messagesUsed, limit } = await getUserTier(effectiveUserId, effectiveGuestToken);
 
-    if (messagesUsed >= limit) {
+    const hasCustomKey = customApiKey && customApiProvider;
+
+    if (!hasCustomKey && messagesUsed >= limit) {
       return NextResponse.json({
         error: 'LIMIT_REACHED',
         tier,
@@ -41,7 +43,13 @@ export async function POST(req: NextRequest) {
 
     const chatMessages = messages as ChatMessage[];
 
-    const { response, model } = await sendChatMessageSmart(chatMessages, userProfile, exam);
+    const { response, model } = await sendChatMessageSmart(
+      chatMessages, 
+      userProfile, 
+      exam, 
+      customApiProvider, 
+      customApiKey
+    );
 
     // Increment counter
     const newUsedCount = messagesUsed + 1;

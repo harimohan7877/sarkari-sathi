@@ -85,6 +85,64 @@ export default function Home() {
     router.push("/results");
   };
 
+  const handleBrowseWithoutProfile = async () => {
+    setLoading(true);
+    const dummyProfile = {
+      name: "अतिथि उपयोगकर्ता",
+      city: "जयपुर",
+      state: "राजस्थान",
+      age: "25",
+      education: "graduation",
+      category: "general_ews",
+      gender: "male",
+      hasRSCIT: true,
+      hasCET_graduate: true,
+      hasCET_senior: true,
+    };
+
+    if (!user) {
+      const sessionToken = crypto.randomUUID();
+      try {
+        await supabase.from('guest_sessions').insert({
+          session_token: sessionToken,
+          name: dummyProfile.name,
+          city: dummyProfile.city,
+          age: parseInt(dummyProfile.age),
+          education: dummyProfile.education,
+          category: dummyProfile.category,
+          gender: dummyProfile.gender,
+          has_cet_graduate: dummyProfile.hasCET_graduate,
+          has_cet_senior_secondary: dummyProfile.hasCET_senior,
+          has_rscit: dummyProfile.hasRSCIT
+        });
+        sessionStorage.setItem('guestToken', sessionToken);
+      } catch (err) {
+        console.error('Guest session creation failed:', err);
+      }
+    } else {
+      try {
+        await supabase.from('user_profiles').update({
+          name: dummyProfile.name,
+          city: dummyProfile.city,
+          age: parseInt(dummyProfile.age),
+          education: dummyProfile.education,
+          category: dummyProfile.category,
+          gender: dummyProfile.gender,
+          has_cet_graduate: dummyProfile.hasCET_graduate,
+          has_cet_senior_secondary: dummyProfile.hasCET_senior,
+          has_rscit: dummyProfile.hasRSCIT,
+          updated_at: new Date().toISOString()
+        }).eq('id', user.id);
+      } catch (err) {
+        console.error('Profile update failed:', err);
+      }
+    }
+
+    sessionStorage.setItem('userProfile', JSON.stringify(dummyProfile));
+    localStorage.setItem('userProfile', JSON.stringify(dummyProfile));
+    router.push("/results");
+  };
+
   const updateField = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -131,6 +189,21 @@ export default function Home() {
 
       {/* Main Content */}
       <div className="pt-24 pb-12 px-4 max-w-md mx-auto relative z-10">
+        {/* Scrolling News Ticker */}
+        <div className="bg-orange-500/10 border border-[#FF6B00]/30 rounded-xl p-2.5 mb-4 flex items-center overflow-hidden shadow-sm animate-slide-up">
+          <span className="bg-[#FF6B00] text-white text-[10px] font-extrabold px-2 py-1 rounded shrink-0 mr-3 flex items-center gap-1 select-none" style={{ fontFamily: "var(--font-noto)" }}>
+            बड़ी खबरें 📢
+          </span>
+          <div className="relative w-full overflow-hidden h-5 flex items-center">
+            <div className="animate-marquee whitespace-nowrap flex gap-8 text-[11px] text-[#0F2B5B] font-bold" style={{ fontFamily: "var(--font-noto)" }}>
+              <span>🔥 CET 2024 परीक्षा तिथि घोषित - विस्तृत कार्यक्रम जल्द!</span>
+              <span>📢 RSMSSB LDC 2024 आवेदन तिथि समाप्त, तैयारी शुरू करें!</span>
+              <span>🆕 छात्रावास अधीक्षक ग्रेड-II भर्ती परीक्षा जुलाई में!</span>
+              <span>🎯 सरकारी साथी AI से जानें अपनी योग्यता अनुसार बेस्ट जॉब्स!</span>
+            </div>
+          </div>
+        </div>
+
         {/* Welcome Card */}
         <div className="bg-gradient-to-br from-[#0f2b5b] via-[#143770] to-[#1847a6] rounded-2xl p-6 mb-6 text-white shadow-xl shadow-blue-900/10 border border-white/5 animate-slide-up">
           <h2 className="text-lg font-bold flex items-center gap-2" style={{ fontFamily: "var(--font-noto)" }}>
@@ -355,7 +428,69 @@ export default function Home() {
             >
               {loading ? "खोज रहे हैं..." : "🔍 योग्य भर्तियाँ ढूंढें"}
             </button>
+
+            {/* Browse Without Profile Button */}
+            <button
+              type="button"
+              onClick={handleBrowseWithoutProfile}
+              disabled={loading}
+              className="w-full h-11 bg-white hover:bg-gray-50 text-[#0F2B5B] border border-[#C5D0E0] text-sm font-bold rounded-xl mt-3 active:scale-95 transition-transform disabled:opacity-60 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
+              style={{ fontFamily: "var(--font-noto)" }}
+            >
+              👀 बिना जानकारी के देखें (अतिथि मोड)
+            </button>
           </form>
+        </div>
+
+        {/* How It Works Section */}
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#C5D0E0]/60 mt-6 space-y-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <h3 className="text-sm font-extrabold text-[#0F2B5B] flex items-center gap-2 border-b border-gray-100 pb-2" style={{ fontFamily: "var(--font-noto)" }}>
+            ⚙️ सरकारी साथी कैसे काम करता है?
+          </h3>
+          <div className="grid grid-cols-1 gap-3.5">
+            {/* Step 1 */}
+            <div className="flex gap-3.5 items-start">
+              <div className="w-6 h-6 rounded-full bg-[#0F2B5B] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                1
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-gray-800" style={{ fontFamily: "var(--font-noto)" }}>
+                  अपनी योग्यता दर्ज करें
+                </h4>
+                <p className="text-[11px] text-gray-500 leading-relaxed" style={{ fontFamily: "var(--font-noto)" }}>
+                  अपनी आयु, शिक्षा (10वीं, 12वीं, स्नातक) और अन्य विवरण भरें।
+                </p>
+              </div>
+            </div>
+            {/* Step 2 */}
+            <div className="flex gap-3.5 items-start">
+              <div className="w-6 h-6 rounded-full bg-[#FF6B00] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                2
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-gray-800" style={{ fontFamily: "var(--font-noto)" }}>
+                  AI खोजेगा बेस्ट भर्तियां
+                </h4>
+                <p className="text-[11px] text-gray-500 leading-relaxed" style={{ fontFamily: "var(--font-noto)" }}>
+                  हमारा स्मार्ट AI सिस्टम तुरंत आपकी योग्यता अनुसार राजस्थान की एक्टिव सरकारी नौकरियों की सूची दिखाएगा।
+                </p>
+              </div>
+            </div>
+            {/* Step 3 */}
+            <div className="flex gap-3.5 items-start">
+              <div className="w-6 h-6 rounded-full bg-[#138808] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                3
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-gray-800" style={{ fontFamily: "var(--font-noto)" }}>
+                  Syllabus, PYQ और AI चैट
+                </h4>
+                <p className="text-[11px] text-gray-500 leading-relaxed" style={{ fontFamily: "var(--font-noto)" }}>
+                  प्रत्येक परीक्षा का विस्तृत सिलेबस, पुराने प्रश्न पत्र देखें और AI गाइड से कभी भी सवाल पूछें।
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Trust Signals */}

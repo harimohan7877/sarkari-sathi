@@ -85,13 +85,15 @@ ${JSON.stringify((examsData.exams as unknown as Exam[]).map((e: Exam) => ({
 export async function sendChatMessageSmart(
   messages: ChatMessage[],
   userProfile: UserProfile,
-  exam?: Exam
+  exam?: Exam,
+  customApiProvider?: string,
+  customApiKey?: string
 ): Promise<{ response: string; model: string }> {
   const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || "";
 
   // 1. Load active AI provider and key from admin settings (DB with env fallback)
   const settings = await getAdminSettings();
-  const provider = settings.active_provider;
+  const provider = customApiProvider || settings.active_provider;
 
   // Decide if we need a smarter model based on query complexity
   const needsSonnet =
@@ -119,8 +121,8 @@ ${examInfo}`;
 
   // 2. Dispatch to the correct AI Provider
   if (provider === 'gemini') {
-    const key = settings.gemini_key || process.env.GEMINI_API_KEY;
-    if (!key) throw new Error("Gemini API Key is not configured in Admin Settings or env.");
+    const key = customApiKey || settings.gemini_key || process.env.GEMINI_API_KEY;
+    if (!key) throw new Error("Gemini API Key is not configured.");
 
     const modelName = "gemini-2.0-flash";
     
@@ -160,8 +162,8 @@ ${examInfo}`;
   }
 
   if (provider === 'openai') {
-    const key = settings.openai_key || process.env.OPENAI_API_KEY;
-    if (!key) throw new Error("OpenAI API Key is not configured in Admin Settings or env.");
+    const key = customApiKey || settings.openai_key || process.env.OPENAI_API_KEY;
+    if (!key) throw new Error("OpenAI API Key is not configured.");
 
     const modelName = needsSonnet ? "gpt-4o" : "gpt-4o-mini";
 
@@ -193,8 +195,8 @@ ${examInfo}`;
   }
 
   if (provider === 'claude') {
-    const key = settings.claude_key || process.env.CLAUDE_API_KEY;
-    if (!key) throw new Error("Claude API Key is not configured in Admin Settings or env.");
+    const key = customApiKey || settings.claude_key || process.env.CLAUDE_API_KEY;
+    if (!key) throw new Error("Claude API Key is not configured.");
 
     const modelName = needsSonnet ? "claude-3-5-sonnet-20241022" : "claude-3-5-haiku-20241022";
 
@@ -231,8 +233,8 @@ ${examInfo}`;
   }
 
   if (provider === 'groq') {
-    const key = settings.groq_key || process.env.GROQ_API_KEY;
-    if (!key) throw new Error("Groq API Key is not configured in Admin Settings or env.");
+    const key = customApiKey || settings.groq_key || process.env.GROQ_API_KEY;
+    if (!key) throw new Error("Groq API Key is not configured.");
 
     const modelName = "llama-3.3-70b-versatile";
 
@@ -263,9 +265,42 @@ ${examInfo}`;
     };
   }
 
+  if (provider === 'nvidia') {
+    const key = customApiKey || process.env.NVIDIA_API_KEY;
+    if (!key) throw new Error("Nvidia API Key is not configured.");
+
+    const modelName = "meta/llama-3.1-70b-instruct";
+
+    const res = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: apiMessages,
+        max_tokens: maxTokens,
+        temperature: 0.7
+      })
+    });
+
+    if (!res.ok) {
+      const errTxt = await res.text();
+      console.error("Nvidia NIM API error:", res.status, errTxt);
+      throw new Error(`Nvidia NIM API error: ${res.status} - ${errTxt.substring(0, 200)}`);
+    }
+
+    const data = await res.json();
+    return {
+      response: data.choices[0].message.content,
+      model: modelName
+    };
+  }
+
   // Default: OpenRouter
-  const key = settings.openrouter_key || settings.openai_key || process.env.OPENROUTER_API_KEY;
-  if (!key) throw new Error("OpenRouter API Key is not configured in Admin Settings or env.");
+  const key = customApiKey || settings.openrouter_key || settings.openai_key || process.env.OPENROUTER_API_KEY;
+  if (!key) throw new Error("OpenRouter API Key is not configured.");
 
   const modelName = needsSonnet ? "openai/gpt-4o" : "openai/gpt-4o-mini";
 

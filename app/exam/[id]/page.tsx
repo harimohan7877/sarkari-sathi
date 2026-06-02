@@ -143,6 +143,37 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
   const [saveLoading, setSaveLoading] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
+  // Custom User API Keys state
+  const [showCustomKeyModal, setShowCustomKeyModal] = useState(false);
+  const [customKeys, setCustomKeys] = useState<{
+    activeProvider: string;
+    gemini: string;
+    openrouter: string;
+    nvidia: string;
+    groq: string;
+    openai: string;
+    [key: string]: string;
+  }>({
+    activeProvider: 'gemini',
+    gemini: '',
+    openrouter: '',
+    nvidia: '',
+    groq: '',
+    openai: '',
+  });
+
+  // Load custom keys on mount
+  useEffect(() => {
+    try {
+      const keysStr = localStorage.getItem("custom_user_keys");
+      if (keysStr) {
+        setCustomKeys(prev => ({ ...prev, ...JSON.parse(keysStr) }));
+      }
+    } catch {}
+  }, []);
+
+  const hasCustomKey = !!(customKeys.activeProvider && customKeys[customKeys.activeProvider]?.trim());
+
   useEffect(() => {
     const loadInitialData = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -213,10 +244,33 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     setSaveLoading(false);
   }
 
+  const saveCustomKeys = (newConfig: typeof customKeys) => {
+    localStorage.setItem("custom_user_keys", JSON.stringify(newConfig));
+    setCustomKeys(newConfig);
+    setShowCustomKeyModal(false);
+  };
+
   async function sendMessage(text?: string) {
     const msg = text || input.trim();
     if (!msg || loading) return;
-    if (msgUsed >= msgLimit) {
+
+    // Load active key info
+    let customApiProvider = undefined;
+    let customApiKey = undefined;
+    try {
+      const keysStr = localStorage.getItem("custom_user_keys");
+      if (keysStr) {
+        const config = JSON.parse(keysStr);
+        if (config.activeProvider && config[config.activeProvider]?.trim()) {
+          customApiProvider = config.activeProvider;
+          customApiKey = config[config.activeProvider].trim();
+        }
+      }
+    } catch {}
+
+    const isCustomActive = !!(customApiProvider && customApiKey);
+
+    if (!isCustomActive && msgUsed >= msgLimit) {
       setAuthReason('message_limit');
       setShowAuthModal(true);
       return;
@@ -235,7 +289,9 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           examId: id, 
           userProfile: profile,
           userId: user?.id,
-          guestToken
+          guestToken,
+          customApiProvider,
+          customApiKey
         }),
       });
       const data = await res.json();
@@ -261,11 +317,11 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
 
   const syllabus = SYLLABUS_DATA[id];
   const pyqs = PYQ_DATA[id] || [];
-  const isGuest = !user;
+  const isPaidUser = userTier === 'paid';
   const tabs = [
     { id: 'overview', label: 'Overview', emoji: '📋' },
-    { id: 'syllabus', label: 'Syllabus', emoji: '📚', locked: isGuest },
-    { id: 'pyq', label: 'PYQ', emoji: '📝', locked: isGuest },
+    { id: 'syllabus', label: 'Syllabus', emoji: '📚', locked: !isPaidUser },
+    { id: 'pyq', label: 'PYQ', emoji: '📝', locked: !isPaidUser },
     { id: 'documents', label: 'Documents', emoji: '📄' },
     { id: 'links', label: 'Links', emoji: '🔗' },
   ];
@@ -313,15 +369,25 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
         {/* Chat Section */}
         <div className="bg-white rounded-2xl border border-[#C5D0E0]/60 shadow-lg flex flex-col overflow-hidden w-full" style={{ height: '55vh' }}>
           {/* Bot header */}
-          <div className="bg-gradient-to-r from-gray-50 to-[#EEF2F8] px-4 py-3 flex items-center gap-3 border-b border-[#C5D0E0]/60">
-            <div className="w-8 h-8 bg-[#0F2B5B] rounded-full flex items-center justify-center text-white text-sm shadow-sm">🏛️</div>
-            <div>
-              <p className="text-sm font-bold text-[#0F2B5B] leading-none" style={{ fontFamily: "var(--font-noto)" }}>सरकारी साथी</p>
-              <p className="text-[10px] text-green-600 mt-1 font-semibold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block animate-pulse"></span>
-                Online
-              </p>
+          <div className="bg-gradient-to-r from-gray-50 to-[#EEF2F8] px-4 py-3 flex items-center justify-between border-b border-[#C5D0E0]/60">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-[#0F2B5B] rounded-full flex items-center justify-center text-white text-sm shadow-sm">🏛️</div>
+              <div>
+                <p className="text-sm font-bold text-[#0F2B5B] leading-none" style={{ fontFamily: "var(--font-noto)" }}>सरकारी साथी</p>
+                <p className="text-[10px] text-green-600 mt-1 font-semibold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block animate-pulse"></span>
+                  Online
+                </p>
+              </div>
             </div>
+            {/* Custom API Key Configuration */}
+            <button
+              onClick={() => setShowCustomKeyModal(true)}
+              className="text-xs font-bold text-[#1847A6] hover:text-[#0F2B5B] bg-[#EEF2F8] hover:bg-blue-100/50 px-2.5 py-1.5 rounded-lg border border-blue-200/50 transition-all flex items-center gap-1 active:scale-95 cursor-pointer shadow-sm"
+              style={{ fontFamily: 'var(--font-noto)' }}
+            >
+              🔑 API Settings
+            </button>
           </div>
 
           {/* Messages */}
@@ -361,7 +427,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           )}
 
           {/* Message Counter */}
-          <MessageCounter used={msgUsed} limit={msgLimit} tier={userTier} />
+          <MessageCounter used={msgUsed} limit={msgLimit} tier={userTier} isCustomKeyActive={hasCustomKey} />
 
           {/* Input Area */}
           <div className="p-3 bg-white border-t border-[#C5D0E0]/50 flex gap-2 items-center">
@@ -369,14 +435,14 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
-              placeholder="अपना सवाल पूछें..."
-              disabled={msgUsed >= msgLimit}
+              placeholder={hasCustomKey ? "अपनी API Key से असीमित चैट करें..." : "अपना सवाल पूछें..."}
+              disabled={!hasCustomKey && msgUsed >= msgLimit}
               className="flex-1 h-12 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50 focus:border-[#1847A6] focus:bg-white transition-all outline-none disabled:opacity-50 text-[#0D1B2A] placeholder-gray-400"
               style={{ fontFamily: "var(--font-noto)" }}
             />
             <button
               onClick={() => sendMessage()}
-              disabled={!input.trim() || loading || msgUsed >= msgLimit}
+              disabled={!input.trim() || loading || (!hasCustomKey && msgUsed >= msgLimit)}
               className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-md ${input.trim() ? 'bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white shadow-orange-500/10' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}
             >
               ➤
@@ -521,6 +587,115 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
       </div>
 
       {showAuthModal && <AuthPromptModal onClose={() => setShowAuthModal(false)} reason={authReason} />}
+
+      {/* Custom API Key Settings Modal */}
+      {showCustomKeyModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCustomKeyModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-6 animate-slide-up space-y-4">
+            <div className="flex justify-between items-center border-b pb-3">
+              <h3 className="font-extrabold text-base text-[#0F2B5B] flex items-center gap-1.5" style={{ fontFamily: 'var(--font-noto)' }}>
+                <span>🔑</span> अपनी AI API Key दर्ज करें
+              </h3>
+              <button onClick={() => setShowCustomKeyModal(false)} className="text-gray-400 hover:text-gray-650 font-black text-xl cursor-pointer">×</button>
+            </div>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
+                  प्रदाता चुनें (Select Provider)
+                </label>
+                <select
+                  value={customKeys.activeProvider}
+                  onChange={e => setCustomKeys({ ...customKeys, activeProvider: e.target.value })}
+                  className="w-full h-11 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] transition-all outline-none cursor-pointer"
+                >
+                  <option value="gemini">Google Gemini (Recommended - Free)</option>
+                  <option value="openai">OpenAI (ChatGPT)</option>
+                  <option value="openrouter">OpenRouter</option>
+                  <option value="groq">Groq</option>
+                  <option value="nvidia">Nvidia NIM</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
+                  {customKeys.activeProvider.toUpperCase()} API Key दर्ज करें
+                </label>
+                <input
+                  type="password"
+                  value={customKeys[customKeys.activeProvider] || ''}
+                  onChange={e => setCustomKeys({ ...customKeys, [customKeys.activeProvider]: e.target.value })}
+                  placeholder="यहाँ अपनी API Key पेस्ट करें..."
+                  className="w-full h-11 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] transition-all outline-none"
+                />
+              </div>
+
+              {/* Guide links & instructions */}
+              <div className="bg-[#EEF2F8] p-4 rounded-xl border border-blue-100/50 text-xs text-[#0F2B5B] space-y-2">
+                <p className="font-bold flex items-center gap-1">
+                  <span>ℹ️</span> {customKeys.activeProvider.toUpperCase()} की चाबी कैसे बनाएं:
+                </p>
+                {customKeys.activeProvider === 'gemini' && (
+                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
+                    <li><a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Google AI Studio ↗</a> पर जाएं।</li>
+                    <li>अपने गूगल अकाउंट से लॉगिन करके <b>"Create API Key"</b> पर क्लिक करें।</li>
+                    <li>चाबी को कॉपी करें और ऊपर पेस्ट कर के सेव करें। (यह बिल्कुल मुफ्त है)।</li>
+                  </ol>
+                )}
+                {customKeys.activeProvider === 'openai' && (
+                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
+                    <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">OpenAI Platform ↗</a> पर जाएं।</li>
+                    <li>लॉगिन करके <b>"Create new secret key"</b> पर क्लिक करें।</li>
+                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
+                  </ol>
+                )}
+                {customKeys.activeProvider === 'openrouter' && (
+                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
+                    <li><a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">OpenRouter Keys ↗</a> पर जाएं।</li>
+                    <li>लॉगिन करके <b>"Create Key"</b> पर क्लिक करें।</li>
+                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
+                  </ol>
+                )}
+                {customKeys.activeProvider === 'groq' && (
+                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
+                    <li><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Groq Console ↗</a> पर जाएं।</li>
+                    <li>लॉगिन करके <b>"Create API Key"</b> पर क्लिक करें।</li>
+                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
+                  </ol>
+                )}
+                {customKeys.activeProvider === 'nvidia' && (
+                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
+                    <li><a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Nvidia NIM ↗</a> पर जाएं।</li>
+                    <li>लॉगिन करके <b>"Get API Key"</b> पर क्लिक करें।</li>
+                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
+                  </ol>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => saveCustomKeys(customKeys)}
+                className="flex-1 h-12 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white font-bold rounded-xl active:scale-[0.98] transition-all text-sm cursor-pointer shadow-md"
+                style={{ fontFamily: 'var(--font-noto)' }}
+              >
+                सेव करें (Save Key)
+              </button>
+              <button
+                onClick={() => {
+                  const resetConfig = { ...customKeys, [customKeys.activeProvider]: '' };
+                  saveCustomKeys(resetConfig);
+                }}
+                className="h-12 bg-gray-100 text-red-600 hover:bg-gray-200 px-4 font-bold rounded-xl active:scale-[0.98] transition-all text-sm cursor-pointer"
+                style={{ fontFamily: 'var(--font-noto)' }}
+              >
+                हटाएं (Remove)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

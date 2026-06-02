@@ -321,4 +321,19 @@ select option {
 .admin-select-field option {
   background-color: #1a1d27 !important;
   color: #ffffff !important;
+}
+
+/* News Marquee */
+@keyframes marquee {
+  0% { transform: translateX(10%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
