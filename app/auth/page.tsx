@@ -169,10 +169,17 @@ export default function AuthPage() {
                     <button
                       onClick={sendOTP}
                       disabled={!email || loading}
-                      className="btn-saffron w-full h-12 font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] text-sm"
+                      className="btn-saffron w-full h-12 font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] text-sm flex items-center justify-center gap-2"
                       style={{ fontFamily: 'var(--font-noto)' }}
                     >
-                      {loading ? '⏳ भेज रहे हैं...' : 'OTP कोड भेजें 📧'}
+                      {loading ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                          भेज रहे हैं...
+                        </>
+                      ) : (
+                        <>OTP कोड भेजें <span className="ml-1">📧</span></>
+                      )}
                     </button>
 
                     <p
@@ -250,7 +257,7 @@ export default function AuthPage() {
                     <button
                       onClick={verifyOTP}
                       disabled={!otpComplete || loading}
-                      className="w-full h-12 font-bold rounded-xl disabled:opacity-50 active:scale-[0.98] transition-all text-sm"
+                      className="w-full h-12 font-bold rounded-xl disabled:opacity-50 active:scale-[0.98] transition-all text-sm flex items-center justify-center gap-2"
                       style={{
                         background: 'linear-gradient(135deg, var(--primary-navy), var(--primary-royal))',
                         color: 'white',
@@ -258,7 +265,14 @@ export default function AuthPage() {
                         boxShadow: 'var(--shadow-soft)',
                       }}
                     >
-                      {loading ? '⏳ पुष्टि हो रही है...' : 'Login पुष्टि करें ✅'}
+                      {loading ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                          पुष्टि हो रही है...
+                        </>
+                      ) : (
+                        <>Login पुष्टि करें <span className="ml-1">✅</span></>
+                      )}
                     </button>
 
                     <button

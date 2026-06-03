@@ -25,6 +25,7 @@ export default function Home() {
     hasCET_senior: false,
   });
   const [loading, setLoading] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -162,22 +163,41 @@ export default function Home() {
                   अपनी योग्यता दर्ज करें और 100% सत्यापित सरकारी भर्तियों की सूची पाएं — बिल्कुल मुफ्त।
                 </p>
 
-                <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20 max-w-xl">
-                  <div className="flex-1 flex items-center gap-2 px-3">
-                    <span className="text-white/70 text-lg">🔍</span>
+                <form onSubmit={handleSearchSubmit} className={`flex flex-col sm:flex-row gap-2 backdrop-blur-md p-2 rounded-2xl border transition-all max-w-xl ${searchFocused ? 'bg-white/20 border-white/40 shadow-2xl' : 'bg-white/10 border-white/20'}`}>
+                  <div className="flex-1 flex items-center gap-3 px-3">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[hsl(24,100%,55%)] to-[hsl(24,100%,40%)] flex items-center justify-center shadow-lg flex-shrink-0 ring-2 ring-white/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                      </svg>
+                    </div>
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => setSearchFocused(false)}
                       placeholder="परीक्षा या बोर्ड खोजें..."
                       className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 text-sm lg:text-base py-2 font-noto"
                     />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white/80 text-xs flex-shrink-0 transition-colors"
+                        aria-label="Clear"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                   <button
                     type="submit"
-                    className="bg-[hsl(24,100%,50%)] hover:bg-[hsl(24,100%,43%)] text-white font-bold px-6 py-3 rounded-xl transition-all active:scale-95 font-noto"
+                    className="bg-gradient-to-r from-[hsl(24,100%,55%)] to-[hsl(24,100%,40%)] hover:from-[hsl(24,100%,50%)] hover:to-[hsl(24,100%,35%)] text-white font-bold px-6 py-3 rounded-xl transition-all active:scale-95 font-noto shadow-lg flex items-center justify-center gap-2"
                   >
-                    खोजें ➡️
+                    खोजें
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
                   </button>
                 </form>
               </div>

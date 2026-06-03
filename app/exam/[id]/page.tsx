@@ -139,6 +139,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authReason, setAuthReason] = useState<'message_limit' | 'study_material' | 'save_exam'>('message_limit');
   const [showStudySheet, setShowStudySheet] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -219,8 +220,13 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     }
     setInput("");
     const newMsgs: ChatMsg[] = [...messages, { role: "user", content: msg }];
-    setMessages(newMsgs);
+    // Add empty assistant message that will be filled as stream arrives
+    setMessages([...newMsgs, { role: "assistant", content: "" }]);
     setLoading(true);
+
+    let streamedContent = "";
+    let lastUpdate = 0;
+
     try {
       const guestToken = sessionStorage.getItem('guestToken');
       const res = await fetch("/api/chat", {
@@ -234,21 +240,82 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           guestToken,
         }),
       });
-      const data = await res.json();
 
-      if (data.error === 'LIMIT_REACHED') {
-        setAuthReason('message_limit');
-        setShowAuthModal(true);
-        setLoading(false);
-        return;
+      if (!res.ok) {
+        if (res.status === 429) {
+          setAuthReason('message_limit');
+          setShowAuthModal(true);
+          setLoading(false);
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `HTTP ${res.status}`);
       }
 
-      if (data.error) throw new Error(data.error);
-      setMessages([...newMsgs, { role: "assistant", content: data.response }]);
-      setMsgUsed(data.messagesUsed || (msgUsed + 1));
-      if (data.tier) setUserTier(data.tier);
-    } catch {
-      setMessages([...newMsgs, { role: "assistant", content: "⚠️ कुछ problem हो गई। कृपया दोबारा कोशिश करें।" }]);
+      if (!res.body) throw new Error("No response body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed.startsWith('data:')) continue;
+          const data = trimmed.slice(5).trim();
+          if (!data) continue;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === 'chunk' && parsed.content) {
+              streamedContent += parsed.content;
+              // Throttle React state updates to every 50ms for perf
+              const now = Date.now();
+              if (now - lastUpdate > 50) {
+                lastUpdate = now;
+                setMessages(prev => {
+                  const updated = [...prev];
+                  updated[updated.length - 1] = { role: "assistant", content: streamedContent };
+                  return updated;
+                });
+              }
+            } else if (parsed.type === 'done') {
+              setMsgUsed(parsed.messagesUsed || (msgUsed + 1));
+              if (parsed.limit) setMsgLimit(parsed.limit);
+              if (parsed.tier) setUserTier(parsed.tier);
+            } else if (parsed.type === 'error') {
+              throw new Error(parsed.error || 'Stream error');
+            }
+          } catch (e: any) {
+            if (e.message && e.message !== 'Stream error' && !e.message.includes('JSON')) {
+              throw e;
+            }
+          }
+        }
+      }
+
+      // Final flush
+      setMessages(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1] = { role: "assistant", content: streamedContent };
+        return updated;
+      });
+    } catch (err: any) {
+      setMessages(prev => {
+        const updated = [...prev];
+        updated[updated.length - 1] = {
+          role: "assistant",
+          content: streamedContent
+            ? streamedContent + "\n\n⚠️ Connection cut. ऊपर का जवाब देखें।"
+            : "⚠️ कुछ problem हो गई। कृपया दोबारा कोशिश करें।"
+        };
+        return updated;
+      });
     }
     setLoading(false);
   }
@@ -1070,11 +1137,25 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
                   बाद में
                 </button>
                 <button
-                  onClick={() => router.push('/auth')}
-                  className="flex-1 h-11 rounded-xl font-bold text-sm text-white btn-saffron"
+                  onClick={() => {
+                    if (loginLoading) return;
+                    setLoginLoading(true);
+                    const returnTo = `/exam/${id}`;
+                    sessionStorage.setItem('returnTo', returnTo);
+                    router.push('/auth');
+                  }}
+                  disabled={loginLoading}
+                  className="flex-1 h-11 rounded-xl font-bold text-sm text-white btn-saffron disabled:opacity-70 flex items-center justify-center gap-2"
                   style={{ fontFamily: 'var(--font-noto)' }}
                 >
-                  Login →
+                  {loginLoading ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      खुल रहा है...
+                    </>
+                  ) : (
+                    <>Login →</>
+                  )}
                 </button>
               </div>
             </div>
