@@ -4,9 +4,6 @@ import { useEffect, useState, useRef, use } from "react";
 import { useRouter } from "next/navigation";
 import { getExamById, type Exam, type UserProfile } from "@/lib/eligibility";
 import { supabase } from "@/lib/supabase";
-import MessageCounter from "@/components/MessageCounter";
-import ScrollArrowCTA from "@/components/ScrollArrowCTA";
-import AuthPromptModal from "@/components/AuthPromptModal";
 import { User } from "@/lib/types";
 
 interface ChatMsg { role: "user" | "assistant"; content: string; }
@@ -55,15 +52,15 @@ const SYLLABUS_DATA: Record<string, SyllabusData> = {
       { name: "भारत और विश्व का भूगोल", weightage: "15%", topics: ["भौतिक विशेषताएं", "कृषि व उद्योग", "वन्यजीव", "प्रमुख खनिज"] },
       { name: "भारतीय संविधान व राजव्यवस्था", weightage: "15%", topics: ["संविधान सभा", "मौलिक अधिकार", "राष्ट्रपति व राज्यपाल", "पंचायती राज"] },
       { name: "भारतीय व राजस्थान अर्थव्यवस्था", weightage: "15%", topics: ["बजट संकल्पना", "राष्ट्रीय आय", "सरकारी योजनाएं", "कृषि एवं औद्योगिक क्षेत्र"] },
-      { name: "सामान्य विज्ञान व प्रौद्योगिकी", weightage: "15%", topics: ["दैनिक जीवन में विज्ञान", "कंप्यूटर व आईटी", "रक्षा व अंतरिक्ष", "पर्यावरण जैव विविधता"] },
+      { name: "सामान्य विज्ञान व प्रौद्योगिकी", weightage: "15%", topics: ["दैनिक जीवन में विज्ञान", "कंप्यूटर व आउट", "रक्षा व अंतरिक्ष", "पर्यावरण जैव विविधता"] },
       { name: "तार्किक क्षमता व रीजनिंग", weightage: "10%", topics: ["कथन और निष्कर्ष", "कोडिंग-डिकोडिंग", "प्रतिशत", "औसत व ब्याज"] },
-      { name: "सामयिक मामले (Current Affairs)", weightage: "10%", topics: ["राजस्थान समसामयिकी", "राष्ट्रीय घटनाएं", "खेलकूद", "पुरस्कार"] },
+      { name: "तार्किक क्षमता व सामयिक मामले", weightage: "10%", topics: ["राजस्थान समसामयिकी", "राष्ट्रीय घटनाएं", "खेलकूद", "पुरस्कार"] },
     ],
   },
   'rsmssb-ldc-2026': {
     subjects: [
       { name: "सामान्य ज्ञान (Paper 1)", weightage: "25%", topics: ["राजस्थान की भूगोल व इतिहास", "भारत का भूगोल", "प्रमुख औद्योगिक क्षेत्र", "संसदीय व्यवस्था"] },
-      { name: "दैनिक विज्ञान (Paper 1)", weightage: "25%", topics: ["भौतिक एवं रासायनिक परिवर्तन", "धातु व अधातु", "प्रकाश का परावर्तन", "आनुवंशिकी", "पारिस्थितिकी"] },
+      { name: "दैनिक विज्ञान (Paper 1)", weightage: "25%", topics: ["भौतिक एवं रासायनिक परिवर्तन", "धातु व अधातु", "प्रकाश का परावर्तन", "आनुवांशिकी", "पारिस्थितिकी"] },
       { name: "गणित (Paper 1)", weightage: "20%", topics: ["वैदिक गणित", "अनुपात-समानुपात", "गुणनखंड", "त्रिकोणमिति", "क्षेत्रमिति"] },
       { name: "सामान्य हिंदी (Paper 2)", weightage: "15%", topics: ["संधि और समास", "उपसर्ग-प्रत्यय", "विलोम-पर्यायवाची", "वाक्य शुद्धि", "कार्यालयी पत्र"] },
       { name: "General English (Paper 2)", weightage: "15%", topics: ["Tenses", "Voice & Narration", "Use of Prepositions", "Translation (Eng-Hindi)", "Synonyms & Antonyms"] },
@@ -137,59 +134,28 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
   const [msgLimit, setMsgLimit] = useState(5);
   const [userTier, setUserTier] = useState<'guest' | 'registered' | 'paid'>('guest');
   const [activeTab, setActiveTab] = useState("overview");
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authReason, setAuthReason] = useState<'message_limit' | 'study_material' | 'save_exam'>('message_limit');
   const [isSaved, setIsSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authReason, setAuthReason] = useState<'message_limit' | 'study_material' | 'save_exam'>('message_limit');
+  const [showStudySheet, setShowStudySheet] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
-
-  // Custom User API Keys state
-  const [showCustomKeyModal, setShowCustomKeyModal] = useState(false);
-  const [customKeys, setCustomKeys] = useState<{
-    activeProvider: string;
-    gemini: string;
-    openrouter: string;
-    nvidia: string;
-    groq: string;
-    openai: string;
-    [key: string]: string;
-  }>({
-    activeProvider: 'gemini',
-    gemini: '',
-    openrouter: '',
-    nvidia: '',
-    groq: '',
-    openai: '',
-  });
-
-  // Load custom keys on mount
-  useEffect(() => {
-    try {
-      const keysStr = localStorage.getItem("custom_user_keys");
-      if (keysStr) {
-        setCustomKeys(prev => ({ ...prev, ...JSON.parse(keysStr) }));
-      }
-    } catch {}
-  }, []);
-
-  const hasCustomKey = !!(customKeys.activeProvider && customKeys[customKeys.activeProvider]?.trim());
 
   useEffect(() => {
     const loadInitialData = async () => {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       setUser(authUser as User);
-      
+
       const stored = localStorage.getItem("userProfile") || sessionStorage.getItem("userProfile");
       if (stored) setProfile(JSON.parse(stored));
-      
+
       const guestToken = sessionStorage.getItem('guestToken');
-      
-      // Fetch real tier info
+
       try {
         const query = new URLSearchParams();
         if (authUser?.id) query.set('userId', authUser.id);
         if (guestToken) query.set('guestToken', guestToken);
-        
+
         const tierRes = await fetch(`/api/user/tier?${query.toString()}`);
         const tierData = await tierRes.json();
         setUserTier(tierData.tier);
@@ -199,7 +165,6 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
         console.error("Failed to fetch tier:", err);
       }
 
-      // Check if exam is saved
       if (authUser?.id) {
         const { data } = await supabase
           .from('saved_exams')
@@ -209,14 +174,14 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           .single();
         if (data) setIsSaved(true);
       }
-      
+
       const e = getExamById(id);
       if (e) {
         setExam(e);
         setMessages([{ role: "assistant", content: `नमस्ते! 🙏 मैं आपको **${e.short_name || e.name}** के बारे में पूरी जानकारी दे सकता हूँ।\n\nनीचे कोई भी सवाल पूछें या quick buttons use करें! ⬇️` }]);
       }
     };
-    
+
     loadInitialData();
   }, [id]);
 
@@ -228,7 +193,6 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
       setShowAuthModal(true);
       return;
     }
-
     setSaveLoading(true);
     try {
       if (isSaved) {
@@ -244,33 +208,11 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     setSaveLoading(false);
   }
 
-  const saveCustomKeys = (newConfig: typeof customKeys) => {
-    localStorage.setItem("custom_user_keys", JSON.stringify(newConfig));
-    setCustomKeys(newConfig);
-    setShowCustomKeyModal(false);
-  };
-
   async function sendMessage(text?: string) {
     const msg = text || input.trim();
     if (!msg || loading) return;
 
-    // Load active key info
-    let customApiProvider = undefined;
-    let customApiKey = undefined;
-    try {
-      const keysStr = localStorage.getItem("custom_user_keys");
-      if (keysStr) {
-        const config = JSON.parse(keysStr);
-        if (config.activeProvider && config[config.activeProvider]?.trim()) {
-          customApiProvider = config.activeProvider;
-          customApiKey = config[config.activeProvider].trim();
-        }
-      }
-    } catch {}
-
-    const isCustomActive = !!(customApiProvider && customApiKey);
-
-    if (!isCustomActive && msgUsed >= msgLimit) {
+    if (msgUsed >= msgLimit) {
       setAuthReason('message_limit');
       setShowAuthModal(true);
       return;
@@ -284,25 +226,23 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          messages: newMsgs.filter(m => m.role !== 'assistant' || newMsgs.indexOf(m) > 0), 
-          examId: id, 
+        body: JSON.stringify({
+          messages: newMsgs.filter(m => m.role !== 'assistant' || newMsgs.indexOf(m) > 0),
+          examId: id,
           userProfile: profile,
           userId: user?.id,
           guestToken,
-          customApiProvider,
-          customApiKey
         }),
       });
       const data = await res.json();
-      
+
       if (data.error === 'LIMIT_REACHED') {
         setAuthReason('message_limit');
         setShowAuthModal(true);
         setLoading(false);
         return;
       }
-      
+
       if (data.error) throw new Error(data.error);
       setMessages([...newMsgs, { role: "assistant", content: data.response }]);
       setMsgUsed(data.messagesUsed || (msgUsed + 1));
@@ -313,7 +253,11 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     setLoading(false);
   }
 
-  if (!exam) return <div className="min-h-screen flex items-center justify-center bg-[#EEF2F8]"><p className="text-gray-500">लोड हो रहा है...</p></div>;
+  if (!exam) return (
+    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-app)' }}>
+      <p style={{ color: 'var(--text-muted)' }}>लोड हो रहा है...</p>
+    </div>
+  );
 
   const syllabus = SYLLABUS_DATA[id];
   const pyqs = PYQ_DATA[id] || [];
@@ -324,374 +268,815 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     { id: 'pyq', label: 'PYQ', emoji: '📝', locked: !isPaidUser },
     { id: 'documents', label: 'Documents', emoji: '📄' },
     { id: 'links', label: 'Links', emoji: '🔗' },
+    { id: 'strategy', label: 'Strategy', emoji: '🎯' },
   ];
 
   return (
-    <main className="min-h-screen bg-[#EEF2F8] pb-12 relative overflow-hidden flex flex-col">
+    <main className="min-h-screen relative overflow-hidden" style={{ background: 'var(--bg-app)' }}>
       {/* Decorative glows */}
-      <div className="absolute w-96 h-96 rounded-full bg-orange-500/5 blur-3xl -top-20 -left-20 pointer-events-none" />
-      <div className="absolute w-96 h-96 rounded-full bg-blue-500/5 blur-3xl top-1/2 right-0 pointer-events-none" />
+      <div className="absolute w-96 h-96 rounded-full blur-3xl -top-20 -left-20 pointer-events-none"
+        style={{ background: 'hsl(24, 100%, 50%, 0.05)' }} />
+      <div className="absolute w-96 h-96 rounded-full blur-3xl top-1/2 right-0 pointer-events-none"
+        style={{ background: 'hsl(217, 91%, 60%, 0.06)' }} />
 
-      <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF6B00] via-white to-[#138808] z-[60]" />
+      {/* Tiranga stripe */}
+      <div className="tiranga-stripe fixed top-0 left-0 right-0 z-50" />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#0F2B5B] to-[#1847A6] h-16 px-4 flex items-center justify-between fixed top-1 w-full z-50 shadow-md border-b border-white/10 rounded-b-xl">
-        <button 
-          onClick={() => router.push("/results")} 
-          className="text-white/90 hover:text-white flex items-center gap-1 text-sm font-semibold bg-white/10 px-3 py-1.5 rounded-full border border-white/10 transition-all hover:bg-white/20 active:scale-95" 
-          style={{ fontFamily: "var(--font-noto)" }}
+      <div
+        className="fixed top-1 w-full z-40 h-16 px-4 flex items-center justify-between rounded-b-xl"
+        style={{
+          background: 'linear-gradient(135deg, var(--primary-navy), var(--primary-royal))',
+          boxShadow: 'var(--shadow-premium)',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+        }}
+      >
+        <button
+          onClick={() => router.push("/results")}
+          className="text-white/90 hover:text-white flex items-center gap-1 text-sm font-semibold px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/15 transition-all active:scale-95"
+          style={{ fontFamily: 'var(--font-noto)' }}
         >
           ← वापस
         </button>
-        <div className="text-center flex-1 max-w-[50%] mx-auto">
-          <h1 className="text-white text-sm md:text-base font-bold truncate" style={{ fontFamily: "var(--font-noto)" }}>{exam.short_name || exam.name}</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <button 
+        <h1
+          className="text-white text-sm md:text-base font-bold truncate max-w-[50%]"
+          style={{ fontFamily: 'var(--font-noto)' }}
+        >
+          {exam.short_name || exam.name}
+        </h1>
+        <div className="flex items-center gap-2">
+          <button
             onClick={toggleSave}
             disabled={saveLoading}
-            className={`text-lg p-1.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all ${isSaved ? 'text-red-500' : 'text-white/50 hover:text-white'}`}
+            className={`text-lg p-1.5 rounded-full hover:bg-white/15 transition-all active:scale-95 ${isSaved ? 'text-red-400' : 'text-white/60 hover:text-white'}`}
+            aria-label="Toggle save"
           >
             {isSaved ? '❤️' : '🤍'}
           </button>
-          <a 
-            href={exam.official_url} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-white/85 hover:text-white text-xs bg-white/10 hover:bg-white/20 p-2 rounded-full border border-white/10 transition-all active:scale-95 flex items-center justify-center font-bold"
+          <a
+            href={exam.official_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/80 hover:text-white text-xs px-2.5 py-1.5 rounded-full border border-white/20 hover:bg-white/15 transition-all active:scale-95 font-bold"
           >
             🌐
           </a>
         </div>
       </div>
 
-      <div className="pt-20 pb-4 flex flex-col flex-1 max-w-xl mx-auto w-full px-4 relative z-10 space-y-5">
-        {/* Chat Section */}
-        <div className="bg-white rounded-2xl border border-[#C5D0E0]/60 shadow-lg flex flex-col overflow-hidden w-full" style={{ height: '55vh' }}>
-          {/* Bot header */}
-          <div className="bg-gradient-to-r from-gray-50 to-[#EEF2F8] px-4 py-3 flex items-center justify-between border-b border-[#C5D0E0]/60">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#0F2B5B] rounded-full flex items-center justify-center text-white text-sm shadow-sm">🏛️</div>
-              <div>
-                <p className="text-sm font-bold text-[#0F2B5B] leading-none" style={{ fontFamily: "var(--font-noto)" }}>सरकारी साथी</p>
-                <p className="text-[10px] text-green-600 mt-1 font-semibold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full inline-block animate-pulse"></span>
-                  Online
-                </p>
+      {/* Mobile: floating Study button to open bottom sheet */}
+      <button
+        onClick={() => setShowStudySheet(true)}
+        className="lg:hidden fixed bottom-24 right-4 z-30 px-5 py-3 rounded-full font-bold text-sm shadow-elevated active:scale-95 flex items-center gap-2"
+        style={{
+          background: 'var(--accent-saffron)',
+          color: 'white',
+          fontFamily: 'var(--font-noto)',
+        }}
+      >
+        📚 Study Material
+      </button>
+
+      {/* DESKTOP: dual-pane | MOBILE: chat only + bottom sheet */}
+      <div className="pt-20 pb-4 max-w-7xl mx-auto w-full px-4 relative z-10">
+        <div className="lg:grid lg:grid-cols-5 lg:gap-5 lg:h-[calc(100vh-6rem)]">
+          {/* Chat pane (60% desktop) */}
+          <div
+            className="lg:col-span-3 flex flex-col rounded-2xl overflow-hidden mb-4 lg:mb-0"
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-card)',
+              boxShadow: 'var(--shadow-premium)',
+              height: '70vh',
+            }}
+          >
+            {/* Bot header with message counter */}
+            <div
+              className="px-4 py-3 flex items-center justify-between border-b"
+              style={{
+                background: 'linear-gradient(135deg, var(--bg-app), var(--bg-input))',
+                borderColor: 'var(--border-card)',
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--primary-navy), var(--primary-royal))',
+                    boxShadow: 'var(--shadow-soft)',
+                  }}
+                >
+                  🏛️
+                </div>
+                <div>
+                  <p className="text-sm font-bold leading-none" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    सरकारी साथी
+                  </p>
+                  <p className="text-[10px] mt-1 font-semibold flex items-center gap-1" style={{ color: 'var(--success-green)' }}>
+                    <span className="w-1.5 h-1.5 rounded-full inline-block animate-pulse" style={{ background: 'var(--success-green)' }} />
+                    Online
+                  </p>
+                </div>
+              </div>
+              {/* Message counter */}
+              <div
+                className="px-3 py-1.5 rounded-full text-xs font-bold"
+                style={{
+                  background: msgUsed >= msgLimit ? 'var(--danger-red-light)' : 'var(--accent-saffron-light)',
+                  color: msgUsed >= msgLimit ? 'var(--danger-red)' : 'var(--accent-saffron-hover)',
+                  fontFamily: 'var(--font-outfit)',
+                }}
+              >
+                {msgUsed}/{msgLimit} AI
               </div>
             </div>
-            {/* Custom API Key Configuration */}
-            <button
-              onClick={() => setShowCustomKeyModal(true)}
-              className="text-xs font-bold text-[#1847A6] hover:text-[#0F2B5B] bg-[#EEF2F8] hover:bg-blue-100/50 px-2.5 py-1.5 rounded-lg border border-blue-200/50 transition-all flex items-center gap-1 active:scale-95 cursor-pointer shadow-sm"
-              style={{ fontFamily: 'var(--font-noto)' }}
-            >
-              🔑 API Settings
-            </button>
-          </div>
 
-          {/* Messages */}
-          <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#E5EBF5]/60">
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={m.role === 'user' ? 'chat-bubble-user shadow-md' : 'chat-bubble-ai shadow-sm'}>
-                  <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed" style={{ fontFamily: "var(--font-noto)" }}>{m.content}</p>
+            {/* Messages */}
+            <div
+              ref={chatRef}
+              className="flex-1 overflow-y-auto p-4 space-y-3"
+              style={{ background: 'hsl(217, 33%, 94%)' }}
+            >
+              {messages.map((m, i) => (
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}>
+                    <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
+                      {m.content}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-            {loading && (
-              <div className="flex justify-start">
-                <div className="chat-bubble-ai flex gap-1.5 py-3.5 shadow-sm">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot" />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot" />
-                  <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot" />
+              ))}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="chat-bubble-ai flex gap-1.5 py-3.5">
+                    <div className="w-2 h-2 rounded-full typing-dot" />
+                    <div className="w-2 h-2 rounded-full typing-dot" />
+                    <div className="w-2 h-2 rounded-full typing-dot" />
+                  </div>
                 </div>
+              )}
+            </div>
+
+            {/* Quick replies */}
+            {messages.length <= 2 && (
+              <div
+                className="px-3 py-2 flex gap-2 overflow-x-auto scroll-hidden border-t"
+                style={{ background: 'var(--bg-card)', borderColor: 'var(--border-card)' }}
+              >
+                {QUICK_REPLIES.map((q, i) => (
+                  <button
+                    key={i}
+                    onClick={() => sendMessage(q)}
+                    className="quick-reply-chip flex-shrink-0 text-xs py-2"
+                    style={{ fontFamily: 'var(--font-noto)' }}
+                  >
+                    {q}
+                  </button>
+                ))}
               </div>
             )}
+
+            {/* Input Area */}
+            <div
+              className="p-3 flex gap-2 items-center border-t"
+              style={{ background: 'var(--bg-card)', borderColor: 'var(--border-card)' }}
+            >
+              <input
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && sendMessage()}
+                placeholder={msgUsed >= msgLimit ? "Limit पूरी हो गई — Login करें" : "अपना सवाल पूछें..."}
+                disabled={msgUsed >= msgLimit}
+                className="flex-1 h-12 rounded-xl px-4 text-sm focus-ring transition-all outline-none"
+                style={{
+                  background: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-card)',
+                  fontFamily: 'var(--font-noto)',
+                }}
+              />
+              <button
+                onClick={() => sendMessage()}
+                disabled={!input.trim() || loading || msgUsed >= msgLimit}
+                className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 ${
+                  input.trim()
+                    ? 'btn-saffron'
+                    : 'border'
+                }`}
+                style={!input.trim() ? { background: 'var(--bg-input)', color: 'var(--text-muted)', borderColor: 'var(--border-card)' } : {}}
+              >
+                ➤
+              </button>
+            </div>
           </div>
 
-          {/* Quick replies */}
-          {messages.length <= 2 && (
-            <div className="px-3 py-2 flex gap-2 overflow-x-auto scroll-hidden bg-white border-t border-[#C5D0E0]/50">
-              {QUICK_REPLIES.map((q, i) => (
-                <button 
-                  key={i} 
-                  onClick={() => sendMessage(q)} 
-                  className="quick-reply-chip flex-shrink-0 text-xs py-2 hover:shadow-sm active:scale-95" 
-                  style={{ fontFamily: "var(--font-noto)" }}
+          {/* Study pane (40% desktop) */}
+          <div
+            className="hidden lg:flex lg:col-span-2 flex-col rounded-2xl overflow-hidden"
+            style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-card)',
+              boxShadow: 'var(--shadow-premium)',
+            }}
+          >
+            {/* Tabs */}
+            <div
+              className="flex overflow-x-auto scroll-hidden border-b"
+              style={{ background: 'var(--bg-app)', borderColor: 'var(--border-card)' }}
+            >
+              {tabs.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    if (tab.locked) { setAuthReason('study_material'); setShowAuthModal(true); return; }
+                    setActiveTab(tab.id);
+                  }}
+                  className={`flex-1 min-w-[60px] text-center py-3 text-[10px] font-bold border-b-2 transition-all flex flex-col items-center gap-1 ${
+                    activeTab === tab.id ? '' : 'hover:bg-white/50'
+                  }`}
+                  style={{
+                    borderBottomColor: activeTab === tab.id ? 'var(--accent-saffron)' : 'transparent',
+                    color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-muted)',
+                    fontFamily: 'var(--font-noto)',
+                  }}
                 >
-                  {q}
+                  <span className="text-base">{tab.emoji}</span>
+                  <span className="flex items-center gap-0.5">
+                    {tab.label} {tab.locked && <span className="text-[10px]">🔒</span>}
+                  </span>
                 </button>
               ))}
             </div>
-          )}
 
-          {/* Message Counter */}
-          <MessageCounter used={msgUsed} limit={msgLimit} tier={userTier} isCustomKeyActive={hasCustomKey} />
-
-          {/* Input Area */}
-          <div className="p-3 bg-white border-t border-[#C5D0E0]/50 flex gap-2 items-center">
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && sendMessage()}
-              placeholder={hasCustomKey ? "अपनी API Key से असीमित चैट करें..." : "अपना सवाल पूछें..."}
-              disabled={!hasCustomKey && msgUsed >= msgLimit}
-              className="flex-1 h-12 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50 focus:border-[#1847A6] focus:bg-white transition-all outline-none disabled:opacity-50 text-[#0D1B2A] placeholder-gray-400"
-              style={{ fontFamily: "var(--font-noto)" }}
-            />
-            <button
-              onClick={() => sendMessage()}
-              disabled={!input.trim() || loading || (!hasCustomKey && msgUsed >= msgLimit)}
-              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-md ${input.trim() ? 'bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white shadow-orange-500/10' : 'bg-gray-100 text-gray-400 border border-gray-200'}`}
-            >
-              ➤
-            </button>
-          </div>
-        </div>
-
-        {/* Scroll Arrow CTA */}
-        {messages.length >= 2 && <ScrollArrowCTA />}
-
-        {/* Exam Info Section */}
-        <div id="exam-info" className="bg-white rounded-2xl border border-[#C5D0E0]/60 shadow-lg overflow-hidden w-full">
-          {/* Tabs */}
-          <div className="flex overflow-x-auto scroll-hidden bg-gray-50 border-b border-[#C5D0E0]/60">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  if (tab.locked) { setAuthReason('study_material'); setShowAuthModal(true); return; }
-                  setActiveTab(tab.id);
-                }}
-                className={`flex-1 min-w-[76px] text-center py-3 text-[10px] md:text-xs font-bold border-b-2 transition-all flex flex-col items-center gap-1 ${
-                  activeTab === tab.id 
-                    ? 'border-[#FF6B00] text-[#0F2B5B] bg-white' 
-                    : 'border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-100/50'
-                } ${tab.locked ? 'opacity-70' : ''}`}
-                style={{ fontFamily: "var(--font-noto)" }}
-              >
-                <span className="text-sm md:text-base">{tab.emoji}</span>
-                <span className="flex items-center gap-0.5">
-                  {tab.label} {tab.locked && <span className="text-[10px]">🔒</span>}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Tab Content */}
-          <div className="p-5 min-h-[260px] bg-white">
-            {activeTab === 'overview' && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-extrabold text-[#0F2B5B] mb-3 text-base" style={{ fontFamily: "var(--font-noto)" }}>{exam.name}</h3>
-                  <div className="grid grid-cols-2 gap-3 text-xs md:text-sm">
-                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">बोर्ड</p><p className="font-extrabold text-[#0F2B5B]">{exam.board}</p></div>
-                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">Status</p><p className="font-extrabold text-[#0F2B5B]">{exam.status}</p></div>
-                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">शिक्षा</p><p className="font-extrabold text-[#0F2B5B]">{exam.eligibility.education}</p></div>
-                    <div className="bg-[#EEF2F8]/70 border border-blue-100/30 rounded-xl p-3"><p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-0.5">आयु</p><p className="font-extrabold text-[#0F2B5B]">{exam.eligibility.min_age}-{exam.eligibility.max_age} वर्ष</p></div>
-                  </div>
-                </div>
-                {exam.selection_process && (
-                  <div className="pt-2">
-                    <h4 className="font-bold text-xs md:text-sm text-[#0F2B5B] mb-3" style={{ fontFamily: "var(--font-noto)" }}>चयन प्रक्रिया (Selection Process)</h4>
-                    <div className="space-y-2">
-                      {exam.selection_process.map((s, i) => (
-                        <div key={i} className="flex items-center gap-3 text-xs md:text-sm bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                          <span className="w-6 h-6 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white rounded-full flex items-center justify-center text-xs font-bold shadow-sm">{i+1}</span>
-                          <span className="text-gray-700 font-semibold" style={{ fontFamily: "var(--font-noto)" }}>{s}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'syllabus' && syllabus && (
-              <div className="space-y-3">
-                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>📚 विस्तृत पाठ्यक्रम</h3>
-                {syllabus.subjects.map((s: SyllabusSubject, i: number) => (
-                  <div key={i} className="bg-[#EEF2F8]/70 border border-[#C5D0E0]/30 rounded-xl p-3.5">
-                    <div className="flex justify-between items-center mb-2">
-                      <p className="font-extrabold text-xs md:text-sm text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{s.name}</p>
-                      <span className="bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">{s.weightage}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5 mt-2">
-                      {s.topics.map((t: string, ti: number) => (
-                        <span key={ti} className="bg-white text-[10px] md:text-xs text-gray-600 px-2.5 py-1 rounded-lg border border-gray-100 font-medium" style={{ fontFamily: "var(--font-noto)" }}>{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            {activeTab === 'syllabus' && !syllabus && (
-              <p className="text-gray-400 text-center py-8 text-xs font-semibold" style={{ fontFamily: "var(--font-noto)" }}>Syllabus जल्द उपलब्ध होगा</p>
-            )}
-
-            {activeTab === 'pyq' && (
-              <div className="space-y-3">
-                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-2" style={{ fontFamily: "var(--font-noto)" }}>📝 Previous Year Papers</h3>
-                {pyqs.length > 0 ? pyqs.map((p: PYQItem, i: number) => (
-                  <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="block bg-[#EEF2F8]/70 border border-[#C5D0E0]/30 rounded-xl p-3.5 hover:shadow-md transition-all active:scale-99">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-bold text-xs md:text-sm text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{p.name}</p>
-                        <p className="text-[10px] text-gray-500 mt-0.5 font-medium">{p.source} • {p.year}</p>
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {activeTab === 'overview' && (
+                <div className="space-y-3">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    {exam.name}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {[
+                      { label: 'बोर्ड', value: exam.board },
+                      { label: 'Status', value: exam.status },
+                      { label: 'शिक्षा', value: exam.eligibility.education },
+                      { label: 'आयु', value: `${exam.eligibility.min_age}-${exam.eligibility.max_age} वर्ष` },
+                    ].map((s, i) => (
+                      <div
+                        key={i}
+                        className="rounded-xl p-2.5"
+                        style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                      >
+                        <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                          {s.label}
+                        </p>
+                        <p className="font-extrabold mt-0.5" style={{ color: 'var(--text-primary)' }}>
+                          {s.value}
+                        </p>
                       </div>
-                      <span className="text-[#FF6B00] text-sm font-extrabold">→</span>
-                    </div>
-                  </a>
-                )) : <p className="text-gray-400 text-center py-8 text-xs font-semibold" style={{ fontFamily: "var(--font-noto)" }}>PYQ जल्द उपलब्ध होंगे</p>}
-              </div>
-            )}
-
-            {activeTab === 'documents' && (
-              <div className="space-y-2">
-                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-3" style={{ fontFamily: "var(--font-noto)" }}>📄 जरूरी दस्तावेज़</h3>
-                {["SSO ID (अनिवार्य)", "जन आधार / आधार कार्ड", "10वीं सर्टिफिकेट (आयु प्रमाण)", "श्रेणी प्रमाणपत्र (SC/ST/OBC/EWS)", "मूल निवास प्रमाणपत्र (राजस्थान)", "पासपोर्ट फोटो (सफेद बैकग्राउंड)", "हस्ताक्षर स्कैन", "बैंक खाता विवरण"].map((d, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-[#EEF2F8]/50 border border-blue-50/50 rounded-xl p-3 text-xs md:text-sm font-semibold">
-                    <span className="text-[#138808] text-sm">✓</span>
-                    <span className="text-gray-700" style={{ fontFamily: "var(--font-noto)" }}>{d}</span>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
+                  {exam.selection_process && (
+                    <div className="pt-2">
+                      <h4 className="font-bold text-xs mb-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                        चयन प्रक्रिया
+                      </h4>
+                      <div className="space-y-1.5">
+                        {exam.selection_process.map((s, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center gap-2 text-xs p-2 rounded-lg"
+                            style={{ background: 'var(--bg-input)' }}
+                          >
+                            <span
+                              className="w-5 h-5 text-white rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                              style={{ background: 'var(--accent-saffron)' }}
+                            >
+                              {i + 1}
+                            </span>
+                            <span className="font-semibold" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-noto)' }}>
+                              {s}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
-            {activeTab === 'links' && (
-              <div className="space-y-2.5">
-                <h3 className="font-extrabold text-sm text-[#0F2B5B] mb-3" style={{ fontFamily: "var(--font-noto)" }}>🔗 महत्वपूर्ण लिंक</h3>
-                {[
-                  { label: "आधिकारिक वेबसाइट", url: exam.official_url, icon: "🏛️" },
-                  { label: "ऑनलाइन आवेदन (SSO Portal)", url: exam.apply_url || "https://sso.rajasthan.gov.in", icon: "📝" },
-                  { label: "SSO हेल्पडेस्क: 0141-5153222", url: "tel:01415153222", icon: "📞" },
-                ].map((l, i) => (
-                  <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 bg-[#EEF2F8]/70 border border-[#C5D0E0]/30 rounded-xl p-3.5 hover:shadow-md transition-all active:scale-99">
-                    <span className="text-base">{l.icon}</span>
-                    <span className="text-xs md:text-sm font-bold text-[#0F2B5B]" style={{ fontFamily: "var(--font-noto)" }}>{l.label}</span>
-                    <span className="ml-auto text-[#FF6B00] text-sm">→</span>
-                  </a>
-                ))}
-              </div>
-            )}
+              {activeTab === 'syllabus' && syllabus && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    📚 पाठ्यक्रम
+                  </h3>
+                  {syllabus.subjects.map((s: SyllabusSubject, i: number) => (
+                    <div
+                      key={i}
+                      className="rounded-xl p-3"
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                    >
+                      <div className="flex justify-between items-center mb-1.5">
+                        <p className="font-extrabold text-xs" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                          {s.name}
+                        </p>
+                        <span
+                          className="text-white text-[9px] font-bold px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--accent-saffron)' }}
+                        >
+                          {s.weightage}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {s.topics.map((t: string, ti: number) => (
+                          <span
+                            key={ti}
+                            className="text-[10px] px-2 py-0.5 rounded font-medium"
+                            style={{
+                              background: 'var(--bg-card)',
+                              color: 'var(--text-secondary)',
+                              border: '1px solid var(--border-card)',
+                              fontFamily: 'var(--font-noto)',
+                            }}
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {activeTab === 'syllabus' && !syllabus && (
+                <p className="text-center py-8 text-xs" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-noto)' }}>
+                  Syllabus जल्द उपलब्ध होगा
+                </p>
+              )}
+
+              {activeTab === 'pyq' && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    📝 PYQ
+                  </h3>
+                  {pyqs.length > 0 ? pyqs.map((p: PYQItem, i: number) => (
+                    <a
+                      key={i}
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-xl p-3 transition-all active:scale-[0.99] hover:shadow-md"
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-bold text-xs" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                            {p.name}
+                          </p>
+                          <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                            {p.source} • {p.year}
+                          </p>
+                        </div>
+                        <span style={{ color: 'var(--accent-saffron)' }}>→</span>
+                      </div>
+                    </a>
+                  )) : (
+                    <p className="text-center py-8 text-xs" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-noto)' }}>
+                      PYQ जल्द उपलब्ध होंगे
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'documents' && (
+                <div className="space-y-2">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    📄 दस्तावेज़
+                  </h3>
+                  {["SSO ID (अनिवार्य)", "जन आधार / आधार कार्ड", "10वीं सर्टिफिकेट (आयु प्रमाण)", "श्रेणी प्रमाणपत्र", "मूल निवास प्रमाणपत्र", "पासपोर्ट फोटो (सफेद बैकग्राउंड)", "हस्ताक्षर स्कैन", "बैंक खाता विवरण"].map((d, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 p-2.5 rounded-lg text-xs font-semibold"
+                      style={{ background: 'var(--bg-input)' }}
+                    >
+                      <span style={{ color: 'var(--success-green)' }}>✓</span>
+                      <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-noto)' }}>{d}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'links' && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    🔗 लिंक
+                  </h3>
+                  {[
+                    { label: "आधिकारिक वेबसाइट", url: exam.official_url, icon: "🏛️" },
+                    { label: "SSO Portal (Apply)", url: exam.apply_url || "https://sso.rajasthan.gov.in", icon: "📝" },
+                    { label: "SSO हेल्पडेस्क: 0141-5153222", url: "tel:01415153222", icon: "📞" },
+                  ].map((l, i) => (
+                    <a
+                      key={i}
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 rounded-xl p-3 transition-all active:scale-[0.99] hover:shadow-md"
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                    >
+                      <span className="text-base">{l.icon}</span>
+                      <span className="text-xs font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                        {l.label}
+                      </span>
+                      <span className="ml-auto" style={{ color: 'var(--accent-saffron)' }}>→</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'strategy' && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    🎯 तैयारी रणनीति
+                  </h3>
+                  {[
+                    { step: "1", title: "Syllabus समझें", desc: "Exam pattern + weightage देखें" },
+                    { step: "2", title: "Daily 2-3 घंटे पढ़ाई", desc: "Consistency जरूरी" },
+                    { step: "3", title: "PYQ Solve करें", desc: "पिछले 5 साल के papers" },
+                    { step: "4", title: "Mock Test दें", desc: "हफ्ते में 2-3 tests" },
+                    { step: "5", title: "Revision जरूरी", desc: "हफ्ते में 1 बार सब revise" },
+                  ].map((s, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2.5 p-2.5 rounded-lg"
+                      style={{ background: 'var(--bg-input)' }}
+                    >
+                      <span
+                        className="w-6 h-6 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                        style={{ background: 'var(--primary-royal)' }}
+                      >
+                        {s.step}
+                      </span>
+                      <div>
+                        <p className="text-xs font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                          {s.title}
+                        </p>
+                        <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-noto)' }}>
+                          {s.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Disclaimer */}
-        <div className="bg-[#FFF3E8] border-l-2 border-[#FF6B00] p-3.5 rounded-r-xl">
-          <p className="text-orange-800 text-[10px] md:text-xs leading-relaxed italic" style={{ fontFamily: "var(--font-noto)" }}>
+        <div className="disclaimer-box mt-4">
+          <p className="leading-relaxed italic" style={{ fontFamily: 'var(--font-noto)' }}>
             ⚠️ {exam.disclaimer}
           </p>
         </div>
       </div>
 
-      {showAuthModal && <AuthPromptModal onClose={() => setShowAuthModal(false)} reason={authReason} />}
+      {/* MOBILE: Bottom Sheet for Study Material */}
+      {showStudySheet && (
+        <div className="lg:hidden fixed inset-0 z-[60]">
+          <div
+            className="absolute inset-0"
+            style={{ background: 'rgba(0,0,0,0.5)' }}
+            onClick={() => setShowStudySheet(false)}
+          />
+          <div
+            className="absolute bottom-0 left-0 right-0 max-h-[85vh] flex flex-col rounded-t-3xl overflow-hidden animate-slide-up-sheet"
+            style={{
+              background: 'var(--bg-card)',
+              boxShadow: 'var(--shadow-elevated)',
+            }}
+          >
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-12 h-1.5 rounded-full" style={{ background: 'var(--border-card)' }} />
+            </div>
 
-      {/* Custom API Key Settings Modal */}
-      {showCustomKeyModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCustomKeyModal(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden p-6 animate-slide-up space-y-4">
-            <div className="flex justify-between items-center border-b pb-3">
-              <h3 className="font-extrabold text-base text-[#0F2B5B] flex items-center gap-1.5" style={{ fontFamily: 'var(--font-noto)' }}>
-                <span>🔑</span> अपनी AI API Key दर्ज करें
+            <div
+              className="px-5 py-3 flex items-center justify-between border-b"
+              style={{ borderColor: 'var(--border-card)' }}
+            >
+              <h3 className="font-extrabold text-base" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                📚 Study Material
               </h3>
-              <button onClick={() => setShowCustomKeyModal(false)} className="text-gray-400 hover:text-gray-650 font-black text-xl cursor-pointer">×</button>
+              <button
+                onClick={() => setShowStudySheet(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold"
+                style={{ background: 'var(--bg-input)', color: 'var(--text-muted)' }}
+              >
+                ×
+              </button>
             </div>
-            
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
-                  प्रदाता चुनें (Select Provider)
-                </label>
-                <select
-                  value={customKeys.activeProvider}
-                  onChange={e => setCustomKeys({ ...customKeys, activeProvider: e.target.value })}
-                  className="w-full h-11 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] transition-all outline-none cursor-pointer"
+
+            {/* Tabs - horizontal scroll on mobile */}
+            <div
+              className="flex overflow-x-auto scroll-hidden border-b"
+              style={{ background: 'var(--bg-app)', borderColor: 'var(--border-card)' }}
+            >
+              {tabs.map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    if (tab.locked) { setAuthReason('study_material'); setShowAuthModal(true); return; }
+                    setActiveTab(tab.id);
+                  }}
+                  className={`flex-shrink-0 px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-1.5`}
+                  style={{
+                    borderBottomColor: activeTab === tab.id ? 'var(--accent-saffron)' : 'transparent',
+                    color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-muted)',
+                    fontFamily: 'var(--font-noto)',
+                  }}
                 >
-                  <option value="gemini">Google Gemini (Recommended - Free)</option>
-                  <option value="openai">OpenAI (ChatGPT)</option>
-                  <option value="openrouter">OpenRouter</option>
-                  <option value="groq">Groq</option>
-                  <option value="nvidia">Nvidia NIM</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1" style={{ fontFamily: 'var(--font-noto)' }}>
-                  {customKeys.activeProvider.toUpperCase()} API Key दर्ज करें
-                </label>
-                <input
-                  type="password"
-                  value={customKeys[customKeys.activeProvider] || ''}
-                  onChange={e => setCustomKeys({ ...customKeys, [customKeys.activeProvider]: e.target.value })}
-                  placeholder="यहाँ अपनी API Key पेस्ट करें..."
-                  className="w-full h-11 border border-[#C5D0E0] rounded-xl px-4 text-sm bg-gray-50 text-[#0D1B2A] focus:bg-white focus:border-[#1847A6] transition-all outline-none"
-                />
-              </div>
-
-              {/* Guide links & instructions */}
-              <div className="bg-[#EEF2F8] p-4 rounded-xl border border-blue-100/50 text-xs text-[#0F2B5B] space-y-2">
-                <p className="font-bold flex items-center gap-1">
-                  <span>ℹ️</span> {customKeys.activeProvider.toUpperCase()} की चाबी कैसे बनाएं:
-                </p>
-                {customKeys.activeProvider === 'gemini' && (
-                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
-                    <li><a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Google AI Studio ↗</a> पर जाएं।</li>
-                    <li>अपने गूगल अकाउंट से लॉगिन करके <b>"Create API Key"</b> पर क्लिक करें।</li>
-                    <li>चाबी को कॉपी करें और ऊपर पेस्ट कर के सेव करें। (यह बिल्कुल मुफ्त है)।</li>
-                  </ol>
-                )}
-                {customKeys.activeProvider === 'openai' && (
-                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
-                    <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">OpenAI Platform ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Create new secret key"</b> पर क्लिक करें।</li>
-                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
-                  </ol>
-                )}
-                {customKeys.activeProvider === 'openrouter' && (
-                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
-                    <li><a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">OpenRouter Keys ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Create Key"</b> पर क्लिक करें।</li>
-                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
-                  </ol>
-                )}
-                {customKeys.activeProvider === 'groq' && (
-                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
-                    <li><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Groq Console ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Create API Key"</b> पर क्लिक करें।</li>
-                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
-                  </ol>
-                )}
-                {customKeys.activeProvider === 'nvidia' && (
-                  <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
-                    <li><a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Nvidia NIM ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Get API Key"</b> पर क्लिक करें।</li>
-                    <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
-                  </ol>
-                )}
-              </div>
+                  <span>{tab.emoji}</span>
+                  <span>{tab.label}</span>
+                  {tab.locked && <span className="text-[10px]">🔒</span>}
+                </button>
+              ))}
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => saveCustomKeys(customKeys)}
-                className="flex-1 h-12 bg-gradient-to-r from-[#FF6B00] to-[#E55A00] text-white font-bold rounded-xl active:scale-[0.98] transition-all text-sm cursor-pointer shadow-md"
-                style={{ fontFamily: 'var(--font-noto)' }}
+            {/* Reuse the same tab content as desktop */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {activeTab === 'overview' && (
+                <div className="space-y-3">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    {exam.name}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {[
+                      { label: 'बोर्ड', value: exam.board },
+                      { label: 'Status', value: exam.status },
+                      { label: 'शिक्षा', value: exam.eligibility.education },
+                      { label: 'आयु', value: `${exam.eligibility.min_age}-${exam.eligibility.max_age} वर्ष` },
+                    ].map((s, i) => (
+                      <div
+                        key={i}
+                        className="rounded-xl p-2.5"
+                        style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                      >
+                        <p className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                          {s.label}
+                        </p>
+                        <p className="font-extrabold mt-0.5" style={{ color: 'var(--text-primary)' }}>
+                          {s.value}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                  {exam.selection_process && (
+                    <div className="pt-2">
+                      <h4 className="font-bold text-xs mb-2" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                        चयन प्रक्रिया
+                      </h4>
+                      <div className="space-y-1.5">
+                        {exam.selection_process.map((s, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center gap-2 text-xs p-2 rounded-lg"
+                            style={{ background: 'var(--bg-input)' }}
+                          >
+                            <span
+                              className="w-5 h-5 text-white rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+                              style={{ background: 'var(--accent-saffron)' }}
+                            >
+                              {i + 1}
+                            </span>
+                            <span className="font-semibold" style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-noto)' }}>
+                              {s}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'syllabus' && syllabus && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    📚 पाठ्यक्रम
+                  </h3>
+                  {syllabus.subjects.map((s: SyllabusSubject, i: number) => (
+                    <div
+                      key={i}
+                      className="rounded-xl p-3"
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                    >
+                      <div className="flex justify-between items-center mb-1.5">
+                        <p className="font-extrabold text-xs" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                          {s.name}
+                        </p>
+                        <span
+                          className="text-white text-[9px] font-bold px-2 py-0.5 rounded-full"
+                          style={{ background: 'var(--accent-saffron)' }}
+                        >
+                          {s.weightage}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {s.topics.map((t: string, ti: number) => (
+                          <span
+                            key={ti}
+                            className="text-[10px] px-2 py-0.5 rounded font-medium"
+                            style={{
+                              background: 'var(--bg-card)',
+                              color: 'var(--text-secondary)',
+                              border: '1px solid var(--border-card)',
+                              fontFamily: 'var(--font-noto)',
+                            }}
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'pyq' && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    📝 PYQ
+                  </h3>
+                  {pyqs.length > 0 ? pyqs.map((p: PYQItem, i: number) => (
+                    <a
+                      key={i}
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-xl p-3 active:scale-[0.99]"
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-bold text-xs" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                            {p.name}
+                          </p>
+                          <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                            {p.source} • {p.year}
+                          </p>
+                        </div>
+                        <span style={{ color: 'var(--accent-saffron)' }}>→</span>
+                      </div>
+                    </a>
+                  )) : (
+                    <p className="text-center py-8 text-xs" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-noto)' }}>
+                      PYQ जल्द उपलब्ध होंगे
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'documents' && (
+                <div className="space-y-2">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    📄 दस्तावेज़
+                  </h3>
+                  {["SSO ID (अनिवार्य)", "जन आधार / आधार कार्ड", "10वीं सर्टिफिकेट (आयु प्रमाण)", "श्रेणी प्रमाणपत्र", "मूल निवास प्रमाणपत्र", "पासपोर्ट फोटो (सफेद बैकग्राउंड)", "हस्ताक्षर स्कैन", "बैंक खाता विवरण"].map((d, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 p-2.5 rounded-lg text-xs font-semibold"
+                      style={{ background: 'var(--bg-input)' }}
+                    >
+                      <span style={{ color: 'var(--success-green)' }}>✓</span>
+                      <span style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-noto)' }}>{d}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'links' && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    🔗 लिंक
+                  </h3>
+                  {[
+                    { label: "आधिकारिक वेबसाइट", url: exam.official_url, icon: "🏛️" },
+                    { label: "SSO Portal (Apply)", url: exam.apply_url || "https://sso.rajasthan.gov.in", icon: "📝" },
+                    { label: "SSO हेल्पडेस्क: 0141-5153222", url: "tel:01415153222", icon: "📞" },
+                  ].map((l, i) => (
+                    <a
+                      key={i}
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 rounded-xl p-3 active:scale-[0.99]"
+                      style={{ background: 'var(--bg-input)', border: '1px solid var(--border-card)' }}
+                    >
+                      <span className="text-base">{l.icon}</span>
+                      <span className="text-xs font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                        {l.label}
+                      </span>
+                      <span className="ml-auto" style={{ color: 'var(--accent-saffron)' }}>→</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'strategy' && (
+                <div className="space-y-2.5">
+                  <h3 className="font-extrabold text-sm" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                    🎯 रणनीति
+                  </h3>
+                  {[
+                    { step: "1", title: "Syllabus समझें", desc: "Pattern + weightage देखें" },
+                    { step: "2", title: "Daily 2-3 घंटे पढ़ाई", desc: "Consistency जरूरी" },
+                    { step: "3", title: "PYQ Solve करें", desc: "पिछले 5 साल के papers" },
+                    { step: "4", title: "Mock Test दें", desc: "हफ्ते में 2-3 tests" },
+                    { step: "5", title: "Revision जरूरी", desc: "हफ्ते में 1 बार revise" },
+                  ].map((s, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2.5 p-2.5 rounded-lg"
+                      style={{ background: 'var(--bg-input)' }}
+                    >
+                      <span
+                        className="w-6 h-6 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                        style={{ background: 'var(--primary-royal)' }}
+                      >
+                        {s.step}
+                      </span>
+                      <div>
+                        <p className="text-xs font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}>
+                          {s.title}
+                        </p>
+                        <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-noto)' }}>
+                          {s.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Auth prompt modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0"
+            style={{ background: 'rgba(0,0,0,0.5)' }}
+            onClick={() => setShowAuthModal(false)}
+          />
+          <div
+            className="relative rounded-2xl p-6 max-w-sm w-full animate-slide-up"
+            style={{
+              background: 'var(--bg-card)',
+              boxShadow: 'var(--shadow-elevated)',
+            }}
+          >
+            <div className="text-center">
+              <div className="text-5xl mb-3">
+                {authReason === 'message_limit' ? '💬' : authReason === 'save_exam' ? '❤️' : '🔒'}
+              </div>
+              <h3
+                className="text-base font-extrabold mb-2"
+                style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-noto)' }}
               >
-                सेव करें (Save Key)
-              </button>
-              <button
-                onClick={() => {
-                  const resetConfig = { ...customKeys, [customKeys.activeProvider]: '' };
-                  saveCustomKeys(resetConfig);
-                }}
-                className="h-12 bg-gray-100 text-red-600 hover:bg-gray-200 px-4 font-bold rounded-xl active:scale-[0.98] transition-all text-sm cursor-pointer"
-                style={{ fontFamily: 'var(--font-noto)' }}
+                {authReason === 'message_limit' && 'Limit पूरी हो गई'}
+                {authReason === 'save_exam' && 'Save करने के लिए Login करें'}
+                {authReason === 'study_material' && 'Premium Content'}
+              </h3>
+              <p
+                className="text-xs mb-5"
+                style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-noto)' }}
               >
-                हटाएं (Remove)
-              </button>
+                {authReason === 'message_limit' && 'आज के 5 मुफ्त सवाल हो गए। Login करके unlimited access पाएं।'}
+                {authReason === 'save_exam' && 'Exams save करने के लिए login जरूरी है।'}
+                {authReason === 'study_material' && 'Syllabus, PYQ unlock करने के लिए login करें।'}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowAuthModal(false)}
+                  className="flex-1 h-11 rounded-xl font-bold text-sm"
+                  style={{
+                    background: 'var(--bg-input)',
+                    color: 'var(--text-secondary)',
+                    fontFamily: 'var(--font-noto)',
+                  }}
+                >
+                  बाद में
+                </button>
+                <button
+                  onClick={() => router.push('/auth')}
+                  className="flex-1 h-11 rounded-xl font-bold text-sm text-white btn-saffron"
+                  style={{ fontFamily: 'var(--font-noto)' }}
+                >
+                  Login →
+                </button>
+              </div>
             </div>
           </div>
         </div>
