@@ -7,114 +7,123 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-[hsl(214,32%,91%)]">
-      {/* Top Bar (Contact & Language - similar to Envatx) */}
-      <div className="bg-[hsl(210,40%,98%)] px-4 py-1.5 flex justify-between items-center text-xs text-[hsl(215,16%,40%)] border-b border-[hsl(214,32%,91%)]">
-        <div className="flex items-center gap-2">
-          <span>📞 +91 99999-00000</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="hover:text-[hsl(222,47%,12%)]">English ▾</button>
+    <header className="w-full bg-white font-sans border-b border-gray-200">
+      {/* Top Thin Bar */}
+      <div className="border-b border-gray-100 py-1.5 hidden md:block">
+        <div className="max-w-[1400px] mx-auto px-4 flex justify-between items-center text-xs text-gray-500">
+          <div className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+            </svg>
+            <span>+919334096338</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="flex items-center gap-1 hover:text-gray-800">
+              <img src="https://flagcdn.com/w20/us.png" alt="English" className="w-4 h-3" />
+              English ▾
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <div className="px-4 lg:px-10 py-3 flex items-center justify-between gap-4 max-w-7xl mx-auto">
+      {/* Main Middle Bar */}
+      <div className="max-w-[1400px] mx-auto px-4 py-4 flex items-center justify-between gap-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 bg-gradient-to-br from-[hsl(24,100%,50%)] to-[hsl(348,83%,47%)] rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">
-            S
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold text-[hsl(222,47%,12%)] leading-none font-outfit tracking-tight">
-              Sarkari<span className="text-[hsl(348,83%,47%)]">Sathi</span>
-            </h1>
-            <p className="text-[9px] text-[hsl(215,16%,55%)] leading-tight tracking-wider uppercase font-semibold">
-              Govt Exams Portal
-            </p>
-          </div>
+        <Link href="/" className="shrink-0 flex items-center">
+          <span className="text-3xl font-extrabold text-[#111827] tracking-tight">Sarkari<span className="text-[#e00000]">Sathi</span></span>
         </Link>
 
-        {/* Search Bar (Hidden on very small mobile, visible on tablet/desktop) */}
-        <div className="hidden md:flex flex-1 max-w-2xl mx-8 relative">
-          <input
-            type="text"
-            placeholder="Search for exams, mock tests, pdfs..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-11 pl-4 pr-12 border-2 border-[hsl(214,32%,91%)] rounded-xl bg-[hsl(210,40%,98%)] focus:bg-white focus:border-[hsl(348,83%,47%)] outline-none transition-all font-noto"
-          />
-          <button className="absolute right-1 top-1 bottom-1 w-10 bg-[hsl(348,83%,47%)] hover:bg-[hsl(348,83%,40%)] text-white rounded-lg flex items-center justify-center transition-colors">
+        {/* Large Search Bar */}
+        <div className="hidden lg:flex flex-1 max-w-3xl">
+          <div className="flex w-full border-2 border-gray-100 rounded-l-md bg-gray-50 focus-within:bg-white focus-within:border-gray-200 transition-colors">
+            <input
+              type="text"
+              placeholder="Search for items..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-11 px-4 bg-transparent outline-none text-gray-700"
+            />
+          </div>
+          <button className="h-12 px-6 bg-[#e00000] hover:bg-[#cc0000] text-white rounded-r-md transition-colors flex items-center justify-center -ml-1 border-2 border-[#e00000]">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
         </div>
 
-        {/* Action Icons */}
-        <div className="flex items-center gap-3 shrink-0">
-          <button className="w-10 h-10 rounded-full border border-[hsl(214,32%,91%)] flex items-center justify-center text-[hsl(222,47%,12%)] hover:bg-[hsl(210,40%,98%)] transition-colors relative">
+        {/* Icons Right */}
+        <div className="flex items-center gap-4 shrink-0">
+          {/* Wishlist */}
+          <button className="w-10 h-10 rounded-full bg-red-50 text-[#e00000] flex items-center justify-center relative hover:bg-red-100 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-[hsl(348,83%,47%)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">0</span>
           </button>
           
+          {/* Profile */}
           <Link href="/auth">
-            <button className="w-10 h-10 rounded-full border border-[hsl(214,32%,91%)] flex items-center justify-center text-[hsl(222,47%,12%)] hover:bg-[hsl(210,40%,98%)] transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <button className="w-10 h-10 rounded-full bg-red-50 text-[#e00000] flex items-center justify-center hover:bg-red-100 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
               </svg>
             </button>
           </Link>
 
-          <button className="flex items-center gap-2 border border-[hsl(214,32%,91%)] px-3 py-2 rounded-xl hover:bg-[hsl(210,40%,98%)] transition-colors">
-            <div className="relative">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[hsl(222,47%,12%)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {/* Cart */}
+          <button className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-red-50 text-[#e00000] flex items-center justify-center relative hover:bg-red-100 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              <span className="absolute -top-2 -right-2 w-4 h-4 bg-[hsl(348,83%,47%)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+              <span className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">0</span>
             </div>
             <div className="hidden lg:block text-left">
-              <p className="text-[10px] text-[hsl(215,16%,55%)] leading-none">My cart</p>
-              <p className="text-xs font-bold text-[hsl(222,47%,12%)] leading-none mt-0.5">₹0.00 ▾</p>
+              <p className="text-[11px] text-gray-500 leading-none mb-1">My cart</p>
+              <p className="text-sm font-bold text-gray-900 leading-none">₹0.00 ▾</p>
             </div>
           </button>
         </div>
       </div>
 
-      {/* Mobile Search Bar (Visible only on small screens) */}
-      <div className="md:hidden px-4 pb-3">
-        <div className="relative">
+      {/* Mobile Search */}
+      <div className="lg:hidden px-4 pb-4">
+        <div className="flex w-full border-2 border-gray-100 rounded-md overflow-hidden">
           <input
             type="text"
-            placeholder="Search for exams..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-4 pr-12 border-2 border-[hsl(214,32%,91%)] rounded-xl bg-[hsl(210,40%,98%)] focus:bg-white focus:border-[hsl(348,83%,47%)] outline-none transition-all text-sm font-noto"
+            placeholder="Search for items..."
+            className="flex-1 h-10 px-3 outline-none"
           />
-          <button className="absolute right-1 top-1 bottom-1 w-10 bg-[hsl(348,83%,47%)] text-white rounded-lg flex items-center justify-center">
+          <button className="w-12 bg-[#e00000] text-white flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Red Navigation Bar (Like Envatx) */}
-      <div className="bg-[hsl(348,83%,47%)] text-white text-sm font-medium hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 lg:px-10 flex items-center">
-          <button className="bg-[hsl(210,40%,98%)] text-[hsl(222,47%,12%)] px-6 py-3 font-bold flex items-center gap-2 hover:bg-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[hsl(348,83%,47%)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-            Categories ▾
-          </button>
-          <nav className="flex items-center gap-6 ml-8">
-            <Link href="/" className="hover:text-white/80 transition-colors">Home</Link>
-            <Link href="#" className="hover:text-white/80 transition-colors">Discounted Products</Link>
-            <Link href="#" className="hover:text-white/80 transition-colors">Publication House</Link>
-            <Link href="#" className="hover:text-white/80 transition-colors">All Vendors</Link>
+      {/* Bottom Red Navigation Bar */}
+      <div className="bg-[#e00000] text-white">
+        <div className="max-w-[1400px] mx-auto px-4 flex items-center">
+          {/* Category Dropdown Button */}
+          <div className="relative group">
+            <button className="h-12 bg-white text-[#e00000] px-8 font-bold flex items-center gap-3 w-64 border-b-2 border-transparent">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+              </svg>
+              Categories
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Nav Links */}
+          <nav className="hidden lg:flex items-center ml-6">
+            <Link href="/" className="px-5 py-3 hover:bg-black/10 transition-colors font-medium">Home</Link>
+            <Link href="#" className="px-5 py-3 hover:bg-black/10 transition-colors font-medium">Discounted Products</Link>
+            <Link href="#" className="px-5 py-3 hover:bg-black/10 transition-colors font-medium">Publication House</Link>
+            <Link href="#" className="px-5 py-3 hover:bg-black/10 transition-colors font-medium">All Vendors</Link>
           </nav>
         </div>
       </div>
