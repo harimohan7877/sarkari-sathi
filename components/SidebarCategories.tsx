@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import marketplaceData from "@/data/marketplace_data.json";
+import Link from "next/link";
 
-// Typed data structure based on marketplace_data.json
 interface Exam {
   sl: number;
   id: number;
@@ -32,13 +31,13 @@ export default function SidebarCategories() {
   };
 
   return (
-    <aside className="w-full lg:w-[300px] shrink-0 bg-white border border-gray-200 rounded-sm shadow-sm overflow-hidden h-fit">
-      {/* Sidebar Title */}
-      <div className="bg-[#e00000] text-white px-5 py-3.5 flex items-center gap-2 font-bold text-sm uppercase tracking-wider">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+    <aside className="w-full lg:w-[280px] shrink-0 bg-white border border-gray-100 rounded-sm shadow-sm overflow-hidden h-fit">
+      {/* Sidebar Header - Minimalist styling */}
+      <div className="bg-black text-white px-5 py-4 flex items-center gap-2.5 font-semibold text-xs uppercase tracking-[0.1em] font-mono">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4.5 w-4.5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
         </svg>
-        <span>Rajasthan Exams Categories</span>
+        <span>Exams Categories</span>
       </div>
 
       {/* Categories List */}
@@ -46,22 +45,25 @@ export default function SidebarCategories() {
         {groups.map((group) => {
           const isExpanded = !!expandedGroups[group];
           const exams = data[group];
+          const cleanGroupName = group
+            .replace("Rajasthan", "")
+            .replace("Exams", "")
+            .trim();
 
           return (
             <div key={group} className="flex flex-col">
-              {/* Group Header Button */}
+              {/* Group Button */}
               <button
                 onClick={() => toggleGroup(group)}
-                className="w-full px-5 py-4 flex items-center justify-between text-left font-medium text-[13px] md:text-sm text-gray-800 hover:bg-gray-50 transition-colors"
+                className="w-full px-5 py-3.5 flex items-center justify-between text-left text-xs font-semibold text-gray-800 hover:bg-gray-50 transition-colors uppercase tracking-wider font-mono"
               >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-lg">📁</span>
-                  <span className="font-semibold tracking-tight">{group.replace("Exams", "")}</span>
-                </div>
+                <span className={isExpanded ? "text-black" : "text-gray-600"}>
+                  {cleanGroupName}
+                </span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${
-                    isExpanded ? "transform rotate-180 text-[#e00000]" : ""
+                  className={`h-3 w-3 text-gray-400 transition-transform duration-200 ${
+                    isExpanded ? "transform rotate-180 text-black" : ""
                   }`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -70,16 +72,16 @@ export default function SidebarCategories() {
                 </svg>
               </button>
 
-              {/* Collapsible Exams List */}
+              {/* Nested Dropdown */}
               {isExpanded && (
-                <div className="bg-gray-50/50 pb-2 border-t border-gray-50 pl-9 pr-4 divide-y divide-gray-50 max-h-[250px] overflow-y-auto scrollbar-thin">
+                <div className="bg-gray-50/50 pb-2 border-t border-gray-50 pl-5 pr-3 divide-y divide-gray-50/50 max-h-[220px] overflow-y-auto scrollbar-thin">
                   {exams.map((exam) => (
                     <Link
                       key={exam.id}
                       href={`/exam/${exam.id}`}
-                      className="block py-2.5 text-[12px] text-gray-600 hover:text-[#e00000] font-medium hover:pl-1 transition-all duration-150 border-b border-gray-100/50"
+                      className="block py-2 text-[11px] text-gray-500 hover:text-black font-medium transition-colors border-b border-gray-100/30"
                     >
-                      📝 {exam.name_en}
+                      • {exam.name_en}
                     </Link>
                   ))}
                 </div>
