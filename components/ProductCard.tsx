@@ -30,52 +30,46 @@ export default function ProductCard({ product, onBuyNow }: ProductCardProps) {
   };
 
   return (
-    <div className="bg-white border border-gray-100 rounded-sm shadow-halo hover:shadow-premium transition-shadow duration-300 flex flex-col group overflow-hidden">
+    <div className="bg-white border border-gray-100 rounded-sm shadow-halo card-micro flex flex-col group overflow-hidden">
       {/* Visual Cover Area */}
-      <div className="relative p-5 flex items-center justify-center h-[240px] bg-gray-50/30 border-b border-gray-50">
-        {/* Discount Badge - Minimalist Black tag */}
+      <div className="relative p-5 flex items-center justify-center h-[240px] bg-gray-50/30 border-b border-gray-50 overflow-hidden">
+        {/* Discount Badge */}
         {discount > 0 && (
           <span className="absolute top-3 left-3 bg-black text-white text-[9px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase z-10">
             -{discount}%
           </span>
         )}
 
-        {/* Product Type - Minimalist Grey/White pill */}
+        {/* Product Type pill */}
         <span className="absolute top-3 right-3 bg-gray-100 text-gray-700 text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider z-10">
           {product.type}
         </span>
 
-        {/* Minimalist Book Cover */}
-        <div className={`w-[130px] h-[180px] rounded-r-md shadow-md bg-gradient-to-r ${coverColors[product.type]} p-4 flex flex-col justify-between border-l-3 border-black/25 group-hover:scale-[1.03] transition-transform duration-300`}>
-          {/* Header */}
+        {/* Cover — subtle hover scale */}
+        <div className={`w-[130px] h-[180px] rounded-r-md shadow-md bg-gradient-to-r ${coverColors[product.type]} p-4 flex flex-col justify-between border-l-3 border-black/25 group-hover:scale-[1.08] group-hover:-translate-y-1 transition-all duration-400 ease-out`}>
           <span className="text-[7px] text-gray-400 tracking-[0.2em] uppercase font-mono">{product.language}</span>
 
-          {/* Title - Just the Exam Name */}
           <div className="my-auto text-center">
             <span className="text-white text-xs font-semibold font-devanagari leading-snug line-clamp-3">
               {product.examName}
             </span>
           </div>
 
-          {/* Footer */}
           <span className="text-[7px] text-gray-500 font-mono">2026 EDITION</span>
         </div>
       </div>
 
       {/* Details Area */}
       <div className="p-4 flex flex-col flex-1">
-        {/* Exam Title - Bold Black */}
         <h3 className="text-sm font-bold text-gray-900 leading-snug mb-2 font-mono uppercase tracking-wide">
           {product.title}
         </h3>
 
-        {/* Metadata Details */}
         <div className="flex items-center gap-2 mb-4 text-[10px] text-gray-500 font-medium">
           <span className="bg-gray-100 px-2 py-0.5 rounded-full">{product.language}</span>
           {product.pages && <span className="bg-gray-100 px-2 py-0.5 rounded-full">{product.pages} Pages</span>}
         </div>
 
-        {/* Pricing Row */}
         <div className="mt-auto flex items-center justify-between border-t border-gray-100 pt-3">
           <div className="flex items-end gap-1.5">
             <span className="text-xs text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
@@ -84,7 +78,7 @@ export default function ProductCard({ product, onBuyNow }: ProductCardProps) {
           
           <button
             onClick={() => onBuyNow(product)}
-            className="button-primary-pill text-[11px] px-4 py-1.5 shadow-sm uppercase tracking-wider font-semibold"
+            className="button-primary-pill text-[11px] px-4 py-1.5 shadow-sm uppercase tracking-wider font-semibold active:scale-95 transition-transform duration-100"
           >
             Buy Now
           </button>

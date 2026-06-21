@@ -67,18 +67,18 @@ function HomeContent() {
 
           {/* Right Column: Products List with Search/Filters */}
           <div className="flex-1">
-            {/* Search & Filter Header - Shopify Minimalist Style */}
-            <div className="bg-white p-4 border border-gray-100 rounded-sm shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            {/* Search & Filter Header */}
+            <div className="bg-white p-4 border border-gray-100 rounded-sm shadow-halo flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
               {/* Filter Tabs */}
               <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1 md:pb-0">
                 {["All", "Notes", "MCQ", "Mock Test"].map((type) => (
                   <button
                     key={type}
                     onClick={() => setSelectedType(type)}
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors whitespace-nowrap ${
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all duration-200 whitespace-nowrap ${
                       selectedType === type
-                        ? "bg-black text-white"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        ? "bg-black text-white shadow-sm"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:scale-[1.02] active:scale-[0.98]"
                     }`}
                   >
                     {type === "All" ? "All items" : type === "MCQ" ? "MCQs" : `${type}s`}
@@ -119,7 +119,7 @@ function HomeContent() {
                 ))}
               </div>
             ) : (
-              <div className="bg-white border border-gray-100 text-center py-20 px-4 rounded-sm shadow-sm">
+              <div className="bg-white border border-gray-100 text-center py-20 px-4 rounded-sm shadow-halo">
                 <span className="text-4xl block mb-4">🔍</span>
                 <h3 className="text-sm font-bold text-gray-800 mb-1">No products found</h3>
                 <p className="text-xs text-gray-500 max-w-xs mx-auto">

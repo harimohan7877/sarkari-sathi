@@ -141,6 +141,39 @@ body {
   border-bottom: 1px solid var(--hairline-light);
 }
 
+/* ===== Hero & Micro-Animations ===== */
+@keyframes hero-fade-in {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-hero-fade-in {
+  animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-hero-fade-in-delayed {
+  animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+  opacity: 0;
+}
+
+.animate-hero-fade-in-delayed-2 {
+  animation: hero-fade-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  opacity: 0;
+}
+
+@keyframes card-lift {
+  0% { transform: translateY(0); box-shadow: var(--shadow-halo); }
+  100% { transform: translateY(-6px); box-shadow: var(--shadow-premium); }
+}
+
+.card-micro:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-premium);
+}
+
+.card-micro {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
 /* WhatsApp Float Button */
 .whatsapp-float {
   position: fixed;
