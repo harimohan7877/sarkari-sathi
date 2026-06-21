@@ -8,16 +8,27 @@ import SidebarCategories from "@/components/SidebarCategories";
 import ProductCard, { Product } from "@/components/ProductCard";
 import Footer from "@/components/Footer";
 import productsMock from "@/data/products_mock.json";
+import CartDrawer from "@/components/CartDrawer";
+import Script from "next/script";
 
 function HomeContent() {
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get("q") || "");
-  const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null);
-  const [customerEmail, setCustomerEmail] = useState<string>("");
-  const [customerName, setCustomerName] = useState<string>("");
-  const [orderSuccess, setOrderSuccess] = useState<boolean>(false);
+  const [cart, setCart] = useState<Product[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState<boolean>(false);
+
+  // Initialize cart from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("sarkari_saathi_cart");
+    if (stored) {
+      try {
+        setCart(JSON.parse(stored));
+      } catch (err) {}
+    }
+  }, []);
 
   // Fetch products from database API with local fallback
   useEffect(() => {
@@ -49,30 +60,120 @@ function HomeContent() {
     return matchesSearch;
   });
 
-  const handleBuyNow = (product: Product) => {
-    setCheckoutProduct(product);
-    setOrderSuccess(false);
+  const addToCart = (product: Product) => {
+    if (cart.some((item) => item.id === product.id)) {
+      setIsCartOpen(true);
+      return;
+    }
+    const updated = [...cart, product];
+    setCart(updated);
+    localStorage.setItem("sarkari_saathi_cart", JSON.stringify(updated));
+    setIsCartOpen(true);
   };
 
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customerEmail || !customerName) return;
+  const removeFromCart = (id: string) => {
+    const updated = cart.filter((item) => item.id !== id);
+    setCart(updated);
+    localStorage.setItem("sarkari_saathi_cart", JSON.stringify(updated));
+  };
 
-    // Simulate order placement
-    setOrderSuccess(true);
-    setTimeout(() => {
-      setCheckoutProduct(null);
-      setCustomerEmail("");
-      setCustomerName("");
-      setOrderSuccess(false);
-      alert(`Order Placed Successfully!\n\nEmail Manual Delivery Setup: A Google Drive link for "${checkoutProduct?.title}" will be sent to "${customerEmail}" manually after verifying the payment.`);
-    }, 1500);
+  const handleBuyNow = (product: Product) => {
+    addToCart(product);
+  };
+
+  const handleCartCheckoutSubmit = async (name: string, email: string) => {
+    setIsCheckoutLoading(true);
+    try {
+      const subtotal = cart.reduce((sum, item) => sum + item.salePrice, 0);
+
+      // 1. Create order record on backend
+      const res = await fetch("/api/payment/create-marketplace-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: name,
+          customerEmail: email,
+          products: cart.map((item) => ({ id: item.id, salePrice: item.salePrice })),
+          totalAmount: subtotal,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Order creation failed");
+      const orderData = await res.json();
+      const orderId = orderData.orderId;
+
+      // 2. Call Razorpay if configured, else simulate mock payment success
+      if (orderData.isMock) {
+        // Simulate successful verification
+        const verifyRes = await fetch("/api/payment/verify-marketplace", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: orderId,
+            paymentId: "pay_mock_" + Math.random().toString(36).substring(7),
+            signature: "mock_signature",
+          }),
+        });
+
+        if (verifyRes.ok) {
+          alert(`Order Placed Successfully!\n\nEmail Manual Delivery Setup: A Google Drive link for your items will be sent to "${email}" manually after verifying the payment.`);
+          setCart([]);
+          localStorage.removeItem("sarkari_saathi_cart");
+          setIsCartOpen(false);
+        } else {
+          alert("Verification failed for mock payment.");
+        }
+      } else {
+        // Launch real Razorpay Checkout
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder",
+          amount: Math.round(subtotal * 100),
+          currency: "INR",
+          name: "Sarkari Saathi",
+          description: "Exam Study Materials Payment",
+          order_id: orderId,
+          prefill: {
+            name: name,
+            email: email,
+          },
+          handler: async function (response: any) {
+            const verifyRes = await fetch("/api/payment/verify-marketplace", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                orderId: orderId,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature,
+              }),
+            });
+            if (verifyRes.ok) {
+              alert(`Payment Successful!\n\nEmail Manual Delivery Setup: Google Drive link for your items will be sent to "${email}" manually.`);
+              setCart([]);
+              localStorage.removeItem("sarkari_saathi_cart");
+              setIsCartOpen(false);
+            } else {
+              alert("Payment verification failed. Please contact support.");
+            }
+          },
+          theme: {
+            color: "#000000",
+          },
+        };
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Checkout failed. Please try again.");
+    } finally {
+      setIsCheckoutLoading(false);
+    }
   };
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Top Navigation */}
-      <Navbar />
+      <Navbar cartCount={cart.length} onCartClick={() => setIsCartOpen(true)} />
 
       {/* Hero Banner Area */}
       <HeroSlider />
@@ -164,90 +265,18 @@ function HomeContent() {
       {/* Premium Minimalist Footer */}
       <Footer />
 
-      {/* Checkout Popup Modal */}
-      {checkoutProduct && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white rounded-sm w-full max-w-md shadow-2xl overflow-hidden border border-gray-100">
-            {/* Modal Header */}
-            <div className="bg-black text-white px-6 py-4 flex items-center justify-between">
-              <h3 className="font-bold text-xs uppercase tracking-wider font-mono">Checkout Product</h3>
-              <button
-                onClick={() => setCheckoutProduct(null)}
-                className="text-white/80 hover:text-white text-lg font-bold"
-              >
-                ✕
-              </button>
-            </div>
+      {/* Cart Drawer sliding menu */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cart}
+        onRemoveItem={removeFromCart}
+        onCheckoutSubmit={handleCartCheckoutSubmit}
+        isCheckoutLoading={isCheckoutLoading}
+      />
 
-            {/* Modal Body */}
-            <div className="p-6">
-              {orderSuccess ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4 animate-bounce">
-                    ✓
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-800 mb-1">Processing Order...</h4>
-                  <p className="text-xs text-gray-500">Creating your secure manual delivery request...</p>
-                </div>
-              ) : (
-                <form onSubmit={handleCheckoutSubmit} className="flex flex-col gap-4">
-                  {/* Product Details Box */}
-                  <div className="bg-gray-50 p-4 border border-gray-100 rounded-sm">
-                    <span className="text-[10px] text-black font-extrabold uppercase tracking-wider block mb-1">
-                      {checkoutProduct.examName} ({checkoutProduct.type})
-                    </span>
-                    <h4 className="text-xs font-semibold text-gray-800 leading-snug mb-2">
-                      {checkoutProduct.title}
-                    </h4>
-                    <div className="flex items-center justify-between border-t border-gray-200/50 pt-2 mt-2">
-                      <span className="text-xs text-gray-500 font-medium">Order Total:</span>
-                      <span className="text-sm font-bold text-gray-900">₹{checkoutProduct.salePrice.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Customer Input */}
-                  <div className="flex flex-col gap-3">
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 uppercase mb-1">Full Name</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Enter your name"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        className="w-full h-10 px-3 text-xs bg-gray-50 border border-gray-200 rounded-sm focus:bg-white focus:border-black outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-gray-700 uppercase mb-1">Email Address</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="Enter your email (PDF will be sent here)"
-                        value={customerEmail}
-                        onChange={(e) => setCustomerEmail(e.target.value)}
-                        className="w-full h-10 px-3 text-xs bg-gray-50 border border-gray-200 rounded-sm focus:bg-white focus:border-black outline-none transition-colors"
-                      />
-                      <span className="text-[9px] text-gray-400 mt-1 block">
-                        ⚠️ Double check your email. Your digital PDF guide link will be emailed manually within 10-20 mins.
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    className="w-full h-11 bg-black hover:bg-gray-800 text-white text-xs font-bold uppercase tracking-wider rounded-sm shadow-md transition-colors mt-2"
-                  >
-                    Proceed to Payment (₹{checkoutProduct.salePrice.toFixed(2)})
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Razorpay Web Payment script */}
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
     </div>
   );
 }

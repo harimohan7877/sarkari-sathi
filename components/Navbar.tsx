@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useState } from "react";
 
-export default function Navbar() {
+interface NavbarProps {
+  cartCount?: number;
+  onCartClick?: () => void;
+}
+
+export default function Navbar({ cartCount = 0, onCartClick }: NavbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
@@ -55,12 +60,15 @@ export default function Navbar() {
         {/* Navigation & Cart/Login Action */}
         <div className="flex items-center gap-4 md:gap-6 shrink-0">
           {/* Cart Icon */}
-          <button className="flex items-center gap-2 group relative p-1.5">
+          <button
+            onClick={onCartClick}
+            className="flex items-center gap-2 group relative p-1.5 cursor-pointer"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5.5 w-5.5 text-gray-800 hover:text-black transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
             <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] bg-black text-white text-[9px] font-bold rounded-full flex items-center justify-center border border-white">
-              0
+              {cartCount}
             </span>
           </button>
 
