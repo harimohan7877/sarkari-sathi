@@ -6,28 +6,29 @@ Aapka swagat hai! Yeh file Antigravity aur DeepSeek V4 (local Open Code) ke beec
 
 ## 🎯 Current Task for DeepSeek V4
 
-**Step 2.5: Code Verification & Dynamic Testing**
+**Step 3.5: Code Verification & Bug Review (Shopping Cart & Payments)**
 
 **Goal:**
-Verify the newly implemented dynamic products API and check database schema integrations to make sure offline fallbacks are stable and rendering smoothly.
+Review the newly added Shopping Cart drawer and backend order payment routes to ensure there are no bugs, type mismatches, or runtime errors before we deploy to Render.
 
 **DeepSeek Task Details:**
-1.  **Products API Route ([app/api/products/route.ts](file:///c:/Users/Admin/Downloads/mitu's tool/sarkari-saathi/app/api/products/route.ts))**:
-    - Verify that Supabase queries map perfectly to camelCase properties for frontend compatability.
-    - Check that the `products_mock.json` fallback logic functions correctly when Supabase is unreachable/offline.
-2.  **Home Page Fetching ([app/page.tsx](file:///c:/Users/Admin/Downloads/mitu's tool/sarkari-saathi/app/page.tsx))**:
-    - Check the skeleton loaders, and verify that no leftover type tabs or type badges are visible.
-3.  **Seeding Script ([scripts/seed.mjs](file:///c:/Users/Admin/Downloads/mitu's tool/sarkari-saathi/scripts/seed.mjs))**:
-    - Review the logic for seeding `marketplace_groups` and `marketplace_products`.
-4.  Kaam check karke next step ke suggestions update karein.
+1.  **Shopping Cart Drawer ([components/CartDrawer.tsx](file:///c:/Users/Admin/Downloads/mitu's tool/sarkari-saathi/components/CartDrawer.tsx))**:
+    - Check the React state transitions between cart view, checkout view, and submitting states.
+    - Ensure styling doesn't conflict with Tailwind CSS v4 custom animations.
+2.  **Marketplace Order Route ([app/api/payment/create-marketplace-order/route.ts](file:///c:/Users/Admin/Downloads/mitu's tool/sarkari-saathi/app/api/payment/create-marketplace-order/route.ts))**:
+    - Verify that multiple items are successfully mapped to individual rows inside `marketplace_orders` with the same `razorpay_order_id`.
+    - Check the placeholder fallback logic to verify that it prints clean warning messages and runs successfully.
+3.  **Payment Verification Route ([app/api/payment/verify-marketplace/route.ts](file:///c:/Users/Admin/Downloads/mitu's tool/sarkari-saathi/app/api/payment/verify-marketplace/route.ts))**:
+    - Confirm the `payment_status` is updated to `'paid'` correctly in Supabase.
+4.  **Local Checks**:
+    - Run `npm run lint` and `npx tsc --noEmit` inside the terminal to catch any silent warnings or React 19 hook errors.
 
 ---
 
 ## 💬 DeepSeek Response
 
-- **Status:** ✅ COMPLETED — Step 2.0 Database Setup & Dynamic Integration Done
+- **Status:** ⏳ PENDING REVIEW — Step 3.0 Cart & Checkout under review by DeepSeek
 - **Comments:**
-  1. **seed.mjs** — Successfully created database seeding script that parses `.env.local` to upsert groups and products. Runs dynamically on the server.
-  2. **app/api/products/route.ts** — Created API route that queries `marketplace_products` and `marketplace_groups` from Supabase. It maps keys to camelCase format. Includes try/catch with fallback to local JSON to ensure resilience in offline modes.
-  3. **app/page.tsx** — Replaced direct json import with `useEffect` fetch. Added full state integration and dynamic skeleton loading state. Simplified product filtering to focus purely on search query without badges/types.
-  4. **Build Check:** ✅ Next.js production build compiled successfully. 0 compilation errors.
+  - Antigravity has completed the core Cart and checkout integration.
+  - Please run local tests to identify any bugs or visual glitches, especially on mobile alignments, and post results/fixes here.
+
