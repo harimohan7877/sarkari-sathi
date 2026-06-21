@@ -5,7 +5,7 @@
     "name_hi": "RSMSSB परीक्षाएं",
     "meta_title": "RSMSSB भर्ती 2026 | पटवारी, LDC, कंप्यूटर इंस्ट्रक्टर",
     "meta_description": "RSMSSB (राजस्थान कर्मचारी चयन बोर्ड) की सभी भर्तियों की जानकारी — पटवारी, LDC, कंप्यूटर इंस्ट्रक्टर और अन्य।",
-    "logo_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%232563eb'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='36' font-weight='bold' font-family='Arial'%3ER%3C/text%3E%3C/svg%3E",
+    "logo_url": "/logos/rsmssb.jpg",
     "board": "RSMSSB",
     "color": "hsl(217, 91%, 60%)",
     "exam_ids": ["rsmssb-patwari-2026", "rsmssb-ldc-2026", "rsmssb-computer-instructor-2026"]
@@ -16,7 +16,7 @@
     "name_hi": "RPSC परीक्षाएं",
     "meta_title": "RPSC भर्ती 2026 | RAS, राजस्थान लोक सेवा आयोग",
     "meta_description": "RPSC (राजस्थान लोक सेवा आयोग) की सभी भर्तियों की जानकारी — RAS, स्कूल व्याख्याता और अन्य।",
-    "logo_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231a1a2e'/%3E%3Cstop offset='100%25' stop-color='%232d2d4a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='36' font-weight='bold' font-family='Arial'%3ER%3C/text%3E%3C/svg%3E",
+    "logo_url": "/logos/rpsc.jpg",
     "board": "RPSC",
     "color": "hsl(222, 47%, 12%)",
     "exam_ids": ["rpsc-ras-2026"]
@@ -27,7 +27,7 @@
     "name_hi": "राजस्थान पुलिस परीक्षाएं",
     "meta_title": "Rajasthan Police भर्ती 2026 | कांस्टेबल, SI",
     "meta_description": "राजस्थान पुलिस की सभी भर्तियों की जानकारी — कांस्टेबल, सब-इंस्पेक्टर और अन्य।",
-    "logo_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23dc2626'/%3E%3Cstop offset='100%25' stop-color='%23b91c1c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='28' font-weight='bold' font-family='Arial'%3ERP%3C/text%3E%3C/svg%3E",
+    "logo_url": "/logos/rajasthan-police.jpg",
     "board": "Rajasthan Police",
     "color": "hsl(0, 70%, 35%)",
     "exam_ids": ["rajasthan-police-constable-2026"]
@@ -38,7 +38,7 @@
     "name_hi": "राजस्थान शिक्षण परीक्षाएं",
     "meta_title": "Teaching भर्ती 2026 | BSTC, REET, शिक्षक",
     "meta_description": "राजस्थान शिक्षण विभाग की सभी भर्तियों की जानकारी — BSTC, REET, स्कूल व्याख्याता।",
-    "logo_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23933ea8'/%3E%3Cstop offset='100%25' stop-color='%237b2d8e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='28' font-weight='bold' font-family='Arial'%3ET%3C/text%3E%3C/svg%3E",
+    "logo_url": "/logos/rajasthan-teaching.jpg",
     "board": "Rajasthan Education Department (DEE)",
     "color": "hsl(280, 60%, 40%)",
     "exam_ids": ["bstc-2026"]
@@ -49,7 +49,7 @@
     "name_hi": "राजस्थान उच्च न्यायालय परीक्षाएं",
     "meta_title": "Rajasthan High Court भर्ती 2026 | Clerk, Stenographer, Driver",
     "meta_description": "राजस्थान उच्च न्यायालय की सभी भर्तियों की जानकारी — System Assistant, Stenographer, Driver और अन्य।",
-    "logo_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23059869'/%3E%3Cstop offset='100%25' stop-color='%23047856'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='20' fill='url(%23g)'/%3E%3Ctext x='50' y='62' text-anchor='middle' fill='white' font-size='28' font-weight='bold' font-family='Arial'%3EHC%3C/text%3E%3C/svg%3E",
+    "logo_url": "/logos/rajasthan-high-court.jpg",
     "board": "Rajasthan High Court",
     "color": "hsl(160, 60%, 35%)",
     "exam_ids": []
