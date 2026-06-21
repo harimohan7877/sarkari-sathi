@@ -68,7 +68,8 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
                 className="bg-white border border-gray-100 rounded-sm overflow-hidden hover:shadow-halo transition-all group flex flex-col"
               >
                 {/* Book Cover Visual */}
-                <div className="h-48 bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-100 flex items-center justify-center p-6 relative overflow-hidden">
+                <div className="h-48 relative overflow-hidden group">
+                  {/* Background: logo or gradient */}
                   {(() => {
                     const logoUrl = exam.logo_url || group.logo_url;
                     return logoUrl ? (
@@ -76,40 +77,42 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
                       <img
                         src={logoUrl}
                         alt=""
-                        className="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity"
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                    ) : (
-                      <span
-                        className="absolute text-6xl font-bold opacity-5 group-hover:opacity-10 transition-opacity"
-                        style={{ color: group.color || '#333' }}
-                      >
-                        {initials}
-                      </span>
-                    );
+                    ) : null;
                   })()}
-                  <div className="relative flex flex-col items-center gap-3">
-                    {/* Group logo badge */}
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-5 text-white">
+                    {/* Logo badge */}
                     {(() => {
                       const logoUrl = exam.logo_url || group.logo_url;
                       return logoUrl ? (
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-gray-100 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-white/90 border-2 border-white/50 shadow-lg flex items-center justify-center mb-3 backdrop-blur-sm">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={logoUrl} alt="" className="w-full h-full object-contain p-1" />
+                          <img src={logoUrl} alt="" className="w-full h-full object-contain p-0.5" />
                         </div>
                       ) : (
                         <span
-                          className="w-12 h-12 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm group-hover:scale-105 transition-transform"
+                          className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg mb-3"
                           style={{ background: group.color || '#333' }}
                         >
                           {initials}
                         </span>
                       );
                     })()}
-                    <div className="w-16 h-22 bg-white rounded-r-sm shadow-md border border-gray-200 flex items-center justify-center p-2">
-                      <span className="text-[8px] font-bold text-gray-800 text-center font-mono uppercase leading-tight">
-                        {exam.short_name || exam.name.split(' ').slice(0, 2).join(' ')}
-                      </span>
-                    </div>
+                    {/* Book title */}
+                    <h3 className="text-sm font-bold text-center font-mono uppercase tracking-wide leading-tight drop-shadow-lg">
+                      {exam.short_name || exam.name.split(' ').slice(0, 3).join(' ')}
+                    </h3>
+                    {/* Divider */}
+                    <div className="w-8 h-0.5 bg-white/40 my-2 rounded-full" />
+                    {/* Board / Publisher */}
+                    <p className="text-[9px] text-white/70 font-mono uppercase tracking-widest">
+                      {exam.board}
+                    </p>
                   </div>
                 </div>
 
