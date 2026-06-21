@@ -47,11 +47,13 @@ interface ConfigSettings {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "ai" | "users" | "chats" | "schema">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "ai" | "users" | "chats" | "orders" | "schema">("dashboard");
   const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalPaidUsers: 0, totalGuests: 0, totalChats: 0, totalRevenue: 0 });
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState<ChatMessage[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
   
   // AI Config States
   const [config, setConfig] = useState<ConfigSettings>({ 
@@ -165,6 +167,66 @@ export default function AdminDashboard() {
     }
   };
 
+  // Load marketplace orders
+  const fetchOrders = async () => {
+    setLoadingOrders(true);
+    try {
+      const res = await fetch("/api/admin/orders", {
+        headers: getAuthHeaders(),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  // Update order delivery status
+  const handleUpdateDelivery = async (orderId: string, currentStatus: string) => {
+    const nextStatus = currentStatus === "delivered" ? "pending" : "delivered";
+    try {
+      const res = await fetch("/api/admin/orders", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          orderId,
+          action: "update_delivery",
+          value: nextStatus,
+        }),
+      });
+      if (res.ok) {
+        fetchOrders();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Update order payment status
+  const handleUpdatePayment = async (orderId: string, currentStatus: string) => {
+    const nextStatus = currentStatus === "paid" ? "pending" : "paid";
+    try {
+      const res = await fetch("/api/admin/orders", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          orderId,
+          action: "update_payment",
+          value: nextStatus,
+        }),
+      });
+      if (res.ok) {
+        fetchOrders();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchStats();
     fetchConfig();
@@ -174,6 +236,7 @@ export default function AdminDashboard() {
     if (activeTab === "dashboard") fetchStats();
     if (activeTab === "users") fetchUsers(searchQuery);
     if (activeTab === "chats") fetchChats();
+    if (activeTab === "orders") fetchOrders();
   }, [activeTab]);
 
   // Toggle user paid status
@@ -326,6 +389,14 @@ export default function AdminDashboard() {
             }`}
           >
             💬 Recent Conversations
+          </button>
+          <button
+            onClick={() => setActiveTab("orders")}
+            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "orders" ? "bg-[#10b981] text-white" : "hover:bg-[#2a2d3a] text-gray-400 hover:text-white"
+            }`}
+          >
+            🛒 Marketplace Orders
           </button>
           <button
             onClick={() => setActiveTab("schema")}
@@ -736,6 +807,121 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+
+        {/* Tab: Marketplace Orders */}
+        {activeTab === "orders" && (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-white">मार्केटप्लेस ऑर्डर्स (Marketplace Orders)</h2>
+                <p className="text-gray-400 text-sm">प्रवेश नोट्स, टेस्ट सीरीज और मॉडल पेपर्स के भुगतान एवं डिलीवरी की ट्रैकिंग।</p>
+              </div>
+              <button
+                onClick={fetchOrders}
+                className="bg-[#2a2d3a] hover:bg-[#3a3d4d] border border-[#2a2d3a] text-xs px-4 py-2.5 rounded-xl transition-all"
+              >
+                🔄 Refresh Orders
+              </button>
+            </div>
+
+            {loadingOrders ? (
+              <div className="py-12 text-center text-gray-500">ऑर्डर्स लोड हो रहे हैं...</div>
+            ) : orders.length === 0 ? (
+              <div className="bg-[#1a1d27] border border-[#2a2d3a] rounded-2xl p-8 text-center text-gray-500">
+                कोई ऑर्डर नहीं मिला।
+              </div>
+            ) : (
+              <div className="bg-[#1a1d27] border border-[#2a2d3a] rounded-2xl overflow-hidden shadow-sm">
+                <table className="w-full text-left text-sm border-collapse">
+                  <thead>
+                    <tr className="bg-[#12151f] text-gray-400 text-xs border-b border-[#2a2d3a]">
+                      <th className="p-4">Customer Name & Email</th>
+                      <th className="p-4">Product Purchased</th>
+                      <th className="p-4 text-center">Amount</th>
+                      <th className="p-4 text-center">Payment Status</th>
+                      <th className="p-4 text-center">Delivery Status</th>
+                      <th className="p-4">Transaction Details</th>
+                      <th className="p-4 text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#2a2d3a]">
+                    {orders.map((o) => (
+                      <tr key={o.id} className="hover:bg-[#1f2330]">
+                        <td className="p-4">
+                          <p className="font-bold text-white">{o.customer_name}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
+                            <span className="truncate max-w-[200px]">{o.customer_email}</span>
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(o.customer_email);
+                                alert("ईमेल क्लिपबोर्ड पर कॉपी हो गया!");
+                              }}
+                              className="text-[10px] bg-[#2a2d3a] hover:bg-[#3a3d4d] px-1.5 py-0.5 rounded cursor-pointer transition-colors"
+                              title="Copy Email"
+                            >
+                              📋 Copy
+                            </button>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <p className="font-semibold text-gray-200">
+                            {o.product?.title || "Unknown Product"}
+                          </p>
+                          <p className="text-xs text-gray-500">{o.product?.exam_name || "Rajasthan Exam"}</p>
+                        </td>
+                        <td className="p-4 text-center font-bold text-white">
+                          ₹{Number(o.amount).toFixed(2)}
+                        </td>
+                        <td className="p-4 text-center">
+                          <button
+                            onClick={() => handleUpdatePayment(o.id, o.payment_status)}
+                            className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                              o.payment_status === "paid"
+                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                : "bg-red-500/10 text-red-400 border border-red-500/20"
+                            }`}
+                          >
+                            {o.payment_status === "paid" ? "💳 Success (Paid)" : "⏳ Pending"}
+                          </button>
+                        </td>
+                        <td className="p-4 text-center">
+                          <button
+                            onClick={() => handleUpdateDelivery(o.id, o.delivery_status)}
+                            className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                              o.delivery_status === "delivered"
+                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                            }`}
+                          >
+                            {o.delivery_status === "delivered" ? "✅ Sent (Delivered)" : "📬 Pending Delivery"}
+                          </button>
+                        </td>
+                        <td className="p-4 text-xs text-gray-400 space-y-0.5">
+                          <p><span className="text-gray-500">Order ID:</span> {o.razorpay_order_id ? o.razorpay_order_id.substring(0, 15) : "N/A"}...</p>
+                          {o.razorpay_payment_id && <p><span className="text-gray-500">Pay ID:</span> {o.razorpay_payment_id.substring(0, 15)}...</p>}
+                          <p><span className="text-gray-500">Date:</span> {new Date(o.created_at).toLocaleString("hi-IN")}</p>
+                        </td>
+                        <td className="p-4 text-center">
+                          {o.delivery_status !== "delivered" && o.payment_status === "paid" ? (
+                            <button
+                              onClick={() => handleUpdateDelivery(o.id, o.delivery_status)}
+                              className="bg-[#10b981] hover:bg-[#059669] text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm transition-all"
+                            >
+                              🚀 Mark Sent
+                            </button>
+                          ) : (
+                            <span className="text-xs text-gray-500">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>

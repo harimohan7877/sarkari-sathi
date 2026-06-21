@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     // Insert pending order entries into Supabase marketplace_orders
     // Insert one row per product so they can be individually tracked and delivered
-    const orderInserts = products.map((prod: any) => ({
+    const orderInserts = products.map((prod: { id: string; salePrice: number }) => ({
       customer_name: customerName,
       customer_email: customerEmail,
       product_id: prod.id,
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       isMock: razorpayOrderId.startsWith("order_mock_"),
     });
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error creating marketplace order:", err);
     return NextResponse.json({ error: "Internal order creation error" }, { status: 500 });
   }

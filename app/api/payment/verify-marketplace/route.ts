@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error in verify-marketplace API:", err);
     return NextResponse.json({ error: "Internal verification error" }, { status: 500 });
   }
