@@ -11,6 +11,8 @@ export interface Group {
   logo_url: string;
   board: string;
   color: string;
+  priority?: number;
+  is_active?: boolean;
   exam_ids: string[];
 }
 

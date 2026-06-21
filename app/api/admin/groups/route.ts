@@ -1,6 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifyAdminSession } from '@/lib/admin-auth';
+import fs from 'fs';
+import path from 'path';
+
+function getLocalGroupsPath() {
+  return path.join(process.cwd(), 'data', 'groups.json');
+}
+
+function readLocalGroups(): Record<string, unknown>[] {
+  try {
+    const raw = fs.readFileSync(getLocalGroupsPath(), 'utf-8');
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalGroups(groups: Record<string, unknown>[]) {
+  fs.writeFileSync(getLocalGroupsPath(), JSON.stringify(groups, null, 2), 'utf-8');
+}
+
+function readLocalMarketplaceData(): Record<string, unknown> {
+  try {
+    const raw = fs.readFileSync(
+      path.join(process.cwd(), 'data', 'marketplace_data.json'),
+      'utf-8'
+    );
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
 
 export async function GET(req: NextRequest) {
   if (!verifyAdminSession(req)) {
@@ -11,27 +42,21 @@ export async function GET(req: NextRequest) {
     const { data: groups, error } = await supabaseAdmin
       .from('marketplace_groups')
       .select('*')
-      .order('name', { ascending: true });
+      .order('priority', { ascending: true });
 
     if (error) {
-      // Fallback: return data from static marketplace_data.json
-      const { default: marketplaceData } = await import('@/data/marketplace_data.json');
-      const groupsList = Object.entries(marketplaceData).map(([name, exams]) => ({
-        id: name.toLowerCase().replace(/\s+/g, '-'),
-        name,
-        logo_url: null,
-        exams: (exams as Array<{ sl: number; id: number; name_en: string }>).map(e => ({
-          id: e.id,
-          name_en: e.name_en,
-          sl: e.sl,
-        })),
-      }));
-      return NextResponse.json(groupsList);
+      const local = readLocalGroups();
+      const marketplaceData = readLocalMarketplaceData();
+      const enriched = local.map((g: Record<string, unknown>) => {
+        const groupName = g.name as string;
+        const exams = (marketplaceData as Record<string, unknown[]>)[groupName] || [];
+        return { ...g, exams };
+      });
+      return NextResponse.json(enriched);
     }
 
     return NextResponse.json(groups || []);
-  } catch (error: unknown) {
-    console.error('Admin groups query error:', error);
+  } catch {
     return NextResponse.json([], { status: 200 });
   }
 }
@@ -43,7 +68,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { id, name, name_hi, meta_title, meta_description, logo_url, exams } = body;
+    const { id, name, name_hi, meta_title, meta_description, logo_url, cover_image, priority, is_active, exams } = body;
 
     if (!id || !name) {
       return NextResponse.json({ error: 'Group ID and Name required' }, { status: 400 });
@@ -53,11 +78,13 @@ export async function POST(req: NextRequest) {
       id,
       name,
       logo_url: logo_url || null,
+      cover_image: cover_image || null,
+      name_hi: name_hi || null,
+      meta_title: meta_title || null,
+      meta_description: meta_description || null,
+      priority: priority !== undefined ? priority : 0,
+      is_active: is_active !== undefined ? is_active : true,
     };
-    if (name_hi) groupData.name_hi = name_hi;
-    if (meta_title) groupData.meta_title = meta_title;
-    if (meta_description) groupData.meta_description = meta_description;
-    if (exams) groupData.exams = exams;
 
     const { data, error } = await supabaseAdmin
       .from('marketplace_groups')
@@ -66,8 +93,16 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      // Fallback: just return success with the data
-      return NextResponse.json({ id, name, name_hi, meta_title, meta_description, exams, _fallback: true });
+      const local = readLocalGroups();
+      const idx = local.findIndex((g: Record<string, unknown>) => g.id === id);
+      const entry = { id, name, name_hi, meta_title, meta_description, logo_url, cover_image, priority, is_active, exams };
+      if (idx >= 0) {
+        local[idx] = { ...local[idx], ...entry };
+      } else {
+        local.push(entry);
+      }
+      writeLocalGroups(local);
+      return NextResponse.json({ ...entry, _fallback: true, _file: 'groups.json' });
     }
 
     return NextResponse.json(data);
@@ -94,7 +129,12 @@ export async function DELETE(req: NextRequest) {
       .delete()
       .eq('id', groupId);
 
-    if (error) throw error;
+    if (error) {
+      const local = readLocalGroups();
+      const filtered = local.filter((g: Record<string, unknown>) => g.id !== groupId);
+      writeLocalGroups(filtered);
+      return NextResponse.json({ success: true, _fallback: true });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

@@ -4,8 +4,10 @@ import { useState, useEffect, Suspense, startTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
+import CategoryCircleGrid from "@/components/CategoryCircleGrid";
 import SidebarCategories from "@/components/SidebarCategories";
 import ProductCard, { Product } from "@/components/ProductCard";
+import InfoCards from "@/components/InfoCards";
 import Footer from "@/components/Footer";
 import productsMock from "@/data/products_mock.json";
 import CartDrawer from "@/components/CartDrawer";
@@ -20,7 +22,6 @@ function HomeContent() {
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState<boolean>(false);
 
-  // Initialize cart from localStorage on mount
   useEffect(() => {
     const stored = localStorage.getItem("sarkari_saathi_cart");
     if (stored) {
@@ -30,7 +31,6 @@ function HomeContent() {
     }
   }, []);
 
-  // Fetch products from database API with local fallback
   useEffect(() => {
     async function loadProducts() {
       try {
@@ -41,8 +41,7 @@ function HomeContent() {
         } else {
           setProducts(productsMock as Product[]);
         }
-      } catch (err) {
-        console.error("Error fetching products:", err);
+      } catch {
         setProducts(productsMock as Product[]);
       } finally {
         setLoading(false);
@@ -51,7 +50,6 @@ function HomeContent() {
     loadProducts();
   }, []);
 
-  // Filter products based on search
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -86,7 +84,6 @@ function HomeContent() {
     try {
       const subtotal = cart.reduce((sum, item) => sum + item.salePrice, 0);
 
-      // 1. Create order record on backend
       const res = await fetch("/api/payment/create-marketplace-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -102,9 +99,7 @@ function HomeContent() {
       const orderData = await res.json();
       const orderId = orderData.orderId;
 
-      // 2. Call Razorpay if configured, else simulate mock payment success
       if (orderData.isMock) {
-        // Simulate successful verification
         const verifyRes = await fetch("/api/payment/verify-marketplace", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -124,7 +119,6 @@ function HomeContent() {
           alert("Verification failed for mock payment.");
         }
       } else {
-        // Launch real Razorpay Checkout
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder",
           amount: Math.round(subtotal * 100),
@@ -179,29 +173,26 @@ function HomeContent() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Top Navigation */}
       <Navbar cartCount={cart.length} onCartClick={() => setIsCartOpen(true)} />
 
-      {/* Hero Banner Area */}
       <HeroSlider />
 
-      {/* Main Container Layout: Sidebar + Main Content Grid */}
-      <section className="max-w-[1400px] mx-auto px-4 md:px-8 py-10 flex-1 w-full">
+      {/* Circular Categories Grid */}
+      <CategoryCircleGrid />
+
+      {/* Main Content: Sidebar + Products */}
+      <section className="max-w-[1400px] mx-auto px-4 md:px-8 pb-10 flex-1 w-full">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column: Categories Sidebar */}
           <div className="w-full lg:w-[280px] shrink-0">
             <SidebarCategories />
           </div>
 
-          {/* Right Column: Products List with Search/Filters */}
           <div className="flex-1">
-            {/* Search & Filter Header */}
             <div className="bg-white p-4 border border-gray-100 rounded-sm shadow-halo flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
               <h2 className="text-xs font-bold font-mono text-gray-800 uppercase tracking-wider">
                 Exam Preparation Materials
               </h2>
 
-              {/* In-page search filter input */}
               <div className="relative max-w-xs w-full">
                 <input
                   type="text"
@@ -222,7 +213,6 @@ function HomeContent() {
               </div>
             </div>
 
-            {/* Products Grid */}
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3].map((n) => (
@@ -256,7 +246,9 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* Floating WhatsApp Support Icon (AI assistant disabled as requested) */}
+      {/* Info Cards Above Footer */}
+      <InfoCards />
+
       <a
         href="https://wa.me/919950252138"
         target="_blank"
@@ -269,10 +261,8 @@ function HomeContent() {
         </svg>
       </a>
 
-      {/* Premium Minimalist Footer */}
       <Footer />
 
-      {/* Cart Drawer sliding menu */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -282,7 +272,6 @@ function HomeContent() {
         isCheckoutLoading={isCheckoutLoading}
       />
 
-      {/* Razorpay Web Payment script */}
       <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
     </div>
   );

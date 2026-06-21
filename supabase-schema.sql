@@ -189,7 +189,13 @@ WHERE NOT EXISTS (SELECT 1 FROM admin_settings);
 CREATE TABLE IF NOT EXISTS marketplace_groups (
   id TEXT PRIMARY KEY, -- Group name slug or custom ID (e.g. 'rajasthan-rsmssb-exams')
   name TEXT NOT NULL,
+  name_hi TEXT,
+  meta_title TEXT,
+  meta_description TEXT,
   logo_url TEXT,
+  cover_image TEXT,
+  priority INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -197,7 +203,7 @@ CREATE TABLE IF NOT EXISTS marketplace_groups (
 CREATE TABLE IF NOT EXISTS marketplace_products (
   id TEXT PRIMARY KEY, -- Slug or custom UUID (e.g. 'rsmssb-patwari-notes')
   title TEXT NOT NULL,
-  exam_name TEXT NOT NULL,
+  exam_name TEXT,
   group_id TEXT REFERENCES marketplace_groups(id) ON DELETE SET NULL,
   type TEXT NOT NULL, -- 'Notes', 'MCQ', 'Mock Test'
   price NUMERIC(10, 2) NOT NULL,
@@ -205,7 +211,9 @@ CREATE TABLE IF NOT EXISTS marketplace_products (
   pages INTEGER,
   language TEXT NOT NULL, -- 'Hindi', 'English', 'Bilingual'
   file_url TEXT, -- Link to Google Drive folder or PDF (manual delivery link)
+  cover_image TEXT,
   is_active BOOLEAN DEFAULT TRUE,
+  is_featured BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT NOW()
 );
 

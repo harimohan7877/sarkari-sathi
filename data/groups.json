@@ -6,8 +6,11 @@
     "meta_title": "RSMSSB भर्ती 2026 | पटवारी, LDC, कंप्यूटर इंस्ट्रक्टर",
     "meta_description": "RSMSSB (राजस्थान कर्मचारी चयन बोर्ड) की सभी भर्तियों की जानकारी — पटवारी, LDC, कंप्यूटर इंस्ट्रक्टर और अन्य।",
     "logo_url": "/logos/rsmssb.jpg",
+    "cover_image": "/logos/rsmssb.jpg",
     "board": "RSMSSB",
     "color": "hsl(217, 91%, 60%)",
+    "priority": 1,
+    "is_active": true,
     "exam_ids": ["rsmssb-patwari-2026", "rsmssb-ldc-2026", "rsmssb-computer-instructor-2026"]
   },
   {
@@ -17,8 +20,11 @@
     "meta_title": "RPSC भर्ती 2026 | RAS, राजस्थान लोक सेवा आयोग",
     "meta_description": "RPSC (राजस्थान लोक सेवा आयोग) की सभी भर्तियों की जानकारी — RAS, स्कूल व्याख्याता और अन्य।",
     "logo_url": "/logos/rpsc.jpg",
+    "cover_image": "/logos/rpsc.jpg",
     "board": "RPSC",
     "color": "hsl(222, 47%, 12%)",
+    "priority": 2,
+    "is_active": true,
     "exam_ids": ["rpsc-ras-2026"]
   },
   {
@@ -28,8 +34,11 @@
     "meta_title": "Rajasthan Police भर्ती 2026 | कांस्टेबल, SI",
     "meta_description": "राजस्थान पुलिस की सभी भर्तियों की जानकारी — कांस्टेबल, सब-इंस्पेक्टर और अन्य।",
     "logo_url": "/logos/rajasthan-police.jpg",
+    "cover_image": "/logos/rajasthan-police.jpg",
     "board": "Rajasthan Police",
     "color": "hsl(0, 70%, 35%)",
+    "priority": 3,
+    "is_active": true,
     "exam_ids": ["rajasthan-police-constable-2026"]
   },
   {
@@ -39,8 +48,11 @@
     "meta_title": "Teaching भर्ती 2026 | BSTC, REET, शिक्षक",
     "meta_description": "राजस्थान शिक्षण विभाग की सभी भर्तियों की जानकारी — BSTC, REET, स्कूल व्याख्याता।",
     "logo_url": "/logos/rajasthan-teaching.jpg",
+    "cover_image": "/logos/rajasthan-teaching.jpg",
     "board": "Rajasthan Education Department (DEE)",
     "color": "hsl(280, 60%, 40%)",
+    "priority": 4,
+    "is_active": true,
     "exam_ids": ["bstc-2026"]
   },
   {
@@ -50,8 +62,11 @@
     "meta_title": "Rajasthan High Court भर्ती 2026 | Clerk, Stenographer, Driver",
     "meta_description": "राजस्थान उच्च न्यायालय की सभी भर्तियों की जानकारी — System Assistant, Stenographer, Driver और अन्य।",
     "logo_url": "/logos/rajasthan-high-court.jpg",
+    "cover_image": "/logos/rajasthan-high-court.jpg",
     "board": "Rajasthan High Court",
     "color": "hsl(160, 60%, 35%)",
+    "priority": 5,
+    "is_active": true,
     "exam_ids": []
   }
 ]

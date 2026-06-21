@@ -4,6 +4,7 @@ import { useState, useEffect, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import CategoriesTab from "./components/CategoriesTab";
 import ProductsTab from "./components/ProductsTab";
+import ExamsTab from "./components/ExamsTab";
 
 interface MarketplaceOrder {
   id: string;
@@ -62,7 +63,7 @@ interface ConfigSettings {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "ai" | "users" | "chats" | "orders" | "categories" | "products" | "schema">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "ai" | "users" | "chats" | "orders" | "categories" | "products" | "exams" | "schema">("dashboard");
   const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalPaidUsers: 0, totalGuests: 0, totalChats: 0, totalRevenue: 0 });
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -428,6 +429,14 @@ export default function AdminDashboard() {
             }`}
           >
             📂 Exam Categories
+          </button>
+          <button
+            onClick={() => setActiveTab("exams")}
+            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "exams" ? "bg-[#10b981] text-white" : "hover:bg-[#2a2d3a] text-gray-400 hover:text-white"
+            }`}
+          >
+            📋 Exams Setup
           </button>
           <button
             onClick={() => setActiveTab("products")}
@@ -969,6 +978,11 @@ export default function AdminDashboard() {
         {/* Categories Tab */}
         {activeTab === "categories" && (
           <CategoriesTab getAuthHeaders={getAuthHeaders} />
+        )}
+
+        {/* Exams Tab */}
+        {activeTab === "exams" && (
+          <ExamsTab getAuthHeaders={getAuthHeaders} />
         )}
 
         {/* Products Tab */}
