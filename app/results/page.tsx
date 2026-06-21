@@ -98,7 +98,7 @@ function ResultsPageInner() {
     }
   };
 
-  const updateLiveProfile = (key: keyof UserProfile, value: any) => {
+  const updateLiveProfile = (key: keyof UserProfile, value: string | number | boolean) => {
     setLiveProfile((p) => (p ? { ...p, [key]: value } : p));
   };
 
@@ -129,7 +129,7 @@ function ResultsPageInner() {
             </h2>
             <p className="text-white/85 text-sm mt-1 font-noto">
               आप <span className="text-[hsl(24,100%,65%)] font-bold font-outfit">{eligibleExams.length}</span> भर्तियों के लिए योग्य हैं
-              {searchQuery && <span className="ml-1">— "{searchQuery}" के लिए</span>}
+              {searchQuery && <span className="ml-1">&mdash; &ldquo;{searchQuery}&rdquo; ke liye</span>}
             </p>
           </div>
         </div>

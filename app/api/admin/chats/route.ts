@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(chats || []);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Chats query error:', error);
     return NextResponse.json([]);
   }

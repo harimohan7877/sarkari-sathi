@@ -103,8 +103,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, db_missing_groq: !hasGroqColumn });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Save admin settings error:', error);
-    return NextResponse.json({ error: 'Database update failed: ' + error.message }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Database update failed: ' + message }, { status: 500 });
   }
 }

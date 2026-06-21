@@ -53,7 +53,7 @@ export interface Exam {
     age_cutoff_date?: string;
     attempt_limit?: string;
     states?: string[];
-    [key: string]: string | number | string[] | undefined | any;
+    [key: string]: string | number | string[] | undefined | boolean | null;
   };
   age_relaxation?: {
     [key: string]: string;

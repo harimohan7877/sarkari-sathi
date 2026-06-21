@@ -135,8 +135,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid provider' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Test key error:', error);
-    return NextResponse.json({ success: false, error: 'Connection failed: ' + error.message });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ success: false, error: 'Connection failed: ' + message });
   }
 }

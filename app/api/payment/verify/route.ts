@@ -1,10 +1,9 @@
-import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: NextRequest) {
   try {
-    const { orderId, paymentId, signature, userId } = await req.json();
+    const { orderId, paymentId, userId } = await req.json();
 
     /*
     const text = `${orderId}|${paymentId}`;

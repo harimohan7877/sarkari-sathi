@@ -25,9 +25,9 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(users || []);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Users query error:', error);
-    return NextResponse.json([], { status: 200 }); // Return empty array on missing table/error
+    return NextResponse.json([], { status: 200 });
   }
 }
 
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User ID required' }, { status: 400 });
     }
 
-    const updateObj: Record<string, any> = {};
+    const updateObj: Record<string, string | boolean | number | null> = {};
 
     if (action === 'toggle_paid') {
       updateObj.is_paid = isPaid;
@@ -64,8 +64,9 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('User update error:', error);
-    return NextResponse.json({ error: 'Failed to update user: ' + error.message }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: 'Failed to update user: ' + message }, { status: 500 });
   }
 }

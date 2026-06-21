@@ -227,7 +227,7 @@ export default function DashboardPage() {
               />
 
               <div className="space-y-5">
-                {savedExams.map((se, idx) => (
+                {savedExams.map((se) => (
                   <Link
                     key={se.id}
                     href={`/exam/${se.exam_id}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, use } from "react";
+import { useEffect, useState, useRef, use, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { getExamById, type Exam, type UserProfile } from "@/lib/eligibility";
 import { supabase } from "@/lib/supabase";
@@ -166,7 +166,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     try {
       const keysStr = localStorage.getItem("custom_user_keys");
       if (keysStr) {
-        setCustomKeys(prev => ({ ...prev, ...JSON.parse(keysStr) }));
+        startTransition(() => setCustomKeys(prev => ({ ...prev, ...JSON.parse(keysStr) })));
       }
     } catch {}
   }, []);
@@ -247,6 +247,10 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     setSaveLoading(false);
   }
 
+  // Refs for streaming state (avoids React 19 purity errors with local let variables)
+  const streamedContentRef = useRef("");
+  const lastUpdateRef = useRef(0);
+
   async function sendMessage(text?: string) {
     const msg = text || input.trim();
     if (!msg || loading) return;
@@ -278,8 +282,8 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
     setMessages([...newMsgs, { role: "assistant", content: "" }]);
     setLoading(true);
 
-    let streamedContent = "";
-    let lastUpdate = 0;
+    streamedContentRef.current = "";
+    lastUpdateRef.current = 0;
 
     try {
       const guestToken = sessionStorage.getItem('guestToken');
@@ -329,14 +333,14 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           try {
             const parsed = JSON.parse(data);
             if (parsed.type === 'chunk' && parsed.content) {
-              streamedContent += parsed.content;
-              // Throttle React state updates to every 50ms for perf
+              streamedContentRef.current += parsed.content;
+              // eslint-disable-next-line react-hooks/purity
               const now = Date.now();
-              if (now - lastUpdate > 50) {
-                lastUpdate = now;
+              if (now - lastUpdateRef.current > 50) {
+                lastUpdateRef.current = now;
                 setMessages(prev => {
                   const updated = [...prev];
-                  updated[updated.length - 1] = { role: "assistant", content: streamedContent };
+                  updated[updated.length - 1] = { role: "assistant", content: streamedContentRef.current };
                   return updated;
                 });
               }
@@ -347,8 +351,8 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
             } else if (parsed.type === 'error') {
               throw new Error(parsed.error || 'Stream error');
             }
-          } catch (e: any) {
-            if (e.message && e.message !== 'Stream error' && !e.message.includes('JSON')) {
+          } catch (e: unknown) {
+            if (e instanceof Error && e.message !== 'Stream error' && !e.message.includes('JSON')) {
               throw e;
             }
           }
@@ -358,16 +362,17 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
       // Final flush
       setMessages(prev => {
         const updated = [...prev];
-        updated[updated.length - 1] = { role: "assistant", content: streamedContent };
+        updated[updated.length - 1] = { role: "assistant", content: streamedContentRef.current };
         return updated;
       });
-    } catch (err: any) {
+    } catch {
+      const content = streamedContentRef.current;
       setMessages(prev => {
         const updated = [...prev];
         updated[updated.length - 1] = {
           role: "assistant",
-          content: streamedContent
-            ? streamedContent + "\n\n⚠️ Connection cut. ऊपर का जवाब देखें।"
+          content: content
+            ? content + "\n\n⚠️ Connection cut. ऊपर का जवाब देखें।"
             : "⚠️ कुछ problem हो गई। कृपया दोबारा कोशिश करें।"
         };
         return updated;
@@ -1283,35 +1288,35 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
                 {customKeys.activeProvider === 'gemini' && (
                   <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
                     <li><a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Google AI Studio ↗</a> पर जाएं।</li>
-                    <li>अपने गूगल अकाउंट से लॉगिन करके <b>"Create API Key"</b> पर क्लिक करें।</li>
+                    <li>अपने गूगल अकाउंट से लॉगिन करके <b>&ldquo;Create API Key&rdquo;</b> पर क्लिक करें।</li>
                     <li>चाबी को कॉपी करें और ऊपर पेस्ट कर के सेव करें। (यह बिल्कुल मुफ्त है)।</li>
                   </ol>
                 )}
                 {customKeys.activeProvider === 'openai' && (
                   <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
                     <li><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">OpenAI Platform ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Create new secret key"</b> पर क्लिक करें।</li>
+                    <li>लॉगिन करके <b>&ldquo;Create new secret key&rdquo;</b> पर क्लिक करें।</li>
                     <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
                   </ol>
                 )}
                 {customKeys.activeProvider === 'openrouter' && (
                   <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
                     <li><a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">OpenRouter Keys ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Create Key"</b> पर क्लिक करें।</li>
+                    <li>लॉगिन करके <b>&ldquo;Create Key&rdquo;</b> पर क्लिक करें।</li>
                     <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
                   </ol>
                 )}
                 {customKeys.activeProvider === 'groq' && (
                   <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
                     <li><a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Groq Console ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Create API Key"</b> पर क्लिक करें।</li>
+                    <li>लॉगिन करके <b>&ldquo;Create API Key&rdquo;</b> पर क्लिक करें।</li>
                     <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
                   </ol>
                 )}
                 {customKeys.activeProvider === 'nvidia' && (
                   <ol className="list-decimal list-inside space-y-1 text-gray-650 leading-relaxed" style={{ fontFamily: 'var(--font-noto)' }}>
                     <li><a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer" className="text-[#1847A6] font-bold underline">Nvidia NIM ↗</a> पर जाएं।</li>
-                    <li>लॉगिन करके <b>"Get API Key"</b> पर क्लिक करें।</li>
+                    <li>लॉगिन करके <b>&ldquo;Get API Key&rdquo;</b> पर क्लिक करें।</li>
                     <li>उसे कॉपी कर के ऊपर पेस्ट करें।</li>
                   </ol>
                 )}

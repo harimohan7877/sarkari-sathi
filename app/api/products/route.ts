@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import productsMock from "@/data/products_mock.json";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // 1. Fetch products from Supabase marketplace_products table
     const { data: dbProducts, error: prodError } = await supabaseAdmin
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ products, fromDb: true });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in products API route (using mock fallback):", error);
     // Graceful fallback to mock data
     return NextResponse.json({ products: productsMock, fromDb: false });

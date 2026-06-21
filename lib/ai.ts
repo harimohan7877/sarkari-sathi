@@ -154,7 +154,7 @@ ${examInfo}`;
     }
 
     const data = await res.json();
-    const text = (data.candidates?.[0]?.content?.parts||[]).map((p: any) => p.text||'').join('');
+    const text = (data.candidates?.[0]?.content?.parts||[]).map((p: { text?: string }) => p.text||'').join('');
     return {
       response: text,
       model: modelName
@@ -225,7 +225,7 @@ ${examInfo}`;
     }
 
     const data = await res.json();
-    const text = (data.content||[]).map((b: any) => b.text||'').join('');
+    const text = (data.content||[]).map((b: { text?: string }) => b.text||'').join('');
     return {
       response: text,
       model: modelName
@@ -381,7 +381,7 @@ ${examInfo}`;
   if (provider === 'openai' || provider === 'groq' || provider === 'openrouter' || provider === 'nvidia' || !provider) {
     const apiKey =
       customApiKey ||
-      (provider === 'openrouter' ? (settings.openrouter_key || settings.openai_key) : (settings as any)[`${provider}_key`]) ||
+      (provider === 'openrouter' ? (settings.openrouter_key || settings.openai_key) : settings[`${provider}_key` as keyof typeof settings]) ||
       process.env[`${(provider || 'openrouter').toUpperCase()}_API_KEY` as keyof NodeJS.ProcessEnv];
 
     if (!apiKey) throw new Error(`${provider || 'openrouter'} API Key not configured`);
@@ -422,7 +422,7 @@ ${examInfo}`;
     });
 
     if (!res.ok || !res.body) {
-      const errText = await res.text();
+      await res.text();
       throw new Error(`${provider} API error: ${res.status}`);
     }
 
@@ -500,7 +500,7 @@ ${examInfo}`;
         try {
           const parsed = JSON.parse(data);
           const text = (parsed.candidates?.[0]?.content?.parts || [])
-            .map((p: any) => p.text || '').join('');
+            .map((p: { text?: string }) => p.text || '').join('');
           if (text) {
             totalContent += text;
             yield text;

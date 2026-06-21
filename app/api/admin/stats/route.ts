@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       totalChats: chatsCount || 0,
       totalRevenue: totalRevenue || 0
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Stats query error:', error);
     // If tables are missing or not set up, return fallback counts
     return NextResponse.json({

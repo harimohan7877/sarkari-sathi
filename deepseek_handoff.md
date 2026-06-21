@@ -4,6 +4,21 @@ Aapka swagat hai! Yeh file Antigravity aur DeepSeek V4 (local Open Code) ke beec
 
 ---
 
+## 📘 Master Plan
+
+`DEEPSEEK_PLAN.md` padho — complete 8-step plan hai. Har session isi file ke mutabik chalega.
+
+**DeepSeek Agent Step-by-Step Workflow:**
+1. `DEEPSEEK_PLAN.md` padho → current step kya hai
+2. `deepseek_handoff.md` padho → last agent ne kya kiya
+3. Target files padho → jo modify karna hai
+4. Changes karo → ek file, ek kaam
+5. `deepseek_handoff.md` update karo → kya kiya + changelog
+6. `npm run lint` + `npx tsc --noEmit`
+7. Har session ka ek deployable output
+
+---
+
 ## 🎯 Current Task for DeepSeek V4
 
 **Step 3.5: Code Verification & Bug Review (Shopping Cart & Payments)**
@@ -27,14 +42,14 @@ Review the newly added Shopping Cart drawer and backend order payment routes to 
 
 ## 💬 DeepSeek Response
 
-- **Status:** ✅ REVIEW COMPLETE — All 3 target files checked
+- **Status:** ✅ STEP 3.5 COMPLETE — Review done, 3 lint fixes applied
+- **New file created:** `DEEPSEEK_PLAN.md` — complete 8-step master plan
 - **Results:**
   - **TypeScript:** `npx tsc --noEmit` — ✅ 0 errors
   - **Lint:** `npm run lint` — ✅ 0 errors (3 `any`→`unknown`/typed fixes applied)
-    - `create-marketplace-order/route.ts:49` — `prod: any` → `prod: { id: string; salePrice: number }`
-    - `create-marketplace-order/route.ts:75` — `err: any` → `err: unknown`
-    - `verify-marketplace/route.ts:51` — `err: any` → `err: unknown`
-  - **CartDrawer.tsx:** State transitions (cart→checkout→submitting→reset) look clean; no mobile alignment issues detected in code; Tailwind v4 custom animation classes (`animate-fade-in`, `animate-slide-in`) used correctly
-  - **create-marketplace-order:** Multiple items mapped to individual rows with same `razorpay_order_id` ✓; mock fallback logs clean warning ✓
-  - **verify-marketplace:** `payment_status` updated to `'paid'` correctly in Supabase ✓; mock path logs clean ✓
+- **Fixes applied:**
+  - `create-marketplace-order/route.ts:49` — `prod: any` → `prod: { id: string; salePrice: number }`
+  - `create-marketplace-order/route.ts:75` — `err: any` → `err: unknown`
+  - `verify-marketplace/route.ts:51` — `err: any` → `err: unknown`
+- **Next step (to be confirmed):** STEP 1 — UI/UX redesign to invatax pattern
 

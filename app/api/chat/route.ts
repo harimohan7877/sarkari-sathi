@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
     const stream = new ReadableStream({
       async start(controller) {
-        const send = (data: any) => {
+        const send = (data: Record<string, unknown>) => {
           try {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
           } catch {}
@@ -106,9 +106,10 @@ export async function POST(req: NextRequest) {
             model: modelUsed,
           });
           controller.close();
-        } catch (err: any) {
+        } catch (err: unknown) {
           console.error("Stream error:", err);
-          send({ type: "error", error: err.message || "Server error" });
+          const errorMsg = err instanceof Error ? err.message : "Server error";
+          send({ type: "error", error: errorMsg });
           controller.close();
         }
       },

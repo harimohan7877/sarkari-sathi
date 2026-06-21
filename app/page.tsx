@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, startTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
@@ -25,8 +25,8 @@ function HomeContent() {
     const stored = localStorage.getItem("sarkari_saathi_cart");
     if (stored) {
       try {
-        setCart(JSON.parse(stored));
-      } catch (err) {}
+        startTransition(() => setCart(JSON.parse(stored)));
+      } catch {}
     }
   }, []);
 
@@ -136,7 +136,7 @@ function HomeContent() {
             name: name,
             email: email,
           },
-          handler: async function (response: any) {
+          handler: async function (response: Record<string, string>) {
             const verifyRes = await fetch("/api/payment/verify-marketplace", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -159,7 +159,14 @@ function HomeContent() {
             color: "#000000",
           },
         };
-        const rzp = new (window as any).Razorpay(options);
+        interface RazorpayInstance {
+          open: () => void;
+        }
+        interface RazorpayConstructor {
+          new (options: Record<string, unknown>): RazorpayInstance;
+        }
+        const RazorpayCtor = (window as unknown as { Razorpay: RazorpayConstructor }).Razorpay;
+        const rzp = new RazorpayCtor(options);
         rzp.open();
       }
     } catch (err) {

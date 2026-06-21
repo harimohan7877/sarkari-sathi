@@ -1,7 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { useRouter } from "next/navigation";
+import CategoriesTab from "./components/CategoriesTab";
+import ProductsTab from "./components/ProductsTab";
+
+interface MarketplaceOrder {
+  id: string;
+  customer_name: string;
+  customer_email: string;
+  amount: number;
+  payment_status: string;
+  delivery_status: string;
+  razorpay_order_id: string | null;
+  razorpay_payment_id: string | null;
+  created_at: string;
+  product: { title: string; exam_name: string } | null;
+}
 
 interface Stats {
   totalUsers: number;
@@ -47,12 +62,12 @@ interface ConfigSettings {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "ai" | "users" | "chats" | "orders" | "schema">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "ai" | "users" | "chats" | "orders" | "categories" | "products" | "schema">("dashboard");
   const [stats, setStats] = useState<Stats>({ totalUsers: 0, totalPaidUsers: 0, totalGuests: 0, totalChats: 0, totalRevenue: 0 });
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [chats, setChats] = useState<ChatMessage[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<MarketplaceOrder[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   
   // AI Config States
@@ -228,16 +243,22 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetchStats();
-    fetchConfig();
+    startTransition(() => {
+      fetchStats();
+      fetchConfig();
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (activeTab === "dashboard") fetchStats();
-    if (activeTab === "users") fetchUsers(searchQuery);
-    if (activeTab === "chats") fetchChats();
-    if (activeTab === "orders") fetchOrders();
-  }, [activeTab]);
+    startTransition(() => {
+      if (activeTab === "dashboard") fetchStats();
+      if (activeTab === "users") fetchUsers(searchQuery);
+      if (activeTab === "chats") fetchChats();
+      if (activeTab === "orders") fetchOrders();
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, searchQuery]);
 
   // Toggle user paid status
   const handleTogglePaid = async (userId: string, currentPaid: boolean) => {
@@ -308,8 +329,9 @@ export default function AdminDashboard() {
       } else {
         setTestResult({ success: false, text: `त्रुटि (Error): ${data.error}` });
       }
-    } catch (err: any) {
-      setTestResult({ success: false, text: `कनेक्शन विफल: ${err.message}` });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setTestResult({ success: false, text: `कनेक्शन विफल: ${message}` });
     }
   };
 
@@ -333,8 +355,9 @@ export default function AdminDashboard() {
         const err = await res.json();
         setSaveStatus({ success: false, text: `सेव करने में विफल: ${err.error}` });
       }
-    } catch (err: any) {
-      setSaveStatus({ success: false, text: `त्रुटि: ${err.message}` });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error';
+      setSaveStatus({ success: false, text: `त्रुटि: ${message}` });
     }
   };
 
@@ -397,6 +420,22 @@ export default function AdminDashboard() {
             }`}
           >
             🛒 Marketplace Orders
+          </button>
+          <button
+            onClick={() => setActiveTab("categories")}
+            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "categories" ? "bg-[#10b981] text-white" : "hover:bg-[#2a2d3a] text-gray-400 hover:text-white"
+            }`}
+          >
+            📂 Exam Categories
+          </button>
+          <button
+            onClick={() => setActiveTab("products")}
+            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+              activeTab === "products" ? "bg-[#10b981] text-white" : "hover:bg-[#2a2d3a] text-gray-400 hover:text-white"
+            }`}
+          >
+            📦 Study Materials
           </button>
           <button
             onClick={() => setActiveTab("schema")}
@@ -640,7 +679,7 @@ export default function AdminDashboard() {
                     </div>
                     {config.db_missing_groq && (
                       <div className="bg-amber-950/40 border border-amber-500/30 text-amber-300 p-4 rounded-xl text-xs leading-relaxed">
-                        ⚠️ <strong>डेटाबेस सूचना:</strong> आपके Supabase में <code>groq_key</code> कॉलम मौजूद नहीं है। आपकी यह कुंजी केवल तभी सेव होगी जब आप डेटाबेस में नया कॉलम जोड़ेंगे। कृपया "Supabase Schema Guide" टैब में दिए गए नए ALTER TABLE निर्देश को अपने Supabase SQL Editor में चलाएं। (तब तक आप <code>GROQ_API_KEY</code> को <code>.env.local</code> में भी सेट कर सकते हैं।)
+                        ⚠️ <strong>डेटाबेस सूचना:</strong> आपके Supabase में <code>groq_key</code> कॉलम मौजूद नहीं है। आपकी यह कुंजी केवल तभी सेव होगी जब आप डेटाबेस में नया कॉलम जोड़ेंगे। कृपया &ldquo;Supabase Schema Guide&rdquo; टैब में दिए गए नए ALTER TABLE निर्देश को अपने Supabase SQL Editor में चलाएं। (तब तक आप <code>GROQ_API_KEY</code> को <code>.env.local</code> में भी सेट कर सकते हैं।)
                       </div>
                     )}
                   </div>
@@ -927,6 +966,16 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Categories Tab */}
+        {activeTab === "categories" && (
+          <CategoriesTab getAuthHeaders={getAuthHeaders} />
+        )}
+
+        {/* Products Tab */}
+        {activeTab === "products" && (
+          <ProductsTab getAuthHeaders={getAuthHeaders} />
+        )}
+
         {/* Tab 5: Supabase Schema Guide */}
         {activeTab === "schema" && (
           <div className="space-y-6 max-w-4xl">
@@ -939,7 +988,7 @@ export default function AdminDashboard() {
 
             <div className="bg-[#1a1d27] border border-[#2a2d3a] rounded-2xl p-6 space-y-4">
               <p className="text-sm text-gray-300">
-                यदि एडमिन पैनल खोलते समय <strong>"Relation does not exist"</strong> एरर मिलता है या AI कुंजियां डेटाबेस में सुरक्षित नहीं हो पा रही हैं, तो अपने 
+                यदि एडमिन पैनल खोलते समय <strong>&ldquo;Relation does not exist&rdquo;</strong> एरर मिलता है या AI कुंजियां डेटाबेस में सुरक्षित नहीं हो पा रही हैं, तो अपने 
                 Supabase SQL Editor में यह पूरा स्क्रिप्ट चलाएं:
               </p>
 
