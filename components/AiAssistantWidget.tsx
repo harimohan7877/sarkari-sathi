@@ -137,7 +137,7 @@ export default function AiAssistantWidget() {
                     { key: 'hasCET_graduate', title: 'CET Graduate' },
                     { key: 'hasCET_senior', title: 'CET Senior Secondary' },
                   ].map((c) => {
-                    const selected = (formData as any)[c.key];
+                    const selected = formData[c.key as keyof typeof formData];
                     return (
                       <button key={c.key} type="button" onClick={() => updateField(c.key, !selected)} className={`w-full text-left p-3 rounded-xl border-2 flex items-center gap-3 ${selected ? 'border-[hsl(348,83%,47%)] bg-[hsl(348,83%,97%)]' : 'border-[hsl(214,32%,91%)] bg-white'}`}>
                         <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${selected ? 'bg-[hsl(348,83%,47%)] border-[hsl(348,83%,47%)]' : 'border-[hsl(214,32%,80%)]'}`}>

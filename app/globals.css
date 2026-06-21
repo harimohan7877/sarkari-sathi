@@ -51,8 +51,8 @@
   --border-error: var(--danger-red);
   --success-bg: var(--success-green-light);
   --success-text: var(--success-green);
-  --text-secondary: var(--text-secondary);
-  --text-placeholder: var(--text-placeholder);
+  --text-secondary: hsl(215, 16%, 35%);
+  --text-placeholder: hsl(215, 14%, 65%);
 
   --background: var(--bg-app);
   --foreground: var(--text-primary);

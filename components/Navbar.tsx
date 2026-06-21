@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -19,7 +20,7 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-4">
             <button className="flex items-center gap-1 hover:text-gray-800">
-              <img src="https://flagcdn.com/w20/us.png" alt="English" className="w-4 h-3" />
+              <Image src="https://flagcdn.com/w20/us.png" alt="English" width={20} height={15} className="w-4 h-3" />
               English ▾
             </button>
           </div>
@@ -34,9 +35,17 @@ export default function Navbar() {
         </Link>
 
         {/* Large Search Bar */}
-        <div className="hidden lg:flex flex-1 max-w-3xl">
+        <form
+          action="/"
+          method="GET"
+          className="hidden lg:flex flex-1 max-w-3xl"
+          onSubmit={(e) => {
+            if (!searchQuery.trim()) e.preventDefault();
+          }}
+        >
           <div className="flex w-full border-2 border-gray-100 rounded-l-md bg-gray-50 focus-within:bg-white focus-within:border-gray-200 transition-colors">
             <input
+              name="q"
               type="text"
               placeholder="Search for items..."
               value={searchQuery}
@@ -44,12 +53,12 @@ export default function Navbar() {
               className="w-full h-11 px-4 bg-transparent outline-none text-gray-700"
             />
           </div>
-          <button className="h-12 px-6 bg-[#e00000] hover:bg-[#cc0000] text-white rounded-r-md transition-colors flex items-center justify-center -ml-1 border-2 border-[#e00000]">
+          <button type="submit" className="h-12 px-6 bg-[#e00000] hover:bg-[#cc0000] text-white rounded-r-md transition-colors flex items-center justify-center -ml-1 border-2 border-[#e00000]">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
-        </div>
+        </form>
 
         {/* Icons Right */}
         <div className="flex items-center gap-4 shrink-0">
@@ -87,20 +96,21 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Search */}
-      <div className="lg:hidden px-4 pb-4">
+      <form action="/" method="GET" className="lg:hidden px-4 pb-4">
         <div className="flex w-full border-2 border-gray-100 rounded-md overflow-hidden">
           <input
+            name="q"
             type="text"
             placeholder="Search for items..."
             className="flex-1 h-10 px-3 outline-none"
           />
-          <button className="w-12 bg-[#e00000] text-white flex items-center justify-center">
+          <button type="submit" className="w-12 bg-[#e00000] text-white flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
         </div>
-      </div>
+      </form>
 
       {/* Bottom Red Navigation Bar */}
       <div className="bg-[#e00000] text-white">

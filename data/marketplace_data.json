@@ -1,0 +1,1227 @@
+{
+  "Rajasthan RSMSSB Exams": [
+    {
+      "sl": 1516,
+      "id": 5478,
+      "name_en": "RSMSSB VDO"
+    },
+    {
+      "sl": 1517,
+      "id": 5477,
+      "name_en": "RSMSSB Udyog Prasar Adhikari"
+    },
+    {
+      "sl": 1518,
+      "id": 5476,
+      "name_en": "RSMSSB TRA"
+    },
+    {
+      "sl": 1519,
+      "id": 5475,
+      "name_en": "RSMSSB Tax Assistant"
+    },
+    {
+      "sl": 1520,
+      "id": 5474,
+      "name_en": "RSMSSB Surveyor"
+    },
+    {
+      "sl": 1521,
+      "id": 5473,
+      "name_en": "RSMSSB Stenographer"
+    },
+    {
+      "sl": 1522,
+      "id": 5472,
+      "name_en": "RSMSSB Personal Assistant"
+    },
+    {
+      "sl": 1523,
+      "id": 5471,
+      "name_en": "RSMSSB Pashudhan Sahayak"
+    },
+    {
+      "sl": 1524,
+      "id": 5470,
+      "name_en": "RSMSSB Paramedical"
+    },
+    {
+      "sl": 1525,
+      "id": 5469,
+      "name_en": "RSMSSB Ophthalmic Assistant"
+    },
+    {
+      "sl": 1526,
+      "id": 5468,
+      "name_en": "RSMSSB NTT Teacher"
+    },
+    {
+      "sl": 1527,
+      "id": 5467,
+      "name_en": "RSMSSB NHM Social Worker"
+    },
+    {
+      "sl": 1528,
+      "id": 5466,
+      "name_en": "RSMSSB NHM Senior Counsellor"
+    },
+    {
+      "sl": 1529,
+      "id": 5465,
+      "name_en": "RSMSSB NHM Sector Health Supervisor"
+    },
+    {
+      "sl": 1530,
+      "id": 5464,
+      "name_en": "RSMSSB NHM Rehabilitation Worker"
+    },
+    {
+      "sl": 1531,
+      "id": 5463,
+      "name_en": "RSMSSB NHM Psychiatric Care Nurse"
+    },
+    {
+      "sl": 1532,
+      "id": 5462,
+      "name_en": "RSMSSB NHM Program Assistant"
+    },
+    {
+      "sl": 1533,
+      "id": 5461,
+      "name_en": "RSMSSB NHM Physiotherapist Assistant"
+    },
+    {
+      "sl": 1534,
+      "id": 5460,
+      "name_en": "RSMSSB NHM Pharma Assistant"
+    },
+    {
+      "sl": 1535,
+      "id": 5459,
+      "name_en": "RSMSSB NHM Nursing Tutor"
+    },
+    {
+      "sl": 1536,
+      "id": 5458,
+      "name_en": "RSMSSB NHM Nurse"
+    },
+    {
+      "sl": 1537,
+      "id": 5457,
+      "name_en": "RSMSSB NHM Medical Lab Technician"
+    },
+    {
+      "sl": 1538,
+      "id": 5456,
+      "name_en": "RSMSSB NHM Hospital Administrator"
+    },
+    {
+      "sl": 1539,
+      "id": 5455,
+      "name_en": "RSMSSB NHM DEO"
+    },
+    {
+      "sl": 1540,
+      "id": 5454,
+      "name_en": "RSMSSB NHM Compounder Ayurved"
+    },
+    {
+      "sl": 1541,
+      "id": 5453,
+      "name_en": "RSMSSB NHM Block Program Officer"
+    },
+    {
+      "sl": 1542,
+      "id": 5452,
+      "name_en": "RSMSSB NHM Bio Medical Engineer"
+    },
+    {
+      "sl": 1543,
+      "id": 5451,
+      "name_en": "RSMSSB NHM Audiologist"
+    },
+    {
+      "sl": 1544,
+      "id": 5450,
+      "name_en": "RSMSSB NHM Accounts Assistant"
+    },
+    {
+      "sl": 1545,
+      "id": 5449,
+      "name_en": "RSMSSB MVSI"
+    },
+    {
+      "sl": 1546,
+      "id": 5448,
+      "name_en": "RSMSSB Mine Foreman"
+    },
+    {
+      "sl": 1547,
+      "id": 5447,
+      "name_en": "RSMSSB Lab Assistant Home Science"
+    },
+    {
+      "sl": 1548,
+      "id": 5446,
+      "name_en": "RSMSSB Lab Assistant Geography"
+    },
+    {
+      "sl": 1549,
+      "id": 5445,
+      "name_en": "RSMSSB Lab Assistant"
+    },
+    {
+      "sl": 1550,
+      "id": 5444,
+      "name_en": "RSMSSB Junior Technical Assistant"
+    },
+    {
+      "sl": 1551,
+      "id": 5443,
+      "name_en": "RSMSSB Junior Scientific Assistant"
+    },
+    {
+      "sl": 1552,
+      "id": 5442,
+      "name_en": "RSMSSB Junior Instructor"
+    },
+    {
+      "sl": 1553,
+      "id": 5441,
+      "name_en": "RSMSSB Junior Accountant"
+    },
+    {
+      "sl": 1554,
+      "id": 5440,
+      "name_en": "RSMSSB JE Mechanical"
+    },
+    {
+      "sl": 1555,
+      "id": 5439,
+      "name_en": "RSMSSB JE Electrical"
+    },
+    {
+      "sl": 1556,
+      "id": 5438,
+      "name_en": "RSMSSB JE Civil"
+    },
+    {
+      "sl": 1557,
+      "id": 5437,
+      "name_en": "RSMSSB JE Agriculture"
+    },
+    {
+      "sl": 1558,
+      "id": 5436,
+      "name_en": "RSMSSB Investigator"
+    },
+    {
+      "sl": 1559,
+      "id": 5435,
+      "name_en": "RSMSSB Information Assistant"
+    },
+    {
+      "sl": 1560,
+      "id": 5434,
+      "name_en": "RSMSSB Hostel Superintendent"
+    },
+    {
+      "sl": 1561,
+      "id": 5433,
+      "name_en": "RSMSSB Grade 4"
+    },
+    {
+      "sl": 1562,
+      "id": 5432,
+      "name_en": "RSMSSB GNM"
+    },
+    {
+      "sl": 1563,
+      "id": 5431,
+      "name_en": "RSMSSB Fireman, AFO"
+    },
+    {
+      "sl": 1564,
+      "id": 5430,
+      "name_en": "RSMSSB Driver"
+    },
+    {
+      "sl": 1565,
+      "id": 5429,
+      "name_en": "RSMSSB Conductor"
+    },
+    {
+      "sl": 1566,
+      "id": 5428,
+      "name_en": "RSMSSB APRO"
+    },
+    {
+      "sl": 1567,
+      "id": 5427,
+      "name_en": "RSMSSB ANM"
+    },
+    {
+      "sl": 1568,
+      "id": 5426,
+      "name_en": "RSMSSB Animal Attendant"
+    }
+  ],
+  "Rajasthan Police & Security Exams": [
+    {
+      "sl": 1860,
+      "id": 5134,
+      "name_en": "Rajasthan Post Office Postman Mail Guard"
+    },
+    {
+      "sl": 1863,
+      "id": 5131,
+      "name_en": "Rajasthan Police SI Telecom"
+    },
+    {
+      "sl": 1864,
+      "id": 5130,
+      "name_en": "Rajasthan Police SI"
+    },
+    {
+      "sl": 1865,
+      "id": 5129,
+      "name_en": "Rajasthan Police Mahila ASI"
+    },
+    {
+      "sl": 1866,
+      "id": 5128,
+      "name_en": "Rajasthan Police Constable Telecommunication"
+    },
+    {
+      "sl": 1867,
+      "id": 5127,
+      "name_en": "Rajasthan Police Constable"
+    },
+    {
+      "sl": 1873,
+      "id": 5121,
+      "name_en": "Rajasthan Jail Prahari"
+    },
+    {
+      "sl": 1876,
+      "id": 5118,
+      "name_en": "Rajasthan Home Guard"
+    },
+    {
+      "sl": 1889,
+      "id": 5105,
+      "name_en": "Rajasthan Forest Guard"
+    },
+    {
+      "sl": 1904,
+      "id": 5090,
+      "name_en": "Rajasthan Abkari Vibhag Excise Constable"
+    }
+  ],
+  "Rajasthan High Court & Court Exams": [
+    {
+      "sl": 1878,
+      "id": 5116,
+      "name_en": "Rajasthan High Court System Assistant"
+    },
+    {
+      "sl": 1879,
+      "id": 5115,
+      "name_en": "Rajasthan High Court Stenographer"
+    },
+    {
+      "sl": 1880,
+      "id": 5114,
+      "name_en": "Rajasthan High Court Library Restorer"
+    },
+    {
+      "sl": 1881,
+      "id": 5113,
+      "name_en": "Rajasthan High Court Group D"
+    },
+    {
+      "sl": 1882,
+      "id": 5112,
+      "name_en": "Rajasthan High Court Driver"
+    },
+    {
+      "sl": 1883,
+      "id": 5111,
+      "name_en": "Rajasthan High Court Civil Judge"
+    },
+    {
+      "sl": 1884,
+      "id": 5110,
+      "name_en": "Rajasthan HC District Judge"
+    }
+  ],
+  "Rajasthan Teaching & School Exams": [
+    {
+      "sl": 25,
+      "id": 6969,
+      "name_en": "WCD Rajasthan Anganwadi Worker & Helper"
+    },
+    {
+      "sl": 1648,
+      "id": 5346,
+      "name_en": "RPSC Senior Physical Education Teacher"
+    },
+    {
+      "sl": 1649,
+      "id": 5345,
+      "name_en": "RPSC School Lecturer Sociology"
+    },
+    {
+      "sl": 1650,
+      "id": 5344,
+      "name_en": "RPSC School Lecturer Sanskrit Department"
+    },
+    {
+      "sl": 1651,
+      "id": 5343,
+      "name_en": "RPSC School Lecturer Sanskrit"
+    },
+    {
+      "sl": 1652,
+      "id": 5342,
+      "name_en": "RPSC School Lecturer Political Science"
+    },
+    {
+      "sl": 1653,
+      "id": 5341,
+      "name_en": "RPSC School Lecturer Physics"
+    },
+    {
+      "sl": 1654,
+      "id": 5340,
+      "name_en": "RPSC School Lecturer Physical Education"
+    },
+    {
+      "sl": 1655,
+      "id": 5339,
+      "name_en": "RPSC School Lecturer Mathematics"
+    },
+    {
+      "sl": 1656,
+      "id": 5338,
+      "name_en": "RPSC School Lecturer Home Science"
+    },
+    {
+      "sl": 1657,
+      "id": 5337,
+      "name_en": "RPSC School Lecturer History"
+    },
+    {
+      "sl": 1658,
+      "id": 5336,
+      "name_en": "RPSC School Lecturer Hindi"
+    },
+    {
+      "sl": 1659,
+      "id": 5335,
+      "name_en": "RPSC School Lecturer Geography"
+    },
+    {
+      "sl": 1660,
+      "id": 5334,
+      "name_en": "RPSC School Lecturer English"
+    },
+    {
+      "sl": 1661,
+      "id": 5333,
+      "name_en": "RPSC School Lecturer Economics"
+    },
+    {
+      "sl": 1662,
+      "id": 5332,
+      "name_en": "RPSC School Lecturer Drawing"
+    },
+    {
+      "sl": 1663,
+      "id": 5331,
+      "name_en": "RPSC School Lecturer Commerce"
+    },
+    {
+      "sl": 1664,
+      "id": 5330,
+      "name_en": "RPSC School Lecturer Chemistry"
+    },
+    {
+      "sl": 1665,
+      "id": 5329,
+      "name_en": "RPSC School Lecturer Biology"
+    },
+    {
+      "sl": 1666,
+      "id": 5328,
+      "name_en": "RPSC School Lecturer"
+    },
+    {
+      "sl": 1685,
+      "id": 5309,
+      "name_en": "RPSC College Lecturer Paper 3"
+    },
+    {
+      "sl": 1686,
+      "id": 5308,
+      "name_en": "RPSC Assistant Professor Zoology"
+    },
+    {
+      "sl": 1687,
+      "id": 5307,
+      "name_en": "RPSC Assistant Professor Sociology"
+    },
+    {
+      "sl": 1688,
+      "id": 5306,
+      "name_en": "RPSC Assistant Professor Sanskrit"
+    },
+    {
+      "sl": 1689,
+      "id": 5305,
+      "name_en": "RPSC Assistant Professor Radiodiagnosis"
+    },
+    {
+      "sl": 1690,
+      "id": 5304,
+      "name_en": "RPSC Assistant Professor Public Administration"
+    },
+    {
+      "sl": 1691,
+      "id": 5303,
+      "name_en": "RPSC Assistant Professor Psychology"
+    },
+    {
+      "sl": 1692,
+      "id": 5302,
+      "name_en": "RPSC Assistant Professor Political Science"
+    },
+    {
+      "sl": 1693,
+      "id": 5301,
+      "name_en": "RPSC Assistant Professor Physics"
+    },
+    {
+      "sl": 1694,
+      "id": 5300,
+      "name_en": "RPSC Assistant Professor Philosophy"
+    },
+    {
+      "sl": 1695,
+      "id": 5299,
+      "name_en": "RPSC Assistant Professor Pediatrics"
+    },
+    {
+      "sl": 1696,
+      "id": 5298,
+      "name_en": "RPSC Assistant Professor Orthopedics"
+    },
+    {
+      "sl": 1697,
+      "id": 5297,
+      "name_en": "RPSC Assistant Professor Maths"
+    },
+    {
+      "sl": 1698,
+      "id": 5296,
+      "name_en": "RPSC Assistant Professor Law"
+    },
+    {
+      "sl": 1699,
+      "id": 5295,
+      "name_en": "RPSC Assistant Professor Home Science"
+    },
+    {
+      "sl": 1700,
+      "id": 5294,
+      "name_en": "RPSC Assistant Professor History"
+    },
+    {
+      "sl": 1701,
+      "id": 5293,
+      "name_en": "RPSC Assistant Professor Hindi"
+    },
+    {
+      "sl": 1702,
+      "id": 5292,
+      "name_en": "RPSC Assistant Professor Gynecology and Obstetrics"
+    },
+    {
+      "sl": 1703,
+      "id": 5291,
+      "name_en": "RPSC Assistant Professor Geography"
+    },
+    {
+      "sl": 1704,
+      "id": 5290,
+      "name_en": "RPSC Assistant Professor General Surgery"
+    },
+    {
+      "sl": 1705,
+      "id": 5289,
+      "name_en": "RPSC Assistant Professor General Studies of Rajasthan"
+    },
+    {
+      "sl": 1706,
+      "id": 5288,
+      "name_en": "RPSC Assistant Professor General Medicine"
+    },
+    {
+      "sl": 1707,
+      "id": 5287,
+      "name_en": "RPSC Assistant Professor English"
+    },
+    {
+      "sl": 1708,
+      "id": 5286,
+      "name_en": "RPSC Assistant Professor Economics"
+    },
+    {
+      "sl": 1709,
+      "id": 5285,
+      "name_en": "RPSC Assistant Professor Chemistry"
+    },
+    {
+      "sl": 1710,
+      "id": 5284,
+      "name_en": "RPSC Assistant Professor Business Administration"
+    },
+    {
+      "sl": 1711,
+      "id": 5283,
+      "name_en": "RPSC Assistant Professor Botany"
+    },
+    {
+      "sl": 1712,
+      "id": 5282,
+      "name_en": "RPSC Assistant Professor Anesthesia"
+    },
+    {
+      "sl": 1713,
+      "id": 5281,
+      "name_en": "RPSC Assistant Professor ABST"
+    },
+    {
+      "sl": 1727,
+      "id": 5267,
+      "name_en": "RPSC 2nd Grade Teacher Social Science"
+    },
+    {
+      "sl": 1728,
+      "id": 5266,
+      "name_en": "RPSC 2nd Grade Teacher Science"
+    },
+    {
+      "sl": 1729,
+      "id": 5265,
+      "name_en": "RPSC 2nd Grade Teacher Sanskrit"
+    },
+    {
+      "sl": 1730,
+      "id": 5264,
+      "name_en": "RPSC 2nd Grade Teacher Paper 1"
+    },
+    {
+      "sl": 1731,
+      "id": 5263,
+      "name_en": "RPSC 2nd Grade Teacher Mathematics"
+    },
+    {
+      "sl": 1732,
+      "id": 5262,
+      "name_en": "RPSC 2nd Grade Teacher Hindi"
+    },
+    {
+      "sl": 1733,
+      "id": 5261,
+      "name_en": "RPSC 2nd Grade Teacher English"
+    },
+    {
+      "sl": 1734,
+      "id": 5260,
+      "name_en": "RPSC 2nd Grade Teacher"
+    },
+    {
+      "sl": 1736,
+      "id": 5258,
+      "name_en": "RPSC 1st Grade Special Teacher Sociology"
+    },
+    {
+      "sl": 1737,
+      "id": 5257,
+      "name_en": "RPSC 1st Grade Special Teacher Political Science"
+    },
+    {
+      "sl": 1738,
+      "id": 5256,
+      "name_en": "RPSC 1st Grade Special Teacher Music"
+    },
+    {
+      "sl": 1739,
+      "id": 5255,
+      "name_en": "RPSC 1st Grade Special Teacher History"
+    },
+    {
+      "sl": 1740,
+      "id": 5254,
+      "name_en": "RPSC 1st Grade Special Teacher Hindi"
+    },
+    {
+      "sl": 1741,
+      "id": 5253,
+      "name_en": "RPSC 1st Grade Special Teacher English"
+    },
+    {
+      "sl": 1742,
+      "id": 5252,
+      "name_en": "RPSC 1st Grade Agriculture Teacher"
+    },
+    {
+      "sl": 1823,
+      "id": 5171,
+      "name_en": "Rajasthan Vidyalaya Sahayak Teacher"
+    },
+    {
+      "sl": 1838,
+      "id": 5156,
+      "name_en": "Rajasthan SET Physical Education"
+    },
+    {
+      "sl": 1851,
+      "id": 5143,
+      "name_en": "Rajasthan SET Education"
+    },
+    {
+      "sl": 1857,
+      "id": 5137,
+      "name_en": "Rajasthan Sanskrit Teacher"
+    },
+    {
+      "sl": 1862,
+      "id": 5132,
+      "name_en": "Rajasthan Polytechnic Lecturer"
+    },
+    {
+      "sl": 1903,
+      "id": 5091,
+      "name_en": "Rajasthan Anganwadi Supervisor"
+    }
+  ],
+  "Rajasthan General Government Exams": [
+    {
+      "sl": 1515,
+      "id": 5479,
+      "name_en": "RSPCB JSO JEE"
+    },
+    {
+      "sl": 1570,
+      "id": 5424,
+      "name_en": "RS-CIT Exam"
+    },
+    {
+      "sl": 1644,
+      "id": 5350,
+      "name_en": "RPVT"
+    },
+    {
+      "sl": 1645,
+      "id": 5349,
+      "name_en": "RPSC Veterinary Officer"
+    },
+    {
+      "sl": 1646,
+      "id": 5348,
+      "name_en": "RPSC Statistical Officer"
+    },
+    {
+      "sl": 1647,
+      "id": 5347,
+      "name_en": "RPSC Senior Scientific Officer"
+    },
+    {
+      "sl": 1667,
+      "id": 5327,
+      "name_en": "RPSC RO EO"
+    },
+    {
+      "sl": 1668,
+      "id": 5326,
+      "name_en": "RPSC Research Assistant"
+    },
+    {
+      "sl": 1669,
+      "id": 5325,
+      "name_en": "RPSC RAS"
+    },
+    {
+      "sl": 1670,
+      "id": 5324,
+      "name_en": "RPSC PTI"
+    },
+    {
+      "sl": 1671,
+      "id": 5323,
+      "name_en": "RPSC Protection Officer"
+    },
+    {
+      "sl": 1672,
+      "id": 5322,
+      "name_en": "RPSC Programmer"
+    },
+    {
+      "sl": 1673,
+      "id": 5321,
+      "name_en": "RPSC Librarian"
+    },
+    {
+      "sl": 1674,
+      "id": 5320,
+      "name_en": "RPSC Junior Chemist"
+    },
+    {
+      "sl": 1675,
+      "id": 5319,
+      "name_en": "RPSC JLO Evidence Act Paper 3"
+    },
+    {
+      "sl": 1676,
+      "id": 5318,
+      "name_en": "RPSC JLO English and Hindi Paper 4"
+    },
+    {
+      "sl": 1677,
+      "id": 5317,
+      "name_en": "RPSC JLO Constitution of India Paper 1"
+    },
+    {
+      "sl": 1678,
+      "id": 5316,
+      "name_en": "RPSC JLO Civil Procedure Code Paper 2"
+    },
+    {
+      "sl": 1679,
+      "id": 5315,
+      "name_en": "RPSC JLO"
+    },
+    {
+      "sl": 1680,
+      "id": 5314,
+      "name_en": "RPSC Headmaster"
+    },
+    {
+      "sl": 1681,
+      "id": 5313,
+      "name_en": "RPSC Group Instructor"
+    },
+    {
+      "sl": 1682,
+      "id": 5312,
+      "name_en": "RPSC Grade 2"
+    },
+    {
+      "sl": 1683,
+      "id": 5311,
+      "name_en": "RPSC FSO"
+    },
+    {
+      "sl": 1684,
+      "id": 5310,
+      "name_en": "RPSC Deputy Jailor"
+    },
+    {
+      "sl": 1714,
+      "id": 5280,
+      "name_en": "RPSC Assistant Electrical Inspector"
+    },
+    {
+      "sl": 1715,
+      "id": 5279,
+      "name_en": "RPSC Assistant Director"
+    },
+    {
+      "sl": 1716,
+      "id": 5278,
+      "name_en": "RPSC ASO"
+    },
+    {
+      "sl": 1717,
+      "id": 5277,
+      "name_en": "RPSC ARO & AARO"
+    },
+    {
+      "sl": 1718,
+      "id": 5276,
+      "name_en": "RPSC APO"
+    },
+    {
+      "sl": 1719,
+      "id": 5275,
+      "name_en": "RPSC Agriculture Officer"
+    },
+    {
+      "sl": 1720,
+      "id": 5274,
+      "name_en": "RPSC AE Mechanical"
+    },
+    {
+      "sl": 1721,
+      "id": 5273,
+      "name_en": "RPSC AE Electrical"
+    },
+    {
+      "sl": 1722,
+      "id": 5272,
+      "name_en": "RPSC AE Agriculture"
+    },
+    {
+      "sl": 1723,
+      "id": 5271,
+      "name_en": "RPSC AE"
+    },
+    {
+      "sl": 1724,
+      "id": 5270,
+      "name_en": "RPSC ACF FRO"
+    },
+    {
+      "sl": 1725,
+      "id": 5269,
+      "name_en": "RPSC AAO"
+    },
+    {
+      "sl": 1726,
+      "id": 5268,
+      "name_en": "RPSC AAE"
+    },
+    {
+      "sl": 1735,
+      "id": 5259,
+      "name_en": "RPSC 2nd Grade Clerk"
+    },
+    {
+      "sl": 1764,
+      "id": 5230,
+      "name_en": "RIICO Stenographer"
+    },
+    {
+      "sl": 1765,
+      "id": 5229,
+      "name_en": "RIICO Personal Assistant Grade II"
+    },
+    {
+      "sl": 1766,
+      "id": 5228,
+      "name_en": "RIICO Junior Legal Officer"
+    },
+    {
+      "sl": 1767,
+      "id": 5227,
+      "name_en": "RIICO Junior Assistant"
+    },
+    {
+      "sl": 1768,
+      "id": 5226,
+      "name_en": "RIICO Draughtsman cum Tracer Civil"
+    },
+    {
+      "sl": 1769,
+      "id": 5225,
+      "name_en": "RIICO Assistant Site Engineer Civil"
+    },
+    {
+      "sl": 1770,
+      "id": 5224,
+      "name_en": "RIICO AAO Grade 2"
+    },
+    {
+      "sl": 1773,
+      "id": 5221,
+      "name_en": "RGAVP Project Associate"
+    },
+    {
+      "sl": 1812,
+      "id": 5182,
+      "name_en": "RCDF AM"
+    },
+    {
+      "sl": 1824,
+      "id": 5170,
+      "name_en": "Rajasthan University Lab Assistant"
+    },
+    {
+      "sl": 1825,
+      "id": 5169,
+      "name_en": "Rajasthan University JTA"
+    },
+    {
+      "sl": 1826,
+      "id": 5168,
+      "name_en": "Rajasthan University Electrician"
+    },
+    {
+      "sl": 1827,
+      "id": 5167,
+      "name_en": "Rajasthan University Clerk Grade 2"
+    },
+    {
+      "sl": 1831,
+      "id": 5163,
+      "name_en": "Rajasthan SET Visual Arts"
+    },
+    {
+      "sl": 1832,
+      "id": 5162,
+      "name_en": "Rajasthan SET Sociology"
+    },
+    {
+      "sl": 1833,
+      "id": 5161,
+      "name_en": "Rajasthan SET Sanskrit"
+    },
+    {
+      "sl": 1834,
+      "id": 5160,
+      "name_en": "Rajasthan SET Public Administration"
+    },
+    {
+      "sl": 1835,
+      "id": 5159,
+      "name_en": "Rajasthan SET Psychology"
+    },
+    {
+      "sl": 1836,
+      "id": 5158,
+      "name_en": "Rajasthan SET Political Science"
+    },
+    {
+      "sl": 1837,
+      "id": 5157,
+      "name_en": "Rajasthan SET Physical Science"
+    },
+    {
+      "sl": 1839,
+      "id": 5155,
+      "name_en": "Rajasthan SET Philosophy"
+    },
+    {
+      "sl": 1840,
+      "id": 5154,
+      "name_en": "Rajasthan SET Music"
+    },
+    {
+      "sl": 1841,
+      "id": 5153,
+      "name_en": "Rajasthan SET Mathematical Science"
+    },
+    {
+      "sl": 1842,
+      "id": 5152,
+      "name_en": "Rajasthan SET Management"
+    },
+    {
+      "sl": 1843,
+      "id": 5151,
+      "name_en": "Rajasthan SET Life Science"
+    },
+    {
+      "sl": 1844,
+      "id": 5150,
+      "name_en": "Rajasthan SET Law"
+    },
+    {
+      "sl": 1845,
+      "id": 5149,
+      "name_en": "Rajasthan SET Home Science"
+    },
+    {
+      "sl": 1846,
+      "id": 5148,
+      "name_en": "Rajasthan SET History"
+    },
+    {
+      "sl": 1847,
+      "id": 5147,
+      "name_en": "Rajasthan SET Hindi"
+    },
+    {
+      "sl": 1848,
+      "id": 5146,
+      "name_en": "Rajasthan SET Geography"
+    },
+    {
+      "sl": 1849,
+      "id": 5145,
+      "name_en": "Rajasthan SET Environmental Science"
+    },
+    {
+      "sl": 1850,
+      "id": 5144,
+      "name_en": "Rajasthan SET English"
+    },
+    {
+      "sl": 1852,
+      "id": 5142,
+      "name_en": "Rajasthan SET Economics"
+    },
+    {
+      "sl": 1853,
+      "id": 5141,
+      "name_en": "Rajasthan SET Computer Science"
+    },
+    {
+      "sl": 1854,
+      "id": 5140,
+      "name_en": "Rajasthan SET Commerce"
+    },
+    {
+      "sl": 1855,
+      "id": 5139,
+      "name_en": "Rajasthan SET Chemical Science"
+    },
+    {
+      "sl": 1856,
+      "id": 5138,
+      "name_en": "Rajasthan SET"
+    },
+    {
+      "sl": 1858,
+      "id": 5136,
+      "name_en": "Rajasthan Safai Karmchari"
+    },
+    {
+      "sl": 1859,
+      "id": 5135,
+      "name_en": "Rajasthan PTET"
+    },
+    {
+      "sl": 1861,
+      "id": 5133,
+      "name_en": "Rajasthan Post Office MTS"
+    },
+    {
+      "sl": 1869,
+      "id": 5125,
+      "name_en": "Rajasthan Patwari"
+    },
+    {
+      "sl": 1870,
+      "id": 5124,
+      "name_en": "Rajasthan Nursing Officer"
+    },
+    {
+      "sl": 1871,
+      "id": 5123,
+      "name_en": "Rajasthan Lab Technician"
+    },
+    {
+      "sl": 1872,
+      "id": 5122,
+      "name_en": "Rajasthan JET Agriculture"
+    },
+    {
+      "sl": 1874,
+      "id": 5120,
+      "name_en": "Rajasthan Informatics Assistant"
+    },
+    {
+      "sl": 1875,
+      "id": 5119,
+      "name_en": "Rajasthan IDEED"
+    },
+    {
+      "sl": 1877,
+      "id": 5117,
+      "name_en": "Rajasthan History"
+    },
+    {
+      "sl": 1885,
+      "id": 5109,
+      "name_en": "Rajasthan HC Clerk"
+    },
+    {
+      "sl": 1886,
+      "id": 5108,
+      "name_en": "Rajasthan Gram Sevak Bharti"
+    },
+    {
+      "sl": 1887,
+      "id": 5107,
+      "name_en": "Rajasthan GK in Hindi"
+    },
+    {
+      "sl": 1888,
+      "id": 5106,
+      "name_en": "Rajasthan General Knowledge"
+    },
+    {
+      "sl": 1892,
+      "id": 5102,
+      "name_en": "Rajasthan DLSA"
+    },
+    {
+      "sl": 1893,
+      "id": 5101,
+      "name_en": "Rajasthan Current Affairs"
+    },
+    {
+      "sl": 1897,
+      "id": 5097,
+      "name_en": "Rajasthan Computer Sanganak"
+    },
+    {
+      "sl": 1898,
+      "id": 5096,
+      "name_en": "Rajasthan Computer Instructor"
+    },
+    {
+      "sl": 1900,
+      "id": 5094,
+      "name_en": "Rajasthan BSTC"
+    },
+    {
+      "sl": 1901,
+      "id": 5093,
+      "name_en": "Rajasthan BPED"
+    },
+    {
+      "sl": 3281,
+      "id": 3713,
+      "name_en": "LSG Rajasthan Senior Draftsman"
+    },
+    {
+      "sl": 3700,
+      "id": 3294,
+      "name_en": "JMRC Station Controller"
+    },
+    {
+      "sl": 3701,
+      "id": 3293,
+      "name_en": "JMRC Junior Accountant"
+    },
+    {
+      "sl": 3702,
+      "id": 3292,
+      "name_en": "JMRC JE"
+    },
+    {
+      "sl": 4289,
+      "id": 2705,
+      "name_en": "HRRL Junior Executive"
+    },
+    {
+      "sl": 4290,
+      "id": 2704,
+      "name_en": "HRRL Engineer Chemical"
+    },
+    {
+      "sl": 4291,
+      "id": 2703,
+      "name_en": "HRRL Engineer"
+    },
+    {
+      "sl": 4813,
+      "id": 2181,
+      "name_en": "FCI Rajasthan Watchman"
+    }
+  ]
+}

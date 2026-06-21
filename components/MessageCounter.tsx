@@ -4,12 +4,10 @@ interface MessageCounterProps {
   used: number;
   limit: number;
   tier: 'guest' | 'registered' | 'paid';
-  onLoginClick?: () => void;
-  onPayClick?: () => void;
   isCustomKeyActive?: boolean;
 }
 
-export default function MessageCounter({ used, limit, tier, onLoginClick, onPayClick, isCustomKeyActive }: MessageCounterProps) {
+export default function MessageCounter({ used, limit, tier, isCustomKeyActive }: MessageCounterProps) {
   if (tier === 'paid') return null;
 
   if (isCustomKeyActive) {
