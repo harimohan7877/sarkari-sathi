@@ -111,7 +111,8 @@ function HomeContent() {
         });
 
         if (verifyRes.ok) {
-          alert(`Order Placed Successfully!\n\nEmail Manual Delivery Setup: A Google Drive link for your items will be sent to "${email}" manually after verifying the payment.`);
+          sessionStorage.setItem("purchased_items", JSON.stringify(cart));
+          window.location.href = "/download";
           setCart([]);
           localStorage.removeItem("sarkari_saathi_cart");
           setIsCartOpen(false);
@@ -141,7 +142,8 @@ function HomeContent() {
               }),
             });
             if (verifyRes.ok) {
-              alert(`Payment Successful!\n\nEmail Manual Delivery Setup: Google Drive link for your items will be sent to "${email}" manually.`);
+              sessionStorage.setItem("purchased_items", JSON.stringify(cart));
+              window.location.href = "/download";
               setCart([]);
               localStorage.removeItem("sarkari_saathi_cart");
               setIsCartOpen(false);

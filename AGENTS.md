@@ -24,7 +24,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 No test framework installed. No test/coverage scripts.
 
-## Architecture — what the current code actually is
+## Architecture — current state
 
 The project has **three overlapping design phases** in docs but only the latest code is real:
 
@@ -34,46 +34,80 @@ The project has **three overlapping design phases** in docs but only the latest 
 | `ANTIGRAVITY.md` | Roadmap only | Marketplace pivot plan |
 | Current code | **TRUTH** | Shopify-minimalist: cream `#fbfbf5`, black, Inter/Noto fonts, pill buttons |
 
-The current live code is a **premium e-commerce marketplace** for Rajasthan exam study materials (PDF notes, MCQs, mock tests). It is NOT the old eligibility-check portal described in CLAUDE.md.
+Current code is a **premium e-commerce marketplace** for Rajasthan exam study materials (PDF notes, MCQs, mock tests) with Google Drive delivery.
 
 ## Data duality
 
-Two data systems coexist, neither fully dominant:
-
-- **Static JSON:** `data/products_mock.json` (marketplace products), `data/marketplace_data.json` (exam groups), `data/exams.json` (old exams)
-- **Supabase schema** (`supabase-schema.sql`) defines V3 tables (user_profiles, guest_sessions, admin_settings, etc.) but the frontend uses localStorage mock auth — Supabase client exists in `lib/supabase.ts` but is not the active auth path
+Two data systems coexist:
+- **Static JSON:** `data/products_mock.json` (10 products with drive_url), `data/groups.json` (5 groups with logos), `data/exams.json` (exams with fee/eligibility)
+- **Supabase schema** (`supabase-schema.sql`) defines V3 tables but frontend uses localStorage mock auth
 
 ## Key file map
 
-- `app/page.tsx` — marketplace homepage with hero slider, sidebar categories, product grid, checkout modal
-- `components/Navbar.tsx` — sticky nav with search form (`?q=` param)
-- `components/HeroSlider.tsx` — gradient hero with glowing blobs, fade-in animations
-- `components/ProductCard.tsx` — product card with `card-micro` hover lift
-- `components/SidebarCategories.tsx` — collapsible exam group sidebar
-- `components/Footer.tsx` — dark footer with links + WhatsApp
-- `app/auth/page.tsx` — mock login (localStorage-based, no real auth)
-- `app/exam/[id]/page.tsx` — AI chat + study material workspace
-- `lib/supabase.ts` — Supabase client + mock auth override + message limits
-- `lib/ai.ts` — AI provider routing (OpenRouter, Gemini, etc.)
-- `proxy.ts` (root) — custom proxy server
+- `app/page.tsx` — homepage: hero, circular grid, sidebar+products, info cards, footer, cart drawer, checkout
+- `app/exam/[id]/page.tsx` — exam detail + related products with Buy Now buttons
+- `app/category/[id]/page.tsx` — exam cards with group logo book-cover design
+- `app/exams/page.tsx` — category browser grid
+- `app/download/page.tsx` — post-purchase download page with Google Drive links
+- `app/auth/page.tsx` — mock login (localStorage, no real auth)
+- `app/secret-admin-portal/page.tsx` — admin panel with 9 tabs
+- `app/secret-admin-portal/components/CategoriesTab.tsx` — group CRUD + logo upload
+- `app/secret-admin-portal/components/ProductsTab.tsx` — product CRUD + cover + drive_url
+- `app/secret-admin-portal/components/ExamsTab.tsx` — exam CRUD + logo upload
+- `components/ProductCard.tsx` — Product interface with drive_url
+- `components/SidebarCategories.tsx` — sidebar with group logos
+- `components/CartDrawer.tsx` — checkout form (name, email)
+- `lib/eligibility.ts` — Exam interface with logo_url
+- `lib/groups.ts` — Group interface with priority, is_active
+
+## Status
+
+### ✅ DONE
+| Feature | Details |
+|---------|---------|
+| Homepage layout | Hero → Circular Grid → Sidebar+Products → InfoCards → Footer |
+| Category browser | `/exams` page with group grid |
+| Category detail | `/category/[id]` book-style exam cards with group logo |
+| Admin panel | 9 tabs, dark theme, right-side drawers |
+| Group CRUD | CategoriesTab with logo upload (file + URL) |
+| Product CRUD | ProductsTab with cover upload, drive_url field |
+| Exam CRUD | ExamsTab with logo upload (file + URL) |
+| Per-exam logo | `logo_url` field, falls back to group logo |
+| Sidebar logos | Group logo thumbnails in sidebar |
+| Footer | 5-column enriched footer |
+| Google Drive delivery | `drive_url` field on products |
+| `/download` page | Post-payment download links |
+| Exam detail page | Exam info + related products with Buy Now |
+| Checkout flow | Cart → payment → redirect to /download |
+| Products API | Returns `drive_url` to frontend |
+| Local JSON fallback | All admin CRUD falls back to JSON files |
+
+### ❌ BAKI (Pehli sale ke liye)
+| Priority | Feature | Notes |
+|----------|---------|-------|
+| 🔴 High | **Real products (actual PDF/MCQ files)** | Sirf 10 mock items, koi actual file nahi |
+| 🔴 High | **Razorpay live keys** | Payment mock hai, real gateway nahi |
+| 🔴 High | **Real auth (database session)** | localStorage mock hai |
+| 🟡 Medium | **Order history** | User purane orders nahi dekh sakta |
+| 🟡 Medium | **WhatsApp order notification** | Order aane par admin ko WA message |
+| 🟡 Medium | **Post-payment email delivery** | Google Drive link email se bhejna |
+| 🟢 Low | Blog/About/Contact pages | InfoCards link nowhere |
+| 🟢 Low | Search results page | Navbar mein search form hai but no results page |
 
 ## Design system (globals.css)
 
 CSS custom properties for all tokens. Reusable classes:
-
 - `button-primary-pill` — black pill button
 - `button-outline-on-dark` — white outline on dark bg
 - `button-outline-on-light` — black outline on light bg
 - `shadow-halo` / `shadow-premium` — elevation tokens
 - `card-micro` — lift-on-hover transition
 - `font-devanagari` — Noto Sans Devanagari
-- `animate-hero-fade-in` (plus `-delayed`, `-delayed-2`) — hero entrance
+- `animate-hero-fade-in` (plus `-delayed`, `-delayed-2`)
 - `whatsapp-float` — fixed WhatsApp FAB
 
-Fonts are loaded via CSS `@import` (not Next.js font loader). `layout.tsx` uses no font loader.
+Fonts loaded via CSS `@import` (not Next.js font loader). `layout.tsx` uses no font loader.
 
-## Agent coordination
-
-- `deepseek_handoff.md` — task board between Antigravity and DeepSeek agents
-- `AGENTS.md` (this file) — for OpenCode sessions only
-- Old `CLAUDE.md` exists but is stale; do not trust its tech stack or file structure claims
+## Recent commits
+- `be6aa5d` feat: per-exam logo_url with admin upload, category book cards show group logo badge
+- `6364eb3` fix: replace book box with proper book cover design on exam cards

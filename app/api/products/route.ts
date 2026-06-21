@@ -31,7 +31,8 @@ export async function GET() {
       price: Number(p.price),
       salePrice: Number(p.sale_price),
       pages: p.pages || undefined,
-      language: p.language
+      language: p.language,
+      drive_url: p.file_url || undefined,
     }));
 
     return NextResponse.json({ products, fromDb: true });

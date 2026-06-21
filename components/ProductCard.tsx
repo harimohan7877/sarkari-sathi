@@ -12,6 +12,7 @@ export interface Product {
   salePrice: number;
   pages?: number;
   language: "Hindi" | "English" | "Bilingual";
+  drive_url?: string;
 }
 
 interface ProductCardProps {
