@@ -286,3 +286,101 @@ Tailwind v4 syntax: `@import "tailwindcss"`, `@theme inline` — NO `@tailwind` 
 - [ ] **STEP 6:** Smart API — Notes/MCQ/Mock Test management
 - [ ] **STEP 7:** Payment + Drive delivery enhancement
 - [ ] **STEP 8:** Automation (n8n) — Phase 2
+
+---
+
+## 🧠 CUSTOMIZATION PLAN (Sab Kuch Admin se Manage karo)
+
+**Goal:** Har cheez admin panel se editable — bina code change ke. Non-technical user (aap) sirf admin panel use karke poora site manage kar sake.
+
+### Phase A: Static → Dynamic Data Migration
+
+**Problem:** Abhi data `data/*.json` files mein hardcoded hai. Code change kiye bina edit nahi kar sakte.
+
+**Solution:** Firebase Firestore ya Supabase se serve karo. Admin panel writes → Supabase → Site reads from Supabase.
+
+| Current (Static) | Target (Dynamic) | Priority |
+|-----------------|------------------|----------|
+| `data/exams.json` | Supabase table: `exams` | High |
+| `data/groups.json` | Supabase table: `groups` | High |
+| `data/marketplace_data.json` | Supabase table: `marketplace_groups` | Medium |
+| `data/products_mock.json` | Supabase table: `products` | High |
+
+### Phase B: Admin Panel — Content Management
+
+**Already done (this session):**
+- ✅ Categories (Groups) tab — CRUD with logo, SEO
+- ✅ Products tab — CRUD with pricing, Google Drive links
+
+**Needs to be built:**
+- [ ] **Exams tab** — Har exam ki details edit karo (name, board, eligibility, fee, dates, selection process, syllabus, PYQs, guide steps)
+- [ ] **Hero Slider management** — Slides add/edit/remove from admin
+- [ ] **Footer links** — Social links, WhatsApp number, contact info
+- [ ] **SEO Manager** — Meta title, description, OG image har page ke liye
+- [ ] **Banner/Notification bar** — Site-wide announcement from admin
+- [ ] **Theme settings** — Primary color, accent color, logo, favicon
+
+### Phase C: Exam Data Editor (Big One)
+
+Exam details bahut zyada hain — eligibility, fee, age, selection process, steps, subjects, PYQs. Admin panel mein ek **visual JSON editor** ya **form wizard** banao:
+
+- Tab 1: Basic Info (name, board, status, dates)
+- Tab 2: Eligibility (age, education, category relaxations)
+- Tab 3: Fee Structure (general, OBC, SC/ST amounts)
+- Tab 4: Selection Process (step-wise editor)
+- Tab 5: Subjects/Syllabus (add/remove subjects with weightage)
+- Tab 6: Guide Steps (form filling steps)
+- Tab 7: PYQs (year, name, URL)
+
+**File:** `app/secret-admin-portal/components/ExamsTab.tsx`
+
+### Phase D: Feature Flags System
+
+Admin panel se features on/off karne ka system:
+
+| Flag | Effect |
+|------|--------|
+| `ai_chat_enabled` | Exam page pe AI chat dikhe ya nahi |
+| `marketplace_enabled` | Homepage marketplace dikhe ya nahi |
+| `guest_mode` | Bina login ke exams dikhe ya nahi |
+| `payment_enabled` | Payment flow active ya nahi |
+| `maintenance_mode` | Pura site "Under Maintenance" page dikhaye |
+
+### Phase E: Theme Customization
+
+Admin panel se bina CSS change ke theme badlo:
+
+| Setting | Default |
+|---------|---------|
+| Primary color | `#fbfbf5` (cream bg) |
+| Accent color | `#000000` (black) |
+| Button style | Pill |
+| Hero gradient | `#0a1128` → `#162447` |
+| Logo (top nav) | Upload from admin |
+| Favicon | Upload from admin |
+| Custom CSS | Inline CSS field in admin |
+
+### Phase F: Media Manager
+
+Admin panel mein ek **Media Library** jahan se:
+- Group logos upload karo
+- Product images upload karo
+- Hero slider images upload karo
+- Logo, favicon upload karo
+
+**Storage:** Supabase Storage (free tier, 1GB) ya Cloudinary (free tier).
+
+### Phase G: Roles & Access Control
+
+- **Super Admin** (aap) — full access
+- **Editor** — can edit content but not settings
+- **Support** — can view orders, mark sent
+- No auth system needed beyond Supabase built-in
+
+### Execution Priority
+
+```
+Phase A (Data migration) → Phase B & C (Admin tools) → Phase D (Feature flags) → Phase E (Theme) → Phase F (Media) → Phase G (Roles)
+```
+
+Har phase ka deployable output. Ek session mein ek phase.

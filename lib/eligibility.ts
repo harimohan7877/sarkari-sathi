@@ -17,6 +17,7 @@ export interface UserProfile {
 
 export interface Exam {
   id: string;
+  group?: string;
   name: string;
   name_hindi?: string;
   short_name?: string;

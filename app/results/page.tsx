@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { checkEligibility, getDaysRemaining, getFeeByCategory, type UserProfile, type Exam, type EligibilityResult } from "@/lib/eligibility";
+import { getGroupByBoard, getGroupInitials } from "@/lib/groups";
 import { supabase } from "@/lib/supabase";
 import examsData from "@/data/exams.json";
 import AuthPromptModal from "@/components/AuthPromptModal";
@@ -266,7 +267,27 @@ function ResultsPageInner() {
                         >
                           <div className="flex justify-between items-start mb-3 gap-3">
                             <div className="min-w-0">
-                              <p className="text-[10px] text-[hsl(215,16%,55%)] font-bold uppercase tracking-wider mb-1 font-outfit">{exam.board}</p>
+                              <div className="flex items-center gap-1.5 mb-1">
+                                <p className="text-[10px] text-[hsl(215,16%,55%)] font-bold uppercase tracking-wider font-outfit">{exam.board}</p>
+                                {(() => {
+                                  const g = getGroupByBoard((exam as Exam).board);
+                                  if (!g) return null;
+                                  return (
+                                    <Link
+                                      href={`/category/${g.id}`}
+                                      className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full transition-all hover:opacity-80"
+                                      style={{ background: `${g.color}15`, color: g.color }}
+                                    >
+                                      {g.logo_url ? (
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img src={g.logo_url} alt="" className="w-3 h-3 rounded-full object-contain" />
+                                      ) : (
+                                        <span className="text-[8px]">{getGroupInitials(g.name)}</span>
+                                      )}
+                                    </Link>
+                                  );
+                                })()}
+                              </div>
                               <h3 className="text-base lg:text-lg font-bold text-[hsl(222,47%,12%)] font-noto leading-tight">
                                 {exam.name_hindi || exam.short_name || exam.name}
                               </h3>

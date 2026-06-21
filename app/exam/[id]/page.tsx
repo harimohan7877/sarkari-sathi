@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useRef, use, startTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { getExamById, type Exam, type UserProfile } from "@/lib/eligibility";
+import { getGroupByExamId, getGroupInitials, type Group } from "@/lib/groups";
 import { supabase } from "@/lib/supabase";
 import { User } from "@/lib/types";
 
@@ -125,6 +127,7 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
   const { id } = use(params);
   const router = useRouter();
   const [exam, setExam] = useState<Exam | null>(null);
+  const [group, setGroup] = useState<Group | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -217,6 +220,8 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
       const e = getExamById(id);
       if (e) {
         setExam(e);
+        const g = getGroupByExamId(e.id);
+        if (g) setGroup(g);
         setMessages([{ role: "assistant", content: `नमस्ते! 🙏 मैं आपको **${e.short_name || e.name}** के बारे में पूरी जानकारी दे सकता हूँ।\n\nनीचे कोई भी सवाल पूछें या quick buttons use करें! ⬇️` }]);
       }
     };
@@ -427,10 +432,27 @@ export default function ExamPage({ params }: { params: Promise<{ id: string }> }
           ← वापस
         </button>
         <h1
-          className="text-white text-sm md:text-base font-bold truncate max-w-[50%]"
+          className="text-white text-sm md:text-base font-bold truncate max-w-[50%] flex items-center gap-2"
           style={{ fontFamily: 'var(--font-noto)' }}
         >
-          {exam.short_name || exam.name}
+          {group && (
+            <Link
+              href={`/category/${group.id}`}
+              className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-all flex-shrink-0"
+              title={group.name}
+            >
+              {group.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={group.logo_url} alt="" className="w-4 h-4 rounded-full object-contain" />
+              ) : (
+                <span className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold bg-white/20">
+                  {getGroupInitials(group.name)}
+                </span>
+              )}
+              <span className="hidden sm:inline">{group.name_hi || group.name}</span>
+            </Link>
+          )}
+          <span className="truncate">{exam.short_name || exam.name}</span>
         </h1>
         <div className="flex items-center gap-2">
           <button

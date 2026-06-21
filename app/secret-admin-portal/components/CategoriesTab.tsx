@@ -2,6 +2,16 @@
 
 import { useState, useEffect, startTransition } from "react";
 
+function generateGroupLogo(name: string): string {
+  const cleanName = name.replace(/Exams?|Test|Exam/gi, '').trim();
+  const initials = cleanName.split(' ').map(w => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || 'G';
+  const hue = Math.floor(Math.random() * 360);
+  const color1 = `hsl(${hue}, 60%, 45%)`;
+  const color2 = `hsl(${hue}, 60%, 35%)`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="${color1}"/><stop offset="100%" stop-color="${color2}"/></linearGradient></defs><rect width="100" height="100" rx="20" fill="url(#g)"/><text x="50" y="62" text-anchor="middle" fill="white" font-size="${initials.length > 1 ? 28 : 36}" font-weight="bold" font-family="Arial">${initials}</text></svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
 interface Exam {
   id: number;
   sl: number;
@@ -69,11 +79,15 @@ export default function CategoriesTab({ getAuthHeaders }: { getAuthHeaders: () =
     e.preventDefault();
     if (!groupForm.id || !groupForm.name) return;
     setSaving(true);
+    const payload = { ...groupForm };
+    if (!payload.logo_url) {
+      payload.logo_url = generateGroupLogo(payload.name);
+    }
     try {
       const res = await fetch('/api/admin/groups', {
         method: 'POST',
         headers: getAuthHeaders(),
-        body: JSON.stringify(groupForm),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         showMsg('success', 'Group saved successfully!');

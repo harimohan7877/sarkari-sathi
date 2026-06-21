@@ -120,6 +120,7 @@
   "exams": [
     {
       "id": "rpsc-ras-2026",
+      "group": "rpsc",
       "name": "RPSC RAS (Rajasthan Administrative Service) 2026",
       "short_name": "RAS",
       "board": "RPSC",
@@ -209,6 +210,7 @@
 
     {
       "id": "rsmssb-patwari-2026",
+      "group": "rsmssb",
       "name": "RSMSSB Patwari Recruitment 2026",
       "short_name": "Patwari",
       "board": "RSMSSB",
@@ -314,6 +316,7 @@
 
     {
       "id": "rsmssb-ldc-2026",
+      "group": "rsmssb",
       "name": "RSMSSB LDC / Junior Assistant 2026",
       "short_name": "LDC",
       "board": "RSMSSB",
@@ -379,6 +382,7 @@
 
     {
       "id": "rajasthan-police-constable-2026",
+      "group": "rajasthan-police",
       "name": "Rajasthan Police Constable Recruitment 2026",
       "short_name": "Police Constable",
       "board": "Rajasthan Police",
@@ -451,6 +455,7 @@
 
     {
       "id": "bstc-2026",
+      "group": "rajasthan-teaching",
       "name": "BSTC (Pre D.El.Ed) Entrance Exam 2026",
       "short_name": "BSTC",
       "board": "Rajasthan Education Department (DEE)",
@@ -516,6 +521,7 @@
     },
     {
       "id": "rsmssb-computer-instructor-2026",
+      "group": "rsmssb",
       "name": "RSMSSB Senior & Basic Computer Instructor 2026",
       "short_name": "Computer Instructor",
       "board": "RSMSSB",
