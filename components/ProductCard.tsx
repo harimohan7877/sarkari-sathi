@@ -40,11 +40,6 @@ export default function ProductCard({ product, onBuyNow }: ProductCardProps) {
           </span>
         )}
 
-        {/* Product Type pill */}
-        <span className="absolute top-3 right-3 bg-gray-100 text-gray-700 text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider z-10">
-          {product.type}
-        </span>
-
         {/* Cover — subtle hover scale */}
         <div className={`w-[130px] h-[180px] rounded-r-md shadow-md bg-gradient-to-r ${coverColors[product.type]} p-4 flex flex-col justify-between border-l-3 border-black/25 group-hover:scale-[1.08] group-hover:-translate-y-1 transition-all duration-400 ease-out`}>
           <span className="text-[7px] text-gray-400 tracking-[0.2em] uppercase font-mono">{product.language}</span>
