@@ -56,15 +56,20 @@ export default function SidebarCategories() {
                     className="flex-1 px-5 py-3.5 text-left text-xs font-semibold text-gray-800 hover:bg-gray-50 transition-colors uppercase tracking-wider font-mono"
                     style={{ textDecoration: 'none' }}
                   >
-                    <span className="flex items-center gap-2">
-                      {groupData && (
+                    <span className="flex items-center gap-2.5">
+                      {groupData?.logo_url ? (
+                        <span className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 bg-white border border-gray-100">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={groupData.logo_url} alt="" className="w-full h-full object-contain" />
+                        </span>
+                      ) : groupData?.color ? (
                         <span
                           className="w-5 h-5 rounded-lg flex items-center justify-center text-[8px] font-bold text-white flex-shrink-0"
                           style={{ background: groupData.color }}
                         >
                           {getGroupInitials(groupData.name)}
                         </span>
-                      )}
+                      ) : null}
                       {cleanGroupName}
                     </span>
                   </Link>
@@ -73,7 +78,15 @@ export default function SidebarCategories() {
                     onClick={() => toggleGroup(group)}
                     className="flex-1 px-5 py-3.5 text-left text-xs font-semibold text-gray-800 hover:bg-gray-50 transition-colors uppercase tracking-wider font-mono"
                   >
-                    <span className={isExpanded ? "text-black" : "text-gray-600"}>{cleanGroupName}</span>
+                    <span className="flex items-center gap-2.5">
+                      {groupData?.logo_url ? (
+                        <span className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0 bg-white border border-gray-100">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={groupData.logo_url} alt="" className="w-full h-full object-contain" />
+                        </span>
+                      ) : null}
+                      <span className={isExpanded ? "text-black" : "text-gray-600"}>{cleanGroupName}</span>
+                    </span>
                   </button>
                 )}
                 <button

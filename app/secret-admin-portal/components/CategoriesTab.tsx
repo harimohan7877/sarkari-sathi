@@ -312,11 +312,34 @@ export default function CategoriesTab({ getAuthHeaders }: { getAuthHeaders: () =
                     placeholder="राजस्थान RSMSSB परीक्षाएं"
                     className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#10b981]" />
                 </div>
-                {/* Logo URL */}
+                {/* Logo Upload / URL */}
                 <div className="col-span-2">
-                  <label className="block text-[10px] text-gray-400 uppercase mb-1">Logo URL</label>
+                  <label className="block text-[10px] text-gray-400 uppercase mb-1">Logo Image</label>
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden border border-[#2a2d3a] bg-[#0f1117] flex items-center justify-center flex-shrink-0">
+                      {groupForm.logo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={groupForm.logo_url} alt="logo preview" className="w-full h-full object-contain" />
+                      ) : (
+                        <span className="text-xs text-gray-600">No img</span>
+                      )}
+                    </div>
+                    <label className="cursor-pointer bg-[#2a2d3a] hover:bg-[#3a3d4d] text-gray-300 text-xs px-3 py-2 rounded-xl transition-colors">
+                      Upload Image
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const dataUrl = ev.target?.result as string;
+                          setGroupForm({ ...groupForm, logo_url: dataUrl });
+                        };
+                        reader.readAsDataURL(file);
+                      }} />
+                    </label>
+                  </div>
                   <input value={groupForm.logo_url} onChange={e => setGroupForm({ ...groupForm, logo_url: e.target.value })}
-                    placeholder="/logos/group-name.jpg"
+                    placeholder="Ya URL daalein: /logos/group-name.jpg"
                     className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#10b981]" />
                 </div>
                 {/* Meta Title */}

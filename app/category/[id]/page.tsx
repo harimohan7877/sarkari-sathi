@@ -23,78 +23,98 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
   const initials = getGroupInitials(group.name);
 
   return (
-    <main className="min-h-screen bg-[hsl(210,40%,98%)] pb-8 font-noto">
-      <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(24,100%,50%)] via-white to-[hsl(142,70%,29%)] z-[60]" />
-
-      <header className="bg-[hsl(222,47%,12%)] h-16 px-4 lg:px-10 flex items-center fixed top-1 left-0 right-0 z-50 shadow-lg">
-        <div className="flex items-center gap-3 flex-1 max-w-7xl mx-auto w-full">
-          <Link href="/" className="text-white/90 hover:text-white font-semibold text-sm font-noto flex items-center gap-1">← वापस</Link>
-          <h1 className="flex-1 text-center text-white text-lg font-bold font-noto">{group.name_hi}</h1>
+    <main className="min-h-screen bg-[#fbfbf5]">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-10">
+        {/* Header */}
+        <div className="mb-8">
+          <Link href="/" className="text-xs text-gray-500 hover:text-black transition-colors font-mono uppercase tracking-wider">← Back to Home</Link>
         </div>
-      </header>
 
-      <div className="pt-24 px-4 lg:px-10 max-w-7xl mx-auto">
-        {/* Group Header */}
-        <div
-          className="rounded-3xl p-6 lg:p-8 mb-6 text-white shadow-elevated relative overflow-hidden"
-          style={{ background: `linear-gradient(135deg, ${group.color}, #1a1a2e)` }}
-        >
-          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
-          <div className="relative flex items-center gap-5">
-            <div
-              className="w-16 h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center text-xl lg:text-2xl font-bold shadow-lg flex-shrink-0"
-              style={{ background: 'rgba(255,255,255,0.2)' }}
-            >
-              {group.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={group.logo_url} alt={group.name} className="w-full h-full object-contain rounded-2xl" />
-              ) : (
-                initials
-              )}
-            </div>
-            <div>
-              <h2 className="text-2xl lg:text-3xl font-bold">{group.name}</h2>
-              <p className="text-white/80 text-sm mt-1">{group.name_hi}</p>
-              <p className="text-white/60 text-xs mt-1">{exams.length} परीक्षाएं</p>
-            </div>
+        {/* Group Header Card */}
+        <div className="bg-white border border-gray-100 rounded-sm p-6 md:p-8 mb-8 flex items-center gap-5 shadow-sm">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden border-2 border-gray-100 bg-white flex items-center justify-center flex-shrink-0">
+            {group.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={group.logo_url} alt={group.name} className="w-full h-full object-contain p-1" />
+            ) : (
+              <span
+                className="w-full h-full flex items-center justify-center text-sm font-bold text-white"
+                style={{ background: group.color || '#333' }}
+              >
+                {initials}
+              </span>
+            )}
+          </div>
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-900 font-mono uppercase tracking-wide">{group.name}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{group.name_hi}</p>
+            <p className="text-xs text-gray-400 mt-1 font-mono">{exams.length} exams in this category</p>
           </div>
         </div>
 
-        {/* Exams List */}
-        <div className="space-y-3">
-          {exams.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 text-center shadow-premium border border-[hsl(214,32%,91%)]">
-              <p className="text-4xl mb-3">📋</p>
-              <h3 className="text-lg font-bold text-[hsl(222,47%,12%)] font-noto">कोई परीक्षा नहीं मिली</h3>
-              <p className="text-sm text-[hsl(215,16%,55%)] mt-1 font-noto">इस श्रेणी में अभी कोई परीक्षा उपलब्ध नहीं है।</p>
-            </div>
-          ) : (
-            exams.map((exam) => (
+        {/* Exams Grid — Book Style Cards */}
+        {exams.length === 0 ? (
+          <div className="bg-white border border-gray-100 rounded-sm p-12 text-center">
+            <p className="text-4xl mb-3">📋</p>
+            <h3 className="text-sm font-bold text-gray-900 font-mono uppercase tracking-wider mb-1">No exams found</h3>
+            <p className="text-xs text-gray-500">Exams will appear here once added to this category.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {exams.map((exam) => (
               <Link
                 key={exam.id}
                 href={`/exam/${exam.id}`}
-                className="block bg-white rounded-2xl p-5 shadow-premium border border-[hsl(214,32%,91%)] hover:shadow-elevated transition-all"
-                style={{ borderLeftWidth: '4px', borderLeftColor: group.color }}
+                className="bg-white border border-gray-100 rounded-sm overflow-hidden hover:shadow-halo transition-all group flex flex-col"
               >
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0"
-                    style={{ background: `${group.color}15`, color: group.color }}
-                  >
-                    {initials}
+                {/* Book Cover Visual */}
+                <div className="h-48 bg-gradient-to-br from-gray-50 to-gray-100 border-b border-gray-100 flex items-center justify-center p-6 relative">
+                  {group.logo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={group.logo_url}
+                      alt={exam.name}
+                      className="w-16 h-16 object-contain opacity-20 group-hover:opacity-30 transition-opacity"
+                    />
+                  ) : (
+                    <span
+                      className="text-3xl font-bold opacity-10 group-hover:opacity-20 transition-opacity"
+                      style={{ color: group.color || '#333' }}
+                    >
+                      {initials}
+                    </span>
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-20 h-28 bg-white rounded-r-sm shadow-md border border-gray-200 flex items-center justify-center p-2 group-hover:-translate-y-1 transition-transform">
+                      <span className="text-[9px] font-bold text-gray-800 text-center font-mono uppercase leading-tight">
+                        {exam.short_name || exam.name.split(' ').slice(0, 2).join(' ')}
+                      </span>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-bold text-[hsl(222,47%,12%)] font-noto truncate">
-                      {exam.name_hindi || exam.short_name || exam.name}
-                    </h3>
-                    <p className="text-xs text-[hsl(215,16%,55%)] mt-0.5 font-noto">{exam.board}</p>
+                </div>
+
+                {/* Content */}
+                <div className="p-4 flex flex-col flex-1">
+                  <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider mb-1">{exam.board}</span>
+                  <h3 className="text-sm font-bold text-gray-900 font-mono uppercase leading-snug mb-2 group-hover:opacity-70 transition-opacity">
+                    {exam.name_hindi || exam.short_name || exam.name}
+                  </h3>
+                  <div className="mt-auto flex items-center justify-between">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                      exam.status === 'open' ? 'bg-green-100 text-green-700' :
+                      exam.status === 'upcoming' ? 'bg-blue-100 text-blue-700' :
+                      exam.status === 'expected' ? 'bg-amber-100 text-amber-700' :
+                      'bg-gray-100 text-gray-500'
+                    }`}>
+                      {exam.status === 'open' ? 'Open' : exam.status === 'upcoming' ? 'Upcoming' : exam.status === 'expected' ? 'Expected' : exam.status}
+                    </span>
+                    <span className="text-[11px] text-gray-400 font-mono">→</span>
                   </div>
-                  <span className="text-[hsl(215,16%,55%)] text-lg">→</span>
                 </div>
               </Link>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

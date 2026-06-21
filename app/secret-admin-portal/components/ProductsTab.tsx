@@ -376,18 +376,35 @@ export default function ProductsTab({ getAuthHeaders }: { getAuthHeaders: () => 
                     <option value="Bilingual">Bilingual</option>
                   </select>
                 </div>
-                {/* Cover Image */}
+                {/* Cover Image Upload / URL */}
                 <div className="col-span-2">
-                  <label className="block text-[10px] text-gray-400 uppercase mb-1">Cover Image URL</label>
-                  <input value={form.cover_image} onChange={e => setForm({ ...form, cover_image: e.target.value })}
-                    placeholder="/images/products/patwari-notes.jpg"
-                    className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#10b981]" />
-                  {form.cover_image && (
-                    <div className="mt-2 w-14 h-14 rounded-lg overflow-hidden border border-[#2a2d3a]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={form.cover_image} alt="preview" className="w-full h-full object-contain" />
+                  <label className="block text-[10px] text-gray-400 uppercase mb-1">Cover Image</label>
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="w-14 h-14 rounded-lg overflow-hidden border border-[#2a2d3a] bg-[#0f1117] flex items-center justify-center flex-shrink-0">
+                      {form.cover_image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={form.cover_image} alt="cover preview" className="w-full h-full object-contain" />
+                      ) : (
+                        <span className="text-xs text-gray-600">No img</span>
+                      )}
                     </div>
-                  )}
+                    <label className="cursor-pointer bg-[#2a2d3a] hover:bg-[#3a3d4d] text-gray-300 text-xs px-3 py-2 rounded-xl transition-colors">
+                      Upload Image
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const dataUrl = ev.target?.result as string;
+                          setForm({ ...form, cover_image: dataUrl });
+                        };
+                        reader.readAsDataURL(file);
+                      }} />
+                    </label>
+                  </div>
+                  <input value={form.cover_image} onChange={e => setForm({ ...form, cover_image: e.target.value })}
+                    placeholder="Ya URL daalein: /images/products/patwari-notes.jpg"
+                    className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#10b981]" />
                 </div>
                 {/* Google Drive Link */}
                 <div className="col-span-2">
