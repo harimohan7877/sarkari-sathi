@@ -180,3 +180,65 @@ INSERT INTO admin_settings (active_provider)
 SELECT 'openrouter'
 WHERE NOT EXISTS (SELECT 1 FROM admin_settings);
 
+
+-- ═══════════════════════════════════════════
+-- SARKARI SAATHI — E-COMMERCE MARKETPLACE TABLES
+-- ═══════════════════════════════════════════
+
+-- Table 6: Marketplace Groups (Exam Groups/Categories)
+CREATE TABLE IF NOT EXISTS marketplace_groups (
+  id TEXT PRIMARY KEY, -- Group name slug or custom ID (e.g. 'rajasthan-rsmssb-exams')
+  name TEXT NOT NULL,
+  logo_url TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Table 7: Marketplace Products (Notes, MCQs, Mock Tests)
+CREATE TABLE IF NOT EXISTS marketplace_products (
+  id TEXT PRIMARY KEY, -- Slug or custom UUID (e.g. 'rsmssb-patwari-notes')
+  title TEXT NOT NULL,
+  exam_name TEXT NOT NULL,
+  group_id TEXT REFERENCES marketplace_groups(id) ON DELETE SET NULL,
+  type TEXT NOT NULL, -- 'Notes', 'MCQ', 'Mock Test'
+  price NUMERIC(10, 2) NOT NULL,
+  sale_price NUMERIC(10, 2) NOT NULL,
+  pages INTEGER,
+  language TEXT NOT NULL, -- 'Hindi', 'English', 'Bilingual'
+  file_url TEXT, -- Link to Google Drive folder or PDF (manual delivery link)
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Table 8: Marketplace Orders (Razorpay integration & Manual Email delivery tracking)
+CREATE TABLE IF NOT EXISTS marketplace_orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_name TEXT NOT NULL,
+  customer_email TEXT NOT NULL,
+  product_id TEXT REFERENCES marketplace_products(id) ON DELETE SET NULL,
+  amount NUMERIC(10, 2) NOT NULL,
+  payment_status TEXT DEFAULT 'pending', -- 'pending', 'paid', 'failed'
+  razorpay_order_id TEXT UNIQUE,
+  razorpay_payment_id TEXT,
+  delivery_status TEXT DEFAULT 'pending', -- 'pending', 'delivered'
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE marketplace_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketplace_products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE marketplace_orders ENABLE ROW LEVEL SECURITY;
+
+-- Policies
+CREATE POLICY "Allow public read access to groups" ON marketplace_groups
+  FOR SELECT USING (TRUE);
+
+CREATE POLICY "Allow public read access to products" ON marketplace_products
+  FOR SELECT USING (TRUE);
+
+CREATE POLICY "Allow anyone to create an order" ON marketplace_orders
+  FOR INSERT WITH CHECK (TRUE);
+
+CREATE POLICY "Allow admin to manage all orders" ON marketplace_orders
+  FOR ALL USING (TRUE);
+
+
