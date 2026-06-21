@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
@@ -11,22 +11,42 @@ import productsMock from "@/data/products_mock.json";
 
 function HomeContent() {
   const searchParams = useSearchParams();
-  const allProducts = productsMock as Product[];
-  const [selectedType, setSelectedType] = useState<string>("All");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>(searchParams.get("q") || "");
   const [checkoutProduct, setCheckoutProduct] = useState<Product | null>(null);
   const [customerEmail, setCustomerEmail] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
   const [orderSuccess, setOrderSuccess] = useState<boolean>(false);
 
-  // Filter products based on search and selected type tab
-  const filteredProducts = allProducts.filter((product) => {
-    const matchesType = selectedType === "All" || product.type === selectedType;
+  // Fetch products from database API with local fallback
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const res = await fetch("/api/products");
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data.products);
+        } else {
+          setProducts(productsMock as Product[]);
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setProducts(productsMock as Product[]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProducts();
+  }, []);
+
+  // Filter products based on search
+  const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.examName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.groupName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesType && matchesSearch;
+    return matchesSearch;
   });
 
   const handleBuyNow = (product: Product) => {
@@ -95,7 +115,17 @@ function HomeContent() {
             </div>
 
             {/* Products Grid */}
-            {filteredProducts.length > 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="bg-white border border-gray-100 rounded-sm p-4 h-[380px] animate-pulse flex flex-col justify-between">
+                    <div className="h-[240px] bg-gray-100 rounded-sm mb-4" />
+                    <div className="h-4 bg-gray-100 w-3/4 rounded-sm mb-2" />
+                    <div className="h-3 bg-gray-100 w-1/2 rounded-sm" />
+                  </div>
+                ))}
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard
