@@ -8,6 +8,7 @@ interface ExamData {
   group?: string;
   name: string;
   short_name?: string;
+  logo_url?: string;
   board: string;
   status: string;
   last_date?: string | null;
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { id, group, name, short_name, board, status, last_date, form_start, expected_vacancies, official_url, fee, eligibility, selection_process, subjects, disclaimer } = body;
+    const { id, group, name, short_name, logo_url, board, status, last_date, form_start, expected_vacancies, official_url, fee, eligibility, selection_process, subjects, disclaimer } = body;
 
     if (!id || !name) {
       return NextResponse.json({ error: 'Exam ID and Name required' }, { status: 400 });
@@ -103,6 +104,7 @@ export async function POST(req: NextRequest) {
       group: group || '',
       name,
       short_name: short_name || '',
+      logo_url: logo_url || undefined,
       board: board || '',
       status: status || 'expected',
       last_date: last_date || null,

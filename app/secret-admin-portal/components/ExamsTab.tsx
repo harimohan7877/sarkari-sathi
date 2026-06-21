@@ -7,6 +7,7 @@ interface ExamData {
   group?: string;
   name: string;
   short_name?: string;
+  logo_url?: string;
   board: string;
   status: string;
   last_date?: string | null;
@@ -37,6 +38,7 @@ interface ExamFormData {
   form_start: string;
   expected_vacancies: string;
   official_url: string;
+  logo_url: string;
   fee_general: string;
   fee_obc: string;
   fee_sc_st: string;
@@ -58,7 +60,7 @@ export default function ExamsTab({ getAuthHeaders }: { getAuthHeaders: () => Rec
 
   const [form, setForm] = useState<ExamFormData>({
     id: '', group: '', name: '', short_name: '', board: '', status: 'expected',
-    last_date: '', form_start: '', expected_vacancies: '', official_url: '',
+    last_date: '', form_start: '', expected_vacancies: '', official_url: '', logo_url: '',
     fee_general: '', fee_obc: '', fee_sc_st: '', eligibility_education: '',
     eligibility_min_age: '', eligibility_max_age: '', disclaimer: '',
   });
@@ -104,6 +106,7 @@ export default function ExamsTab({ getAuthHeaders }: { getAuthHeaders: () => Rec
         form_start: exam.form_start || '',
         expected_vacancies: exam.expected_vacancies || '',
         official_url: exam.official_url,
+        logo_url: exam.logo_url || '',
         fee_general: String(exam.fee?.general_OBC_creamy ?? exam.fee?.general_ews ?? exam.fee?.general ?? ''),
         fee_obc: String(exam.fee?.obc_sbc ?? exam.fee?.SC_ST_OBC_non_creamy_EWS_PwD ?? ''),
         fee_sc_st: String(exam.fee?.sc_st ?? ''),
@@ -115,7 +118,7 @@ export default function ExamsTab({ getAuthHeaders }: { getAuthHeaders: () => Rec
     } else {
       setForm({
         id: '', group: filterGroup, name: '', short_name: '', board: '', status: 'expected',
-        last_date: '', form_start: '', expected_vacancies: '', official_url: '',
+        last_date: '', form_start: '', expected_vacancies: '', official_url: '', logo_url: '',
         fee_general: '', fee_obc: '', fee_sc_st: '', eligibility_education: '',
         eligibility_min_age: '', eligibility_max_age: '', disclaimer: '',
       });
@@ -135,6 +138,7 @@ export default function ExamsTab({ getAuthHeaders }: { getAuthHeaders: () => Rec
         group: form.group,
         name: form.name,
         short_name: form.short_name,
+        logo_url: form.logo_url || undefined,
         board: form.board,
         status: form.status,
         last_date: form.last_date || null,
@@ -377,6 +381,38 @@ export default function ExamsTab({ getAuthHeaders }: { getAuthHeaders: () => Rec
                   <input value={form.official_url} onChange={e => setForm({ ...form, official_url: e.target.value })}
                     placeholder="https://rsmssb.rajasthan.gov.in"
                     className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#10b981]" />
+                </div>
+
+                {/* Logo Upload */}
+                <div className="col-span-2 border-t border-[#2a2d3a] pt-4">
+                  <h4 className="text-xs font-semibold text-gray-300 mb-3">Exam Logo</h4>
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden border border-[#2a2d3a] bg-[#0f1117] flex items-center justify-center flex-shrink-0">
+                      {form.logo_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={form.logo_url} alt="logo preview" className="w-full h-full object-contain" />
+                      ) : (
+                        <span className="text-xs text-gray-600">No img</span>
+                      )}
+                    </div>
+                    <label className="cursor-pointer bg-[#2a2d3a] hover:bg-[#3a3d4d] text-gray-300 text-xs px-3 py-2 rounded-xl transition-colors">
+                      Upload Image
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                          const dataUrl = ev.target?.result as string;
+                          setForm({ ...form, logo_url: dataUrl });
+                        };
+                        reader.readAsDataURL(file);
+                      }} />
+                    </label>
+                  </div>
+                  <input value={form.logo_url} onChange={e => setForm({ ...form, logo_url: e.target.value })}
+                    placeholder="Logo URL ya group logo use automatic"
+                    className="w-full bg-[#0f1117] border border-[#2a2d3a] rounded-xl px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#10b981]" />
+                  <p className="text-[10px] text-gray-600 mt-1">Khaali chhodein to group logo automatic use hoga</p>
                 </div>
 
                 {/* Fee Section */}
