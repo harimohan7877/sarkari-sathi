@@ -1,22 +1,9 @@
 import type { Metadata } from "next";
-import { Outfit, Noto_Sans_Devanagari } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const notoSansDevanagari = Noto_Sans_Devanagari({
-  variable: "--font-noto",
-  subsets: ["devanagari"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: "Sarkari Saathi | राजस्थान सरकारी नौकरी गाइड",
-  description: "Rajasthan ke government job seekers ke liye AI-powered Hindi form filling guide",
+  title: "Sarkari Saathi | Premium Rajasthan Study Materials",
+  description: "Rajasthan government exam preparation — notes, MCQs, and mock tests with immediate email delivery.",
 };
 
 export default function RootLayout({
@@ -25,11 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="hi"
-      className={`${outfit.variable} ${notoSansDevanagari.variable} antialiased`}
-    >
-      <body className="min-h-screen flex flex-col bg-[hsl(210,40%,98%)] text-[hsl(222,47%,12%)]">
+    <html lang="hi">
+      <body className="min-h-screen flex flex-col">
         {children}
       </body>
     </html>
