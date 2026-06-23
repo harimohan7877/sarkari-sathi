@@ -1,35 +1,29 @@
-# SARKARI SAATHI — Session Summary (2026-05-19)
+# SARKARI SAATHI — Session Summary (2026-06-23)
 
-## 1. Summary of Changes
-Maine Vercel deployment error ko fix kar diya hai aur Next.js 16 ke naye standards ke hisaab se codebase ko update kiya hai.
+## 1. Razorpay Real Integration
+- **Mock code removed** from `create-marketplace-order/route.ts` — ab hamesha real Razorpay order create hota hai
+- **Mock code removed** from `verify-marketplace/route.ts` — strict HMAC-SHA256 signature verification
+- **Mock branch removed** from `app/page.tsx` checkout handler — ab direct Razorpay popup khulta hai
+- **Cart closure bug fixed** — `useRef` se cart snapshot capture kiya taaki payment handler mein hamesha sahi cart rahe
+- **Error handling** in `CartDrawer.tsx` — payment fail hone par error message dikhta hai
+- **`.env.local` fixed** — proper env var names with real test keys (`rzp_test_T54MKK5H47huwt`)
 
-### ✅ Razorpay Deployment Fix
-*   **Build Error Resolved:** `create-order` API route me Razorpay SDK initialization ko "lazy load" kar diya hai. Ab build time par agar keys missing hain (Vercel dashboard me add karne se pehle), toh bhi build fail nahi hoga.
-*   **Safe Execution:** Razorpay client ab sirf tab banta hai jab koi payment request aati hai.
+## 2. Google OAuth Login (Supabase)
+- **New file:** `app/auth/callback/page.tsx` — Google OAuth callback handler
+- **Updated:** `app/auth/page.tsx` — "Continue with Google" button + "Continue with Email" (mock) option
+- **Updated:** `components/Navbar.tsx` — logged in user ka naam/profile dikhta hai, dropdown with Sign out
+- Backward compatible — existing mock auth still works alongside Google login
 
-### ✅ Next.js 16 Proxy Migration
-*   **Middleware to Proxy:** `middleware.ts` ka naam badal kar `proxy.ts` kar diya hai kyunki Next.js 16 me purana convention deprecate ho gaya hai.
-*   **Export Update:** Function ka naam `middleware` se badal kar `proxy` kar diya hai taaki build pass ho sake.
+## 3. Fixes Applied
+- `npm run lint` — 0 errors
+- `npx tsc --noEmit` — 0 errors
 
-### ✅ Smart Tier & Save Feature
-*   **Tier API:** Naya API route (`/api/user/tier`) banaya jo user ki chat limits track karta hai.
-*   **Save Exam:** Exam page par "Save ❤️" functionality add ki hai jo logged-in users ke liye database me data save karti hai.
-*   **Redundant Files:** Purane `app/guide` folder ko delete kar diya hai (ab sab `app/exam/[id]` me hai).
+## 4. Vercel Setup Needed
+Environment variables Vercel dashboard mein daalne hain (`.env.local` se copy):
+- Supabase (URL + anon key + service role key)
+- Razorpay test keys (KEY_ID, KEY_SECRET, NEXT_PUBLIC_KEY_ID)
+- OpenRouter API key + model config
+- App config (APP_NAME, APP_URL, FREE_MESSAGES_LIMIT)
 
----
-
-## 2. Action Required (Vercel Dashboard)
-
-Deployment ab pass honi chahiye, lekin feature chalne ke liye aapko **Vercel Dashboard** me ye keys add karni hongi:
-
-1.  `RAZORPAY_KEY_ID`
-2.  `RAZORPAY_KEY_SECRET`
-3.  `NEXT_PUBLIC_RAZORPAY_KEY_ID` (Same as above)
-
-Baki keys (`SUPABASE`, `OPENROUTER`) pehle se set honi chahiye as per previous handover.
-
----
-
-## 3. How to Deploy?
-Aap bas `deploy.bat` run karein ya Vercel Dashboard me "Redeploy" par click karein.
-Build ab **✓ Compiled successfully** hogi.
+## 5. Baaki Kaam
+- Product files (`drive_url`) — 9 products ke actual PDF/Google Drive links daalne hain

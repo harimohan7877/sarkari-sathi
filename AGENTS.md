@@ -81,13 +81,14 @@ Two data systems coexist:
 | Checkout flow | Cart → payment → redirect to /download |
 | Products API | Returns `drive_url` to frontend |
 | Local JSON fallback | All admin CRUD falls back to JSON files |
+| **Razorpay real integration** | Mock code removed, real test keys (`rzp_test_T54MKK5H47huwt`), HMAC verification, cart closure fix |
+| **Google OAuth login** | Supabase Auth + Google Sign-In button, callback handler, Navbar user menu |
 
 ### ❌ BAKI (Pehli sale ke liye)
 | Priority | Feature | Notes |
 |----------|---------|-------|
 | 🔴 High | **Real products (actual PDF/MCQ files)** | Sirf 10 mock items, koi actual file nahi |
-| 🔴 High | **Razorpay live keys** | Payment mock hai, real gateway nahi |
-| 🔴 High | **Real auth (database session)** | localStorage mock hai |
+| 🔴 High | **Razorpay live keys on Vercel** | `.env.local` se Vercel dashboard mein env vars daalne hain |
 | 🟡 Medium | **Order history** | User purane orders nahi dekh sakta |
 | 🟡 Medium | **WhatsApp order notification** | Order aane par admin ko WA message |
 | 🟡 Medium | **Post-payment email delivery** | Google Drive link email se bhejna |
@@ -109,5 +110,8 @@ CSS custom properties for all tokens. Reusable classes:
 Fonts loaded via CSS `@import` (not Next.js font loader). `layout.tsx` uses no font loader.
 
 ## Recent commits
-- `be6aa5d` feat: per-exam logo_url with admin upload, category book cards show group logo badge
+- `eae98aa` feat: Google OAuth login via Supabase - callback page, auth page, Navbar user menu
+- `d3e8043` fix: Razorpay real integration - removed mock fallback, fixed env keys, cart closure bug
+- `e85c5e0` feat: exam page with products, drive_url delivery, /download page, AGENTS.md update
 - `6364eb3` fix: replace book box with proper book cover design on exam cards
+- `be6aa5d` feat: per-exam logo_url with admin upload, category book cards show group logo badge
