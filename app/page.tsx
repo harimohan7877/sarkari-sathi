@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, startTransition } from "react";
+import { useState, useEffect, useRef, Suspense, startTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import HeroSlider from "@/components/HeroSlider";
@@ -21,6 +21,11 @@ function HomeContent() {
   const [cart, setCart] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState<boolean>(false);
+  const cartRef = useRef<Product[]>(cart);
+
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
 
   useEffect(() => {
     const stored = localStorage.getItem("sarkari_saathi_cart");
@@ -81,8 +86,9 @@ function HomeContent() {
 
   const handleCartCheckoutSubmit = async (name: string, email: string) => {
     setIsCheckoutLoading(true);
+    const currentCart = cartRef.current;
     try {
-      const subtotal = cart.reduce((sum, item) => sum + item.salePrice, 0);
+      const subtotal = currentCart.reduce((sum, item) => sum + item.salePrice, 0);
 
       const res = await fetch("/api/payment/create-marketplace-order", {
         method: "POST",
@@ -90,47 +96,29 @@ function HomeContent() {
         body: JSON.stringify({
           customerName: name,
           customerEmail: email,
-          products: cart.map((item) => ({ id: item.id, salePrice: item.salePrice })),
+          products: currentCart.map((item) => ({ id: item.id, salePrice: item.salePrice })),
           totalAmount: subtotal,
         }),
       });
 
-      if (!res.ok) throw new Error("Order creation failed");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Order creation failed");
+      }
       const orderData = await res.json();
       const orderId = orderData.orderId;
 
-      if (orderData.isMock) {
-        const verifyRes = await fetch("/api/payment/verify-marketplace", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId: orderId,
-            paymentId: "pay_mock_" + Math.random().toString(36).substring(7),
-            signature: "mock_signature",
-          }),
-        });
-
-        if (verifyRes.ok) {
-          sessionStorage.setItem("purchased_items", JSON.stringify(cart));
-          window.location.href = "/download";
-          setCart([]);
-          localStorage.removeItem("sarkari_saathi_cart");
-          setIsCartOpen(false);
-        } else {
-          alert("Verification failed for mock payment.");
-        }
-      } else {
-        const options = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_placeholder",
-          amount: Math.round(subtotal * 100),
-          currency: "INR",
-          name: "Sarkari Saathi",
-          description: "Exam Study Materials Payment",
-          order_id: orderId,
-          prefill: {
-            name: name,
-            email: email,
-          },
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_T54MKK5H47huwt",
+        amount: Math.round(subtotal * 100),
+        currency: "INR",
+        name: "Sarkari Saathi",
+        description: "Exam Study Materials Payment",
+        order_id: orderId,
+        prefill: {
+          name: name,
+          email: email,
+        },
           handler: async function (response: Record<string, string>) {
             const verifyRes = await fetch("/api/payment/verify-marketplace", {
               method: "POST",
@@ -142,7 +130,7 @@ function HomeContent() {
               }),
             });
             if (verifyRes.ok) {
-              sessionStorage.setItem("purchased_items", JSON.stringify(cart));
+              sessionStorage.setItem("purchased_items", JSON.stringify(currentCart));
               window.location.href = "/download";
               setCart([]);
               localStorage.removeItem("sarkari_saathi_cart");
@@ -151,20 +139,24 @@ function HomeContent() {
               alert("Payment verification failed. Please contact support.");
             }
           },
-          theme: {
-            color: "#000000",
+        modal: {
+          ondismiss: function () {
+            setIsCheckoutLoading(false);
           },
-        };
-        interface RazorpayInstance {
-          open: () => void;
-        }
-        interface RazorpayConstructor {
-          new (options: Record<string, unknown>): RazorpayInstance;
-        }
-        const RazorpayCtor = (window as unknown as { Razorpay: RazorpayConstructor }).Razorpay;
-        const rzp = new RazorpayCtor(options);
-        rzp.open();
+        },
+        theme: {
+          color: "#000000",
+        },
+      };
+      interface RazorpayInstance {
+        open: () => void;
       }
+      interface RazorpayConstructor {
+        new (options: Record<string, unknown>): RazorpayInstance;
+      }
+      const RazorpayCtor = (window as unknown as { Razorpay: RazorpayConstructor }).Razorpay;
+      const rzp = new RazorpayCtor(options);
+      rzp.open();
     } catch (err) {
       console.error("Checkout error:", err);
       alert("Checkout failed. Please try again.");

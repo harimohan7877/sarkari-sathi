@@ -12,24 +12,22 @@ export async function POST(req: NextRequest) {
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-    // Perform signature check only if key is not a placeholder and exists
-    if (keySecret && !orderId.startsWith("order_mock_") && signature) {
-      try {
-        const text = `${orderId}|${paymentId}`;
-        const expectedSignature = crypto
-          .createHmac("sha256", keySecret)
-          .update(text)
-          .digest("hex");
+    if (!keySecret) {
+      return NextResponse.json({ error: "Razorpay secret not configured" }, { status: 500 });
+    }
 
-        if (expectedSignature !== signature) {
-          return NextResponse.json({ success: false, error: "Invalid payment signature" }, { status: 400 });
-        }
-      } catch (cryptoErr) {
-        console.error("Crypto verification failed:", cryptoErr);
-        return NextResponse.json({ success: false, error: "Signature matching error" }, { status: 500 });
-      }
-    } else {
-      console.log(`Verifying mock payment for transaction: ${orderId}`);
+    if (!signature) {
+      return NextResponse.json({ success: false, error: "Missing payment signature" }, { status: 400 });
+    }
+
+    const text = `${orderId}|${paymentId}`;
+    const expectedSignature = crypto
+      .createHmac("sha256", keySecret)
+      .update(text)
+      .digest("hex");
+
+    if (expectedSignature !== signature) {
+      return NextResponse.json({ success: false, error: "Invalid payment signature" }, { status: 400 });
     }
 
     // Update payment_status to 'paid' in marketplace_orders for this transaction

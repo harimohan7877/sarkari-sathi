@@ -13,36 +13,31 @@ export async function POST(req: NextRequest) {
     const keyId = process.env.RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-    let razorpayOrderId = "order_mock_" + Math.random().toString(36).substring(7);
-
-    // Initialize Razorpay only if key is not a placeholder and keys exist
-    if (keyId && keySecret && keyId !== "rzp_test_placeholder") {
-      try {
-        const razorpay = new Razorpay({
-          key_id: keyId,
-          key_secret: keySecret,
-        });
-
-        const order = await razorpay.orders.create({
-          amount: Math.round(totalAmount * 100), // Razorpay expects paise (amount * 100)
-          currency: "INR",
-          receipt: `receipt_mp_${Date.now()}`,
-          notes: {
-            customerName,
-            customerEmail,
-            productCount: products.length,
-          },
-        });
-        
-        if (order && order.id) {
-          razorpayOrderId = order.id;
-        }
-      } catch (rzpErr) {
-        console.error("Razorpay order creation failed, falling back to mock:", rzpErr);
-      }
-    } else {
-      console.log("Using Mock Razorpay transaction (Razorpay credentials are placeholder/empty).");
+    if (!keyId || !keySecret) {
+      return NextResponse.json({ error: "Razorpay not configured on server" }, { status: 500 });
     }
+
+    const razorpay = new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret,
+    });
+
+    const order = await razorpay.orders.create({
+      amount: Math.round(totalAmount * 100),
+      currency: "INR",
+      receipt: `receipt_mp_${Date.now()}`,
+      notes: {
+        customerName,
+        customerEmail,
+        productCount: String(products.length),
+      },
+    });
+
+    if (!order || !order.id) {
+      return NextResponse.json({ error: "Failed to create Razorpay order" }, { status: 500 });
+    }
+
+    const razorpayOrderId = order.id;
 
     // Insert pending order entries into Supabase marketplace_orders
     // Insert one row per product so they can be individually tracked and delivered
@@ -69,7 +64,6 @@ export async function POST(req: NextRequest) {
       orderId: razorpayOrderId,
       amount: totalAmount,
       currency: "INR",
-      isMock: razorpayOrderId.startsWith("order_mock_"),
     });
 
   } catch (err: unknown) {

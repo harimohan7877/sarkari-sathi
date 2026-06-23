@@ -23,22 +23,28 @@ export default function CartDrawer({
   const [step, setStep] = useState<"cart" | "checkout">("cart");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.salePrice, 0);
 
   const handleCheckoutClick = () => {
     if (cartItems.length === 0) return;
+    setErrorMsg("");
     setStep("checkout");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
     if (!name.trim() || !email.trim()) return;
-    await onCheckoutSubmit(name, email);
-    // Reset states after complete
-    setName("");
-    setEmail("");
-    setStep("cart");
+    try {
+      await onCheckoutSubmit(name, email);
+      setName("");
+      setEmail("");
+      setStep("cart");
+    } catch {
+      setErrorMsg("Payment failed. Please try again.");
+    }
   };
 
   if (!isOpen) return null;
@@ -192,6 +198,12 @@ export default function CartDrawer({
                   </div>
                 </div>
               </div>
+
+              {errorMsg && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-xs px-4 py-3 rounded-sm">
+                  {errorMsg}
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="border-t border-gray-100 pt-6 mt-8 flex flex-col gap-3">
