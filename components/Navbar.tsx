@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 interface NavbarProps {
   cartCount?: number;
@@ -10,6 +12,55 @@ interface NavbarProps {
 
 export default function Navbar({ cartCount = 0, onCartClick }: NavbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [user, setUser] = useState<{ name?: string; email: string } | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem("mock_user_session");
+      if (!raw) return null;
+      const u = JSON.parse(raw);
+      return { name: u.user_metadata?.full_name || u.name, email: u.email };
+    } catch {
+      return null;
+    }
+  });
+  const [showDropdown, setShowDropdown] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata;
+        setUser({
+          name: meta?.full_name || meta?.name || session.user.email?.split("@")[0],
+          email: session.user.email || "",
+        });
+        localStorage.setItem("mock_user_session", JSON.stringify(session.user));
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata;
+        setUser({
+          name: meta?.full_name || meta?.name || session.user.email?.split("@")[0],
+          email: session.user.email || "",
+        });
+        localStorage.setItem("mock_user_session", JSON.stringify(session.user));
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    localStorage.removeItem("mock_user_session");
+    setUser(null);
+    setShowDropdown(false);
+    await supabase.auth.signOut();
+    router.push("/");
+  };
 
   return (
     <header className="w-full bg-white font-sans border-b border-gray-100 sticky top-0 z-50">
@@ -20,14 +71,14 @@ export default function Navbar({ cartCount = 0, onCartClick }: NavbarProps) {
 
       {/* Main Header Bar */}
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-3.5 flex items-center justify-between gap-6">
-        {/* Brand Logo - Shopify Minimalist Style */}
+        {/* Brand Logo */}
         <Link href="/" className="shrink-0 flex items-center">
           <span className="text-xl md:text-2xl font-bold tracking-tight text-black uppercase font-mono">
             Sarkari<span className="font-light text-gray-500">Sathi</span>
           </span>
         </Link>
 
-        {/* Minimalist Search Bar */}
+        {/* Search Bar */}
         <form
           action="/"
           method="GET"
@@ -57,7 +108,7 @@ export default function Navbar({ cartCount = 0, onCartClick }: NavbarProps) {
           </div>
         </form>
 
-        {/* Navigation & Cart/Login Action */}
+        {/* Navigation & Cart/Login */}
         <div className="flex items-center gap-4 md:gap-6 shrink-0">
           {/* Cart Icon */}
           <button
@@ -72,12 +123,43 @@ export default function Navbar({ cartCount = 0, onCartClick }: NavbarProps) {
             </span>
           </button>
 
-          {/* Shopify-Style Pill Login Button */}
-          <Link href="/auth">
-            <button className="button-primary-pill px-5 py-2 text-xs md:text-sm tracking-wide">
-              Log in
-            </button>
-          </Link>
+          {/* User Menu / Login Button */}
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center gap-2 button-primary-pill px-4 py-2 text-xs cursor-pointer"
+              >
+                <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px] font-bold">
+                  {(user.name || user.email)[0].toUpperCase()}
+                </span>
+                <span className="max-w-[100px] truncate">{user.name || user.email}</span>
+              </button>
+
+              {showDropdown && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-sm shadow-halo z-50 py-1">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-[10px] text-gray-400 font-mono truncate">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2.5 text-xs text-gray-700 hover:bg-gray-50 font-mono cursor-pointer"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Link href="/auth">
+              <button className="button-primary-pill px-5 py-2 text-xs md:text-sm tracking-wide cursor-pointer">
+                Log in
+              </button>
+            </Link>
+          )}
         </div>
       </div>
 
