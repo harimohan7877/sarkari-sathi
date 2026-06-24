@@ -10,7 +10,7 @@
 
 **Core problem:** Rajasthan ke tier-3 city ke job seekers ko pata nahi hota ki kaunse government forms bhar sakte hain. e-Mitra pe Rs. 50-200 dete hain. Ye app unka free AI guide hai.
 
-**Live URL:** https://sarkari-saathi-two.vercel.app
+**Live URL:** https://sarkari-sathi-ecru.vercel.app
 
 ---
 
@@ -258,13 +258,13 @@ npm run build
 vercel --prod --yes
 ```
 
-**Vercel alias:** https://sarkari-saathi-two.vercel.app
+**Vercel alias:** https://sarkari-sathi-ecru.vercel.app
 
 ---
 
 ## Testing Flow
 
-1. Open https://sarkari-saathi-two.vercel.app
+1. Open https://sarkari-sathi-ecru.vercel.app
 2. Fill form: Age=22, Gender=Male, Education=Graduation, Category=OBC
 3. Click "योग्य भर्तियाँ ढूंढें"
 4. See eligible exams
