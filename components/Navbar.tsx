@@ -46,7 +46,7 @@ export default function Navbar({ cartCount = 0, onCartClick }: NavbarProps) {
           email: session.user.email || "",
         });
         localStorage.setItem("mock_user_session", JSON.stringify(session.user));
-      } else {
+      } else if (!localStorage.getItem("mock_user_session")) {
         setUser(null);
       }
     });
