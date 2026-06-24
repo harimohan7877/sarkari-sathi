@@ -9,40 +9,59 @@ export default function AuthCallback() {
   const [status, setStatus] = useState("Completing sign in...");
 
   useEffect(() => {
-    const handleAuth = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+    let cancelled = false;
 
-      if (error) {
-        setStatus("Authentication failed. Redirecting...");
-        setTimeout(() => router.push("/auth"), 2000);
-        return;
-      }
+    async function handleAuth() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
 
-      if (session?.user) {
-        localStorage.setItem("mock_user_session", JSON.stringify(session.user));
-        setStatus("Sign in successful! Redirecting...");
-        const returnTo = sessionStorage.getItem("returnTo") || "/";
-        sessionStorage.removeItem("returnTo");
-        setTimeout(() => router.push(returnTo), 500);
-      } else {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (user) {
-          localStorage.setItem("mock_user_session", JSON.stringify(user));
+      if (code) {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        if (cancelled) return;
+
+        if (error) {
+          setStatus("Authentication failed. Redirecting...");
+          setTimeout(() => router.push("/auth"), 2000);
+          return;
+        }
+
+        if (data?.session?.user) {
+          localStorage.setItem("mock_user_session", JSON.stringify(data.session.user));
           const returnTo = sessionStorage.getItem("returnTo") || "/";
           sessionStorage.removeItem("returnTo");
           router.push(returnTo);
-        } else {
-          setStatus("No session found. Redirecting...");
-          setTimeout(() => router.push("/auth"), 2000);
+          return;
         }
       }
-    };
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      if (session?.user) {
+        localStorage.setItem("mock_user_session", JSON.stringify(session.user));
+        const returnTo = sessionStorage.getItem("returnTo") || "/";
+        sessionStorage.removeItem("returnTo");
+        router.push(returnTo);
+        return;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (cancelled) return;
+
+      if (user) {
+        localStorage.setItem("mock_user_session", JSON.stringify(user));
+        const returnTo = sessionStorage.getItem("returnTo") || "/";
+        sessionStorage.removeItem("returnTo");
+        router.push(returnTo);
+        return;
+      }
+
+      setStatus("No session found. Redirecting...");
+      setTimeout(() => router.push("/auth"), 2000);
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (cancelled) return;
       if (event === "SIGNED_IN" && session?.user) {
         localStorage.setItem("mock_user_session", JSON.stringify(session.user));
         const returnTo = sessionStorage.getItem("returnTo") || "/";
@@ -53,7 +72,10 @@ export default function AuthCallback() {
 
     handleAuth();
 
-    return () => subscription?.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription?.unsubscribe();
+    };
   }, [router]);
 
   return (

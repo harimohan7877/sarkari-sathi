@@ -44,6 +44,7 @@ export default function AuthPage() {
           },
         },
       });
+      // Note: Session URL se code automatically exchange ho jayega callback page par
       if (error) throw error;
     } catch (err) {
       console.error("Google login error:", err);
